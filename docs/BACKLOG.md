@@ -2,34 +2,30 @@
 
 Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **P2** useful after v1.0.
 
-## P0 — Foundation / security
+## P0 — Public release administration / security
 
-- [x] Create public GitHub repository `BehzadErfanian/SadrScales-Integration`.
-- [x] Push M0 bootstrap.
-- [x] Run `tools/Validate-PublicRepository.ps1` in CI; corrected GitHub Actions guard passes.
-- [ ] Confirm the public software license with the company before the first SDK release; no LICENSE is published until approval.
-- [ ] Enable/review GitHub security options available to the repository.
-- [x] Review initial public repository content/history for obvious sensitive files before continuing M1.
+- [ ] Confirm public software license with the company before first SDK release; no `LICENSE` is published until approval.
+- [ ] Complete `docs/GITHUB_SECURITY_ADMIN_CHECKLIST.md` in GitHub Settings.
+- [ ] Upload approved Integration Guide PDF/checksum as GitHub Release assets before public v1.0 distribution.
 
 ## P1 — Contract / docs
 
 - [x] Freeze SQL Contract v1 after 5.2.1 source/schema verification.
 - [x] Publish Contract v1 freeze record and regression checklist.
-- [x] Complete Persian/English Quick Start and contract docs for the basic surface.
-- [x] Add executable SQL samples with only synthetic values and expected results.
-- [ ] Export official Integration Guide PDF.
-- [ ] Generate guide SHA-256 and prepare PDF/checksum as GitHub Release assets.
+- [x] Complete Persian/English Quick Start and contract docs.
+- [x] Add executable SQL samples with synthetic values and expected results.
+- [x] Produce and page-by-page QA the official Integration Guide PDF.
+- [x] Record official PDF SHA-256 in repository reference docs.
 - [ ] Add troubleshooting matrix for common SQL integration failures.
 
 ## P1 — SDK
 
-- [ ] Decide .NET target frameworks.
-- [ ] Define `SadrScalesClient` API.
+- [ ] Decide .NET target framework(s) and SqlClient provider.
+- [ ] Define `SadrScalesClient` public API.
 - [ ] Implement schema validator.
 - [ ] Implement item-group API.
-- [ ] Implement item/PLU API and batch operation.
+- [ ] Implement item/PLU API and bounded batch operation.
 - [ ] Implement incremental `SADR_Logs` sales reader.
-- [ ] Implement optional structured invoice helpers as explicitly advanced APIs.
 - [ ] Add bounded transient-SQL retry policy.
 - [ ] Add tests against a safe test schema.
 - [ ] Add C# console sample.
@@ -42,8 +38,9 @@ Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **
 - [ ] Create `v1.0.0` GitHub Release.
 - [ ] Update website developer landing page to point to repository and release.
 
-## P2 — Language examples
+## P2 — Advanced / language examples
 
+- [ ] Evaluate optional structured invoice helpers as explicitly advanced APIs.
 - [ ] Python.
 - [ ] Node.js.
 - [ ] Java.

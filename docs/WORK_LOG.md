@@ -4,75 +4,34 @@ This is a chronological engineering log. It complements `CHANGELOG.md`: the chan
 
 ## 2026-08-16 — M0 foundation
 
-### Agreed
-
-- Build a dedicated repository named `SadrScales-Integration` for software vendors.
-- The repository is public and serves as the single developer link shared with POS/ERP/accounting vendors.
-- Source, documentation, language samples, compatibility information and GitHub Releases belong in this project.
-- SQL Contract v1 is the current public integration contract for Sadr Scales 5.2.1.
-- The full Persian Integration & Database Guide is the detailed technical reference.
-- Direct device communication protocols and captures remain private.
-- Project state must be documented continuously so future chats/sessions can resume from repository files.
-
-### Foundation work completed
-
-- Created repository governance structure and continuity rules.
-- Added Persian/English README and concise Contract v1 documentation.
-- Added security policy and explicit public/private boundary.
-- Added project status, roadmap, backlog, decision log, compatibility and release policy.
-- Added planned sample folders for C#, SQL, Python, Node.js, Java and PHP.
-- Added GitHub issue/PR templates.
-- Added public-repository validation script and CI workflow.
-- Created `BehzadErfanian/SadrScales-Integration` as a public GitHub repository.
-- Reviewed the public bootstrap before push; no capture/key/database/customer-credential/private-runtime files were included.
-- Removed the initially proposed MIT `LICENSE` before public publication because the software license requires explicit company approval.
-- Kept editable/reference guide binaries out of `main`; approved guide binaries will be GitHub Release assets after M1 validation.
-
-### Public push and guard
-
-- Public M0 foundation commit: `857a1d5ff4da1c79ffff1885b62f088cec00225d`.
-- GitHub Actions guard run #1 reached the validator but failed because the original path normalization was Windows-specific under PowerShell Core/Linux. No forbidden public file was reported.
-- Portability fix commit: `2e91334d6f7c6e63c6f51c037a8d33b8ed8efa0c`.
-- Replaced path trimming with cross-platform normalization.
-- GitHub Actions `Public repository guard` run #2 completed successfully on Ubuntu / PowerShell Core.
-
-### Handoff
-
-- M0 is closed.
-- Current phase is M1: Contract v1 freeze and public documentation.
+- Created dedicated public integration repository and governance structure.
+- Established public/private security boundary and CI guard.
+- Added bilingual README/contract baseline, roadmap, backlog, decision log and sample-language structure.
+- Removed proposed MIT license before publication because company approval is still required.
+- Public repository guard was made cross-platform and verified green on GitHub Actions.
 
 ## 2026-08-16 — M1 Contract v1 source audit and freeze
 
-### Verification performed
+- Re-validated the basic public contract against the effective Sadr Scales 5.2.1 schema after application migration/check.
+- Frozen basic surface: `SADR_ItemClass`, `SADR_Item`, read-only `SADR_Logs`.
+- Confirmed `PluNo` public identity, legacy `ID/IDitem`, SQL-owned rowversion, and destination-owned sales cursor/idempotency rules.
+- Kept Registry/Mapping/structured-sales/runtime-state advanced/controlled.
+- Added Persian/English frozen specs, Quick Starts, regression checklist and executable synthetic SQL samples.
+- M1 Contract Freeze PR #1 passed the public repository guard and was squash-merged to `main` as `5fdac401392a9709fcd68ba2846be7941f60a4a0`.
+- Post-merge public repository guard also completed successfully.
 
-- Re-validated the basic public contract against the effective Sadr Scales 5.2.1 schema after the application's schema migration/check path.
-- Confirmed that legacy/raw installer schema is not sufficient as the public baseline because current 5.2.1 migration hardens older databases.
-- Verified `SADR_ItemClass` public columns and default-group behavior.
-- Verified `SADR_Item.PluNo` unique/non-zero contract and `ItemClassCode` relationship.
-- Confirmed `SADR_Item.ID` and `IDitem` are not the Contract v1 identity.
-- Confirmed SQL-managed `TimeStamp`/rowversion must not be caller-written.
-- Confirmed `TaxNo` and `SendFlag` exist but are not required caller inputs for the basic item path.
-- Verified `SADR_Logs.DeviceNo` is `int` in the current migrated schema.
-- Verified unique sales-row key `(DeviceNo, FID, SubID)` and non-zero sale identifiers.
-- Reconfirmed that Registry/Mapping/structured-sales/runtime-state objects remain advanced/controlled rather than basic SDK surface.
+## 2026-08-16 — M1 official reference preparation
 
-### Public artifacts produced
+- Selected the latest user-reviewed Integration & Database Guide as the publication source (SQL Contract v1, Sadr Scales 5.2.1, document revision 2.1).
+- Generated the official 34-page PDF.
+- Inspected all 34 rendered pages for clipping, overlap, broken glyphs, table/layout problems and page-flow defects.
+- PDF structural preflight passed; file is openable, unencrypted, text-based and uses embedded fonts.
+- Official PDF filename: `SadrScales_Integration_Database_Guide_5.2.1_FA.pdf`.
+- Official PDF SHA-256: `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
+- Binary remains out of `main` by policy and is ready to become a GitHub Release asset.
+- Repository-host security endpoints available through the connected GitHub integration did not expose the required admin settings, so an explicit owner/admin UI checklist was added rather than guessing their state.
+- M1 engineering work is complete; release-asset upload, host-security toggles and license approval remain pre-v1.0 administrative gates.
 
-- Expanded Persian and English Contract v1 documents into source-verified frozen specifications.
-- Updated both Quick Starts to use the frozen rules.
-- Added `CONTRACT_V1_FREEZE.md`.
-- Added `CONTRACT_V1_REGRESSION_CHECKLIST.md`.
-- Added read-only schema validation SQL.
-- Added synthetic transactional item-group/PLU upsert sample that rolls back by default.
-- Added incremental read-only sales sample with destination cursor/idempotency guidance.
-- Updated Roadmap, Backlog, Decisions and Project Status in the same change.
+## Handoff
 
-### Important consumer rule
-
-Basic sales consumption is destination-owned: persist destination data first, then advance the destination cursor. Do not mutate `SADR_Logs` to manage the basic feed. IDs may contain gaps; `(DeviceNo, FID, SubID)` is the preferred duplicate key.
-
-### Next
-
-- Finish M1 by producing the official reviewed guide PDF + SHA-256 release assets.
-- Review available GitHub repository security settings.
-- Then begin M2 C# SDK framework/API design.
+Current phase is M2: C# SDK foundation. Read `PROJECT_STATUS.md` and `ROADMAP.md` for the exact next work.

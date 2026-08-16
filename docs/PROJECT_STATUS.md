@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-16  
-**Phase:** M1 — Contract v1 frozen; reference-release preparation remaining  
+**Phase:** M2 — C# Integration SDK v1 foundation  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
@@ -10,64 +10,54 @@
 
 Create one public, polished GitHub repository that software vendors can receive as the single developer link for integrating POS, ERP and accounting systems with Sadr Scales.
 
-The repository must contain source code, contract documentation, samples, compatibility information, release assets and enough project history to continue development without depending on chat history.
+The repository contains public source code, contract documentation, samples, compatibility information, release assets and enough project history to continue development without depending on chat history.
 
 ## M0 foundation — complete
 
-- Public GitHub repository: `BehzadErfanian/SadrScales-Integration`.
+- Public GitHub repository created.
 - Public/private security boundary documented and enforced by CI guard.
 - English and Persian README published.
-- Project continuity/governance documents published.
-- No device protocol captures, private keys, customer databases/credentials or private runtime source published.
-- No public software `LICENSE` is published yet; license selection requires explicit company approval.
-- Binary Word/PDF guide files remain out of `main`; approved binaries are GitHub Release assets.
+- Project continuity/governance documents established.
+- No direct device protocols, captures, private keys, customer data or private Sadr Scales runtime source published.
+- Public software license is intentionally still pending explicit company approval.
 
-## M1 Contract v1 freeze — complete
+## M1 Contract v1 + documentation — engineering complete
 
-The basic Contract v1 surface was re-validated against the effective Sadr Scales 5.2.1 schema after the application's own schema migration/check path.
+The basic SQL Contract v1 was re-validated against the effective Sadr Scales 5.2.1 schema after the application's own migration/check path and is now frozen.
 
-Frozen basic surface:
+Basic surface:
 
 - `dbo.SADR_ItemClass` — SELECT / INSERT / UPDATE.
-- `dbo.SADR_Item` — SELECT / INSERT / UPDATE; `PluNo` is the public item identity and logical removal is preferred.
-- `dbo.SADR_Logs` — SELECT only; destination-owned cursor by ascending `ID`.
+- `dbo.SADR_Item` — SELECT / INSERT / UPDATE; `PluNo` is the public item identity.
+- `dbo.SADR_Logs` — SELECT only; destination-owned incremental cursor by ascending `ID`.
 
-Additional freeze rules:
+Completed artifacts:
 
-- `SADR_Item.ID` / `IDitem` are legacy and not public identities.
-- SQL `TimeStamp` / `rowversion` is never caller-written.
-- `TaxNo` / `SendFlag` are not required caller inputs in the basic v1 path.
-- sales import is destination-idempotent; `(DeviceNo, FID, SubID)` is the preferred duplicate key.
-- sales IDs may contain gaps.
-- Registry/Mapping/structured-sales/runtime-state areas remain advanced/controlled.
-- breaking public changes require a new contract version.
-
-Public artifacts added for the freeze:
-
-- Persian and English Contract v1 specifications.
+- Persian and English frozen Contract v1 documents.
 - Persian and English Quick Starts.
-- `docs/CONTRACT_V1_FREEZE.md`.
-- `docs/CONTRACT_V1_REGRESSION_CHECKLIST.md`.
-- executable synthetic SQL validation/upsert/sales-read samples.
+- Contract freeze record and regression checklist.
+- Executable synthetic SQL validation/upsert/sales samples.
+- Official Persian Integration & Database Guide PDF prepared and visually QA'd.
+- Official PDF identity: SHA-256 `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
 
-## What is intentionally not implemented yet
+Parallel administrative items that do **not** block M2 source development:
 
-- C# SDK/library code and final API surface.
-- Framework target decision.
-- NuGet package.
-- C#/Python/Node.js/Java/PHP executable samples.
-- GitHub Release `v1.0.0`.
-- Public website developer-page update.
-- REST/Webhook/no-code connector.
+- upload the approved PDF/checksum as a GitHub Release asset at the appropriate release point;
+- complete the owner/admin GitHub host-security checklist in `GITHUB_SECURITY_ADMIN_CHECKLIST.md`.
 
-## Exact next step — finish M1
+## M2 exact next step
 
-1. Produce the official PDF from the approved Persian Integration & Database Guide.
-2. Generate SHA-256 for the official guide and prepare both as GitHub Release/reference assets.
-3. Review/enable repository security features available on GitHub (secret scanning/dependency/security settings where available).
-4. Add the remaining Contract v1 troubleshooting matrix if useful during final documentation QA.
-5. Once those M1 release/documentation gates are clean, begin **M2 — C# Integration SDK v1** and freeze its target framework/API design before implementation.
+Build the first C# SDK foundation on top of the frozen basic contract:
+
+1. freeze target framework and SQL provider choice;
+2. document public API boundaries and exception/result behavior;
+3. scaffold `SadrScales.Integration` as an SDK-style library;
+4. implement contract validation first;
+5. then item-group/item APIs and incremental sales reader;
+6. add CI build/tests before merging implementation to `main`.
+
+Advanced Registry/Mapping/structured-sales APIs remain outside the basic SDK surface unless explicitly introduced as separate advanced APIs later.
 
 ## Handoff rule
 
-A future chat/session must begin by reading `AGENTS.md`, this file, `DECISIONS.md`, `ROADMAP.md`, `BACKLOG.md`, `WORK_LOG.md` and `SECURITY_BOUNDARY.md`. Chat history is not the project source of truth.
+A future chat/session begins by reading `AGENTS.md`, this file, `DECISIONS.md`, `ROADMAP.md`, `BACKLOG.md`, `WORK_LOG.md` and `SECURITY_BOUNDARY.md`. Chat history is not the project source of truth.
