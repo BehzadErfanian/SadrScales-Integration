@@ -19,14 +19,18 @@
 - [x] Retry merged; exact main CI/Public Guard green.
 
 ## P1 — .NET Framework compatibility
-- [x] Add real `net48` NuGet-package consumer smoke application.
-- [x] Extend CI with Windows 2022 package-consumer build/runtime job.
-- [ ] Get branch CI green and fix package/runtime issues.
+- [x] Real `net48` NuGet-package consumer smoke application.
+- [x] Windows 2022 package-consumer build/runtime job.
+- [x] Local-package restore succeeds.
+- [x] net48 build succeeds with 0 warnings / 0 errors and warnings-as-errors.
+- [x] net48 runtime executes and loads SDK + SqlClient dependency graph.
+- [x] Branch SDK CI `31970792734` + Public Guard `31970792738` green.
 - [ ] PR/merge/post-merge verification.
 
 ## P1 — Developer experience/package hardening
-- [ ] Bounded item batch API.
-- [ ] Executable C# Console Quick Start.
+- [ ] Atomic bounded item batch API.
+- [ ] Batch tests: mixed counts, duplicate prevalidation, rollback, semantic rowversion no-op.
+- [ ] Executable read-only-default C# console sample.
 - [ ] Source Link/package validation.
 - [ ] Strong-name policy decision.
 

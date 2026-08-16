@@ -8,9 +8,8 @@
 
 ## 2026-08-16 — M2 SDK / SQL / retry hardening
 - Basic `netstandard2.0` SDK built with `Microsoft.Data.SqlClient 7.0.2`.
-- Contract validator, semantic group/item upserts and read-only sales batches implemented.
 - Real SQL Server 2022 suite: 5/5 current SQL tests.
-- Bounded/cancellable retry added only to safe connection/read boundaries; transaction-scoped writes remain non-replayed.
+- Bounded/cancellable retry added only to safe connection/read boundaries.
 - PR #3 merged as `5fe058148a41385950e0800aff8f10e581668eeb`.
 - PR #4 merged as `676a78fa0d2c0826d823571fad8882bb5585a90f`.
 - PR #5 merged as `77d3c6330e0741a2c2f92eaec62fb8f50c781702`.
@@ -18,33 +17,34 @@
 
 ## 2026-08-16 — M2 .NET Framework 4.8 compatibility
 
-### Research/design
-- Microsoft .NET Standard compatibility documentation lists .NET Framework 4.8 as supporting .NET Standard 2.0 and recommends 4.7.2+ over older 4.6.1-era consumption.
-- Microsoft.Data.SqlClient 7.0.2 publishes both .NET Standard 2.0 and direct .NET Framework 4.6.2+ assets.
-- GitHub Windows Server 2022 runner image includes .NET Framework 4.8.
-- Decided to validate the generated NuGet package, not just a project reference.
+### Design
+- Validate the generated NuGet package, not merely a project reference or theoretical framework table.
+- Windows CI builds/runs a real `net48` Console consumer and loads the SqlClient dependency selected by the restored package graph.
 
-### Implemented on `m2/net48-compatibility`
-- Added SDK-style `net48` Console consumer under `tests/`.
-- Consumer references only `SadrScales.Integration` package version `0.1.0-alpha.1`.
-- Windows CI packs SDK, restores net48 app from local nupkg + public dependency feed, builds it and runs the EXE under .NET Framework 4.8.
-- Runtime smoke checks public SDK options/client/models and loads the `Microsoft.Data.SqlClient` dependency resolved through the package graph.
+### Cycle 1 — `aceb1d4cbae13df7511e88f264d4443dd5127e09`
+- Existing SDK/SQL/Public Guard jobs: PASS.
+- net48 package created, but restore failed before compatibility evaluation because multiline PowerShell `--source` parsing turned nuget.org into a local path (`NU1301`).
+- Replaced CLI source flags with `NuGet.CI.config`.
 
-### Compatibility CI cycle 1 — `aceb1d4cbae13df7511e88f264d4443dd5127e09`
-- Public Guard / existing build-test-pack / SQL Server integration: PASS.
-- net48 job packed SDK but restore never reached real dependency resolution because multiline PowerShell `--source` parsing turned the nuget.org URL into a local path (`NU1301`).
-- Replaced CLI source arguments with dedicated `NuGet.CI.config`.
+### Cycle 2 — `c60c23a84a6a8eaf92e82b90ef292d684aa02f8a`
+- All three SDK CI jobs: PASS.
+- Package restore/build/runtime: PASS.
+- Runtime loaded SDK `0.1.0.0` and `Microsoft.Data.SqlClient 7.0.0.0`.
+- One `CS8602` warning remained in the smoke harness because custom Assert did not inform nullable flow analysis.
 
-### Compatibility CI cycle 2 — `c60c23a84a6a8eaf92e82b90ef292d684aa02f8a`
-- SDK CI `31970684539`: PASS for all three jobs.
-- Package restore from local nupkg: PASS.
-- net48 build: PASS.
-- net48 runtime smoke: PASS.
-- Runtime loaded `SadrScales.Integration, Version=0.1.0.0` and `Microsoft.Data.SqlClient, Version=7.0.0.0`.
-- Existing SQL Server integration: PASS.
-- Public Repository Guard `31970684536`: PASS.
-- One nullable-flow compiler warning (`CS8602`) remained in the smoke harness because a custom Assert does not inform C# nullable flow analysis; runtime behavior was successful.
-- Replaced the custom null assertion with explicit `if (x == null) throw` flow and set the net48 consumer to `TreatWarningsAsErrors=true` so the final compatibility gate cannot be green with compiler warnings.
+### Cycle 3 — `e2b8a7169fcd9226034dba070ed35f7fcbef7216`
+- Replaced custom null assertion with explicit null flow and set `TreatWarningsAsErrors=true`.
+- SDK CI run `31970792734`: **PASS for all three jobs**.
+- build/test/pack: PASS.
+- SQL Server 2022 integration: PASS — 5/5.
+- net48 local-package restore: PASS.
+- net48 build: **0 Warning(s), 0 Error(s)**.
+- net48 runtime: PASS.
+- Runtime output confirms:
+  - `SadrScales.Integration, Version=0.1.0.0` loaded;
+  - `Microsoft.Data.SqlClient, Version=7.0.0.0` loaded from the package dependency graph.
+- Public Repository Guard run `31970792738`: PASS.
+- No SDK/package/runtime net48 incompatibility remains in this gate.
 
 ### Next
-- Run compatibility CI cycle 3; require net48 restore/build/runtime plus existing SDK/SQL jobs and Public Guard to pass with zero consumer warnings before opening the PR.
+- Open compatibility PR, require PR-level SDK CI + Public Guard, merge only when green, then verify `main` exact SHA.

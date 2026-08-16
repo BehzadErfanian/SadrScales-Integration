@@ -5,16 +5,23 @@
 | Integration repository / SDK | Sadr Scales | Public contract | Consumer runtime | Status |
 |---|---:|---|---|---|
 | pre-1.0 | 5.2.1 | SQL Contract v1 | modern .NET via `netstandard2.0` | CI verified |
-| pre-1.0 | 5.2.1 | SQL Contract v1 | .NET Framework 4.8 | compatibility gate in progress |
+| pre-1.0 | 5.2.1 | SQL Contract v1 | .NET Framework 4.8 | **package restore/build/runtime verified** |
 | 1.x (planned) | 5.2.1+ within verified compatibility | SQL Contract v1 | declared per release | Planned |
 
-## .NET Framework compatibility rule
+## .NET Framework 4.8 verification
 
-The SDK library targets `netstandard2.0`. Microsoft documents .NET Framework 4.8 as supporting .NET Standard 2.0, and recommends .NET Framework 4.7.2 or later for consuming .NET Standard 2.0 libraries.
+The SDK library targets `netstandard2.0`. Compatibility is not claimed from framework tables alone: CI builds the actual SDK NuGet package and consumes that package from a separate `net48` application on Windows Server 2022.
 
-`Microsoft.Data.SqlClient 7.0.2` also publishes direct .NET Framework 4.6.2+ and .NET Standard 2.0 package assets.
+Validated package-consumer gate:
 
-Before v1.0, CI must prove the packaged SDK can be restored, built and executed by a real `net48` consumer application on Windows. This test consumes the generated NuGet package rather than using a project reference.
+- generated package: `SadrScales.Integration 0.1.0-alpha.1`;
+- package restore into a real `net48` Console application: PASS;
+- consumer build: PASS with **0 warnings / 0 errors** and warnings treated as errors;
+- consumer runtime execution under .NET Framework 4.8: PASS;
+- loaded SDK assembly: `SadrScales.Integration, Version=0.1.0.0`;
+- loaded provider assembly from the restored dependency graph: `Microsoft.Data.SqlClient, Version=7.0.0.0`.
+
+The compatibility smoke application intentionally does not connect to SQL Server. SQL behavior is independently covered by the disposable SQL Server 2022 integration-test job, which exercises the real Contract v1 schema/data path.
 
 ## Rules
 

@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-16  
-**Phase:** M2 — .NET Framework 4.8 package-consumer compatibility  
+**Phase:** M2 — .NET Framework 4.8 compatibility verified; batch/sample work next  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
@@ -13,38 +13,37 @@
 - M2 basic C# SDK foundation.
 - M2 real SQL Server 2022 integration-test hardening.
 - M2 bounded connection/read retry hardening.
+- M2 real .NET Framework 4.8 NuGet-package consumer compatibility.
 
-### Latest `main` validation
+### Latest compatibility branch validation
 
-Retry PR #5 merged to `main` as:
+Branch: `m2/net48-compatibility`  
+Validated commit: `e2b8a7169fcd9226034dba070ed35f7fcbef7216`.
 
-`77d3c6330e0741a2c2f92eaec62fb8f50c781702`
+SDK CI run `31970792734`: PASS for all three jobs:
 
-Post-merge:
+- build/test/pack: PASS;
+- SQL Server 2022 integration: PASS — 5/5;
+- `.NET Framework 4.8` package consumer: PASS.
 
-- SDK CI `31970450480`: PASS — build/test/pack + SQL Server integration;
-- Public Repository Guard `31970450492`: PASS.
+The net48 consumer gate:
 
-Current unit baseline: 17/17.  
-Current SQL integration baseline: 5/5.
+- restored the generated local NuGet package;
+- built with `TreatWarningsAsErrors=true`;
+- build result: **0 warnings / 0 errors**;
+- executed successfully under .NET Framework 4.8;
+- loaded `SadrScales.Integration, Version=0.1.0.0`;
+- loaded `Microsoft.Data.SqlClient, Version=7.0.0.0` from the package dependency graph.
 
-## Active compatibility branch
+Public Repository Guard run `31970792738`: PASS.
 
-`m2/net48-compatibility`
+### Compatibility investigation history
 
-Goal: prove the **generated NuGet package** is consumable by a real .NET Framework 4.8 application, not merely assert that `netstandard2.0` is theoretically compatible.
+- Cycle 1 failed before package evaluation because PowerShell `--source` parsing treated the nuget.org URL as a Windows path.
+- Cycle 2 fixed restore using `NuGet.CI.config`; package restore/build/runtime all passed but the smoke harness had one nullable-flow warning.
+- Cycle 3 replaced the custom null assertion with compiler-recognized flow and enabled warnings-as-errors; all jobs passed warning-free.
 
-The compatibility consumer:
-
-1. runs on GitHub `windows-2022`, which includes .NET Framework 4.8;
-2. creates the SDK `.nupkg`;
-3. restores a `net48` console application from that local package + public dependency feed;
-4. builds the net48 consumer;
-5. runs it under .NET Framework 4.8;
-6. exercises public SDK options/models/client construction;
-7. loads the `Microsoft.Data.SqlClient` dependency resolved for the net48 package graph.
-
-No SQL connection is opened by this smoke test; SQL runtime behavior remains covered separately by the disposable SQL Server 2022 integration suite.
+No SDK runtime incompatibility was found.
 
 ## Pre-v1.0 administrative gates
 
@@ -56,11 +55,11 @@ Still open:
 
 ## Exact next step
 
-1. Get all three SDK CI jobs green on `m2/net48-compatibility`.
-2. Fix any package/binding/runtime compatibility issue found on Windows.
-3. Require Public Repository Guard.
-4. Merge only after PR CI is green and verify the exact `main` merge SHA.
-5. Next: bounded item batch API + executable C# Quick Start.
+1. Merge the net48 compatibility PR after PR-level CI.
+2. Verify exact `main` merge SHA.
+3. Start `m2/batch-and-csharp-sample`.
+4. Add an **atomic bounded item batch API** with deterministic all-or-nothing semantics per call.
+5. Add an executable C# Quick Start that is read-only by default and never embeds credentials.
 
 ## Handoff rule
 

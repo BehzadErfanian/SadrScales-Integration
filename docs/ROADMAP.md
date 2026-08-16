@@ -22,22 +22,27 @@
 
 ### Bounded retry — complete
 - [x] Safe bounded connection/read retry; transactional writes non-replayed.
-- [x] Retry branch unit 17/17 + SQL 5/5 + package/Public Guard green.
 - [x] PR #5 merged as `77d3c6330e0741a2c2f92eaec62fb8f50c781702`.
-- [x] Post-merge SDK CI `31970450480` PASS.
-- [x] Post-merge Public Guard `31970450492` PASS.
+- [x] Post-merge SDK CI/Public Guard green.
 
-### .NET Framework 4.8 package compatibility — in progress
-- [x] Add real `net48` package consumer application.
+### .NET Framework 4.8 package compatibility — branch green
+- [x] Real `net48` package consumer application.
 - [x] Restore consumer from locally generated SDK NuGet package.
 - [x] Build/run on Windows Server 2022 with .NET Framework 4.8.
-- [x] Smoke public options/client/models and load SqlClient dependency.
-- [ ] Branch CI green.
+- [x] Load SqlClient dependency from restored package graph.
+- [x] Final branch gate `31970792734`: all three SDK CI jobs PASS.
+- [x] net48 build: 0 warnings / 0 errors with warnings-as-errors.
+- [x] Public Guard `31970792738`: PASS.
 - [ ] PR CI/review/merge + post-merge verification.
 
-### Next
-- [ ] Bounded item batch API.
-- [ ] Executable C# Console Quick Start.
+### Next — batch + developer sample
+- [ ] Atomic bounded PLU batch API.
+- [ ] Batch unit + real-SQL rollback/count/rowversion tests.
+- [ ] Executable C# Console Quick Start, read-only by default.
+- [ ] Safe environment-variable configuration example.
+- [ ] CI build/sample smoke validation.
+
+### Later v1.0 hardening
 - [ ] Source Link/package validation.
 - [ ] Strong-name decision before v1.0.
 
