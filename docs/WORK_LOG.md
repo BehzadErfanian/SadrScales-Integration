@@ -48,11 +48,18 @@ This is a chronological engineering log. It complements `CHANGELOG.md` and prese
 - SDK GitHub Actions workflow for restore/build/test/pack.
 - `SDK_DESIGN_V1.md` describing API/security/error/cursor/packaging boundaries.
 
-### Verification before CI
+### Verification
 
 - Rechecked `SADR_ItemClass` and public `SADR_Item` SQL types/lengths against Sadr Scales source.
-- Kept `ItemCode varchar(10)`, `IndexBarcode varchar(50)`, `PluName/Text1..Text7 nvarchar(100)` and SQL-owned rowversion aligned with current schema.
+- First SDK CI run on commit `77587763bbda8c83516ed73253675b801dfb44a4` completed restore/build/test/pack successfully.
+- Build result: 0 warnings, 0 errors.
+- Test result: 8/8 passed.
+- NuGet `.nupkg` and `.snupkg` were created successfully.
+- Public Repository Guard also passed.
+- NuGet emitted one package-quality message because the package had no internal README; a dedicated package README was added immediately rather than leaving that quality issue for later.
 
 ### Next
 
-Commit branch and use GitHub Actions as the authoritative compile/test/package gate because the current local tool environment does not include the .NET SDK. Fix all CI findings before PR merge.
+- Re-run both CI gates after the package README cleanup.
+- If clean, open M2 foundation PR and merge only after PR CI passes.
+- Then continue with bounded retry, safe SQL integration tests and .NET Framework 4.8 consumer compatibility.

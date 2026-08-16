@@ -16,6 +16,7 @@
     <RepositoryUrl>https://github.com/BehzadErfanian/SadrScales-Integration.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>sadr scales pos erp sql integration</PackageTags>
+    <PackageReadmeFile>PACKAGE_README.md</PackageReadmeFile>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <IsPackable>true</IsPackable>
@@ -23,5 +24,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="PACKAGE_README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>
