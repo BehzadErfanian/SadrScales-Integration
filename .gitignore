@@ -1,0 +1,48 @@
+# Build output
+bin/
+obj/
+artifacts/
+TestResults/
+coverage/
+*.user
+*.suo
+.vs/
+.idea/
+.vscode/
+
+# Packages / local caches
+packages/
+*.nupkg
+*.snupkg
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+*.pfx
+*.p12
+*.key
+*.snk
+
+# Database / customer data
+*.mdf
+*.ldf
+*.bak
+*.bacpac
+*.sqlite
+*.db
+
+# Network captures / protocol research
+*.pcap
+*.pcapng
+*.cap
+
+# OS / temp
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak~
+*~

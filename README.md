@@ -1,69 +1,74 @@
 # Sadr Scales Integration
 
-[![Sadr](assets/sadr-logo.png)](https://sadrgroup.ir)
-
 **Official public integration toolkit and SQL contract for connecting POS, ERP and accounting software to Sadr Scales.**
 
-[فارسی](README.fa.md) · [Project Status](docs/PROJECT_STATUS.md) · [Roadmap](docs/ROADMAP.md) · [Security](SECURITY.md)
+[فارسی](README.fa.md) · [Getting Started](docs/en/getting-started.md) · [SQL Contract v1](docs/en/sql-contract-v1.md) · [Roadmap](docs/ROADMAP.md) · [Security](SECURITY.md)
 
 ---
 
-## Status
+## Repository status
 
 This repository is currently in **Foundation / pre-1.0** stage. The public SQL integration contract for **Sadr Scales 5.2.1** is defined as **SQL Contract v1**. The first SDK and language samples are planned and tracked in the project roadmap.
 
-## What this project is
+| Component | Status |
+|---|---|
+| SQL Contract v1 | Defined for Sadr Scales 5.2.1 |
+| Full Persian technical guide | Available in `docs/reference/` |
+| C# integration SDK | Planned for v1.0 |
+| Raw SQL samples | Planned |
+| Python / Node.js / Java / PHP samples | Planned |
+| GitHub Releases | Planned |
+| REST / Webhook gateway | Future generation; not part of 5.2.1 / Contract v1 |
 
-`SadrScales-Integration` is the public developer repository for software vendors that need to integrate POS, ERP and accounting systems with Sadr Scales without implementing proprietary scale protocols.
+## What this repository is for
 
-The integration boundary is intentionally:
+Software vendors should integrate with **Sadr Scales**, not reimplement the proprietary wire protocol of each scale model.
 
 ```text
 POS / ERP / Accounting
         ↓
-Sadr Scales SQL Contract v1
+Sadr Scales SQL Contract v1 / Integration SDK
         ↓
 Sadr Scales Runtime
         ↓
 Supported scale models
 ```
 
-Sadr Scales remains responsible for device sessions, retries, reconnects, protocol differences and communication with the scales.
-
-## Public Contract v1
-
 The public contract allows an external application to:
 
-- create/update item groups;
-- create/update PLUs/items;
-- read sales incrementally;
-- use stable consumer-side cursors;
-- inspect the documented schema contract;
-- use controlled advanced schema areas when required and explicitly understood.
+- create/update item groups and PLUs;
+- read accepted sales from Sadr Scales;
+- use structured invoice data in controlled scenarios;
+- validate the expected database schema;
+- keep its own durable sales cursor/state;
+- integrate without knowing the direct communication protocol of PLUS, LSG, Aclas or other devices.
+
+## Quick contract summary
 
 Public SQL Contract v1 is centered on:
 
-- `dbo.SADR_ItemClass`
-- `dbo.SADR_Item`
-- read-only `dbo.SADR_Logs`
+- `dbo.SADR_ItemClass` — item groups, read/write;
+- `dbo.SADR_Item` — PLU/item master, read/write;
+- `dbo.SADR_Logs` — accepted sales feed, **read-only**.
 
 Registry, internal synchronization state, device sessions and proprietary communication protocols are not part of the basic public contract.
 
+See [SQL Contract v1](docs/en/sql-contract-v1.md) and the [Persian contract](docs/fa/sql-contract-v1.md).
+
 ## Documentation
 
-- [Persian Quick Start](docs/fa/getting-started.md)
-- [English Quick Start](docs/en/getting-started.md)
-- [SQL Contract v1 — Persian](docs/fa/sql-contract-v1.md)
-- [SQL Contract v1 — English](docs/en/sql-contract-v1.md)
-- [Full Persian Integration & Database Guide](docs/reference/README.md)
-- [Compatibility](docs/COMPATIBILITY.md)
 - [Project status](docs/PROJECT_STATUS.md) — current work and exact next step.
-- [Roadmap](docs/ROADMAP.md)
-- [Backlog](docs/BACKLOG.md)
-- [Decision log](docs/DECISIONS.md)
+- [Roadmap](docs/ROADMAP.md) — planned milestones through v1.0 and beyond.
+- [Decision log](docs/DECISIONS.md) — accepted architectural/product decisions.
+- [Backlog](docs/BACKLOG.md) — actionable work items.
+- [Work log](docs/WORK_LOG.md) — chronological engineering/handoff record.
+- [GitHub bootstrap](docs/GITHUB_SETUP.md) — safe first-push instructions.
 - [Security boundary](docs/SECURITY_BOUNDARY.md) — what may and may not be public.
+- [Compatibility](docs/COMPATIBILITY.md) — Sadr Scales / Contract / SDK compatibility.
+- [Release policy](docs/RELEASE_POLICY.md) — versioning and GitHub Release contents.
+- [Full Persian Integration & Database Guide](docs/reference/README.md).
 
-## Planned SDK
+## Planned developer experience
 
 The v1.0 C# client should reduce integration to a small, explicit API while keeping the complete source code public. A target usage shape is:
 
@@ -73,20 +78,16 @@ var client = new SadrScalesClient(connectionString);
 await client.ValidateAsync();
 await client.Items.UpsertAsync(item);
 
-var sales = await client.Sales.ReadAfterAsync(lastProcessedId);
+var sales = await client.Sales.ReadAfterAsync(lastProcessedId, batchSize: 100);
 ```
 
-This API is **not frozen yet**. See the roadmap before building against pre-1.0 source.
-
-## Samples
-
-Sample areas are prepared for C#, SQL, Python, Node.js, Java and PHP. Executable samples will be added after Contract v1 validation is frozen.
+The final API is **not frozen yet**. API design and target frameworks are tracked in the roadmap and decision log.
 
 ## Releases
 
 Release binaries should be published through **GitHub Releases**, not committed into the main branch. A release is expected to include the SDK package/DLL, XML docs where applicable, sample bundle, technical guide, changelog and SHA-256 checksums.
 
-## Security boundary
+## Security
 
 This repository intentionally excludes direct device protocols, packet captures, private keys, credentials, customer data, proprietary firmware/vendor material and internal Sadr Scales release infrastructure. Read [SECURITY.md](SECURITY.md) before contributing.
 

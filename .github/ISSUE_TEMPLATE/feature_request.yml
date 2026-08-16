@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest a public Integration SDK/documentation improvement.
+title: "[Feature] "
+body:
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Integration use case
+      description: Describe the software-vendor need without proprietary/customer-sensitive data.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed public behavior
+      description: Explain the desired SDK/contract/sample behavior.

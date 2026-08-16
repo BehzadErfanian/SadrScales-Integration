@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible problem in the public Integration project.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include credentials, private keys, customer data, packet captures, unpublished device protocol material or private Sadr Scales source.
+  - type: input
+    id: version
+    attributes:
+      label: Integration version
+      placeholder: v1.0.0 or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: sadr_version
+    attributes:
+      label: Sadr Scales version
+      placeholder: 5.2.1
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happened and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Minimal steps using synthetic/sanitized data only.
