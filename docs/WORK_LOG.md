@@ -17,38 +17,37 @@ This chronological engineering log preserves handoff context.
 - Chose `netstandard2.0` and `Microsoft.Data.SqlClient 7.0.2`.
 - Implemented `SadrScalesClient`, Contract validator, semantic group/item upserts and read-only incremental sales batches.
 - Added 8 unit tests, SDK design doc and restore/build/test/pack CI.
-- Branch CI clean: 8/8, 0 warnings/errors, clean `.nupkg` + `.snupkg`.
 - PR #3 passed Public Repository Guard + SDK CI and squash-merged to `main` as `5fe058148a41385950e0800aff8f10e581668eeb`.
-- Post-merge SDK CI run `31969619533` PASS.
-- Post-merge Public Repository Guard run `31969619624` PASS.
+- Post-merge SDK CI `31969619533` PASS; Public Guard `31969619624` PASS.
 
 ## 2026-08-16 — M2 SQL-backed hardening
 
 ### Research/decision
 - Reviewed Microsoft.Data.SqlClient retry documentation before adding retry.
 - Built-in retry providers do not automatically retry commands running inside an open transaction.
-- Write retry remains deferred until commit ambiguity is explicitly tested; no blanket retry is wrapped around transactional upserts.
+- Write retry remains deferred until commit ambiguity is explicitly tested.
 - Selected official Microsoft SQL Server 2022 Linux container for disposable CI integration tests.
 
-### Implemented on `m2/sql-integration-tests`
-- New `SadrScales.Integration.SqlTests` project.
-- Disposable per-run SQL database with synthetic schema matching the basic Contract v1 objects used by the SDK.
-- Startup waits for SQL Server and uses no production/customer credentials.
-- Tests cover Contract validation, semantic group/item writes, rowversion behavior, sales ID gaps/read-only behavior and schema-mismatch exception mapping.
-- Extended SDK CI with a separate SQL Server 2022 service-container job.
+### Implemented
+- `SadrScales.Integration.SqlTests` project with disposable synthetic Contract v1 database.
+- CI SQL Server 2022 service job.
+- Tests for Contract validation, semantic group/item writes, rowversion no-op behavior, sales ID gaps/read-only semantics and schema mismatch mapping.
 
-### SQL integration CI cycle 1 — commit `8cfc5ac9d5b7915418671f249e927f760a46758d`
-- Existing build/test/pack job: PASS.
-- SQL integration project build: PASS — 0 warnings / 0 errors.
+### SQL integration CI cycle 1 — `8cfc5ac9d5b7915418671f249e927f760a46758d`
+- Existing build/test/pack: PASS.
+- SQL integration build: PASS, 0 warnings / 0 errors.
 - SQL tests: 4/5 PASS.
-- Passing real-SQL behaviors:
-  - Contract validator success;
-  - item-group Inserted / Unchanged / Updated;
-  - PLU Inserted / Unchanged / Updated with unchanged rowversion on semantic no-op;
-  - sales reader handles an intentional identity gap and does not mutate source rows.
-- The only failure was in the **test harness**, not the SDK: the mismatch test attempted `DROP INDEX UX_SADR_Item_PluNo`, but the real schema creates that named object as a UNIQUE table constraint. SQL Server correctly rejected direct `DROP INDEX` because it enforces the UNIQUE constraint.
-- Fixed the mismatch test to use `ALTER TABLE ... DROP CONSTRAINT` and restore the same UNIQUE constraint in `finally`.
+- Four real-SQL SDK behaviors passed.
+- Only failure was test-harness DDL: attempted `DROP INDEX` on a named UNIQUE table constraint.
+- Corrected mismatch test to drop/restore the object via `ALTER TABLE ... DROP/ADD CONSTRAINT`.
+
+### SQL integration CI cycle 2 — `19208d9ba4ac32a7174ed8d45c832a0086b7ee5e`
+- SDK CI run `31969914826`: PASS.
+- Existing unit/build/package job: PASS.
+- SQL Server 2022 integration job: PASS.
+- SQL integration tests: **5/5 PASS**.
+- Public Repository Guard run `31969914926`: PASS.
+- No SDK runtime defect was identified by the first real-SQL suite.
 
 ### Next
-- Re-run branch CI after the harness correction.
-- Open PR only after all 5 SQL integration tests and existing SDK/package gates are green.
+- Open SQL-backed hardening PR and require both workflows on PR before merge.

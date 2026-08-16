@@ -20,16 +20,18 @@ Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **
 - [x] PR #3 merged; post-merge SDK CI + Public Guard green.
 
 ## P1 — SQL-backed SDK hardening
-- [x] Add disposable SQL Server 2022 integration-test job.
-- [x] Add synthetic Contract v1 test database fixture.
-- [x] Add real DB tests for Contract validator, semantic upserts, rowversion behavior, sales gaps/read-only semantics and mismatch exception.
-- [ ] Get branch/PR SQL integration CI green and merge.
-- [ ] Add bounded transient retry for connection/read-safe operations.
-- [ ] Add .NET Framework 4.8 consumer compatibility test.
-- [ ] Add bounded item batch API.
-- [ ] Add C# console sample.
-- [ ] Add Source Link/package validation.
-- [ ] Decide strong-name policy.
+- [x] Disposable SQL Server 2022 integration-test job and synthetic Contract v1 database fixture.
+- [x] Real DB tests for Contract validator, semantic upserts, rowversion behavior, sales gaps/read-only semantics and mismatch exception.
+- [x] Branch SQL integration CI green: 5/5 SQL tests; existing unit/package job green.
+- [x] Branch Public Repository Guard green.
+- [ ] PR CI/review and merge.
+- [ ] Post-merge `main` verification.
+- [ ] Bounded transient retry for connection/read-safe operations.
+- [ ] .NET Framework 4.8 consumer compatibility test.
+- [ ] Bounded item batch API.
+- [ ] C# console sample.
+- [ ] Source Link/package validation.
+- [ ] Strong-name policy decision.
 
 ## P1 — Release
 - [ ] Final license approval.

@@ -21,26 +21,29 @@ This roadmap is the canonical plan. Update it when scope or sequencing changes.
 - [x] Basic async API/caller-owned connection and sales cursor boundaries.
 - [x] Schema validator, semantic item-group/PLU upserts and read-only incremental sales batch.
 - [x] Unit tests and restore/build/test/pack CI.
-- [x] PR #3 passed both workflows and merged to `main` as `5fe058148a41385950e0800aff8f10e581668eeb`.
-- [x] Post-merge SDK CI and Public Repository Guard passed on exact merge SHA.
+- [x] PR #3 merged to `main` as `5fe058148a41385950e0800aff8f10e581668eeb`.
+- [x] Post-merge SDK CI and Public Repository Guard passed.
 
-### SQL-backed hardening — in progress
-- [x] Define disposable SQL Server 2022 CI-test architecture using synthetic Contract v1 schema/data.
-- [x] Add SQL integration-test project and CI service job.
-- [x] Cover Contract validation.
-- [x] Cover Inserted / Unchanged / Updated item-group behavior.
-- [x] Cover semantic PLU update and rowversion no-op behavior.
-- [x] Cover sales ID gaps, ascending cursor and read-only behavior.
-- [x] Cover dedicated schema-mismatch exception.
-- [ ] Get branch and PR SQL integration CI green.
+### SQL-backed hardening — branch green
+- [x] Disposable SQL Server 2022 CI architecture with synthetic Contract v1 schema/data.
+- [x] SQL integration-test project and service-container CI job.
+- [x] Contract validation coverage.
+- [x] Item-group Inserted / Unchanged / Updated coverage.
+- [x] PLU semantic no-op/update + rowversion coverage.
+- [x] Sales ID-gap, ascending cursor and read-only coverage.
+- [x] Dedicated schema-mismatch exception coverage.
+- [x] Branch SDK CI green: 5/5 SQL integration tests + existing 8/8 unit tests/package job.
+- [x] Branch Public Repository Guard green.
+- [ ] PR CI/review and merge to `main`.
+- [ ] Post-merge `main` CI verification.
 
 ### M2 next hardening
-- [ ] Add bounded transient retry for connection/read-safe operations only after SQL tests are green.
-- [ ] Add .NET Framework 4.8 consumer compatibility build/test.
-- [ ] Add bounded item batch API.
-- [ ] Add executable C# Console Quick Start.
-- [ ] Add Source Link/package validation.
-- [ ] Decide strong-name policy before v1.0.
+- [ ] Bounded transient retry for connection/read-safe operations only.
+- [ ] .NET Framework 4.8 consumer compatibility build/test.
+- [ ] Bounded item batch API.
+- [ ] Executable C# Console Quick Start.
+- [ ] Source Link/package validation.
+- [ ] Strong-name decision before v1.0.
 
 Advanced Registry/Mapping/structured invoice helpers are not part of the basic SDK foundation.
 

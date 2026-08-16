@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-16  
-**Phase:** M2 — SQL-backed SDK hardening  
+**Phase:** M2 — SQL-backed SDK hardening ready for PR  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
@@ -18,42 +18,50 @@ Official guide SHA-256: `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097
 
 ### M2 SDK foundation
 
-PR #3 `M2: Add first C# Integration SDK foundation` merged to `main` as:
+PR #3 merged to `main` as `5fe058148a41385950e0800aff8f10e581668eeb`.
 
-`5fe058148a41385950e0800aff8f10e581668eeb`
+Post-merge validation:
 
-Post-merge validation on that exact SHA:
+- SDK CI `31969619533`: PASS — restore/build/test/pack.
+- Public Repository Guard `31969619624`: PASS.
+- Unit baseline: 8/8.
+- Build: 0 warnings / 0 errors.
 
-- SDK CI run `31969619533`: PASS — restore/build/test/pack.
-- Public Repository Guard run `31969619624`: PASS.
-- Unit test baseline: 8/8.
-- Build baseline: 0 warnings / 0 errors.
-- Package smoke build: `.nupkg` and `.snupkg` created cleanly.
+## SQL-backed hardening branch
 
-## Active hardening branch
+Branch: `m2/sql-integration-tests`
 
-`m2/sql-integration-tests`
+Latest validated code commit: `19208d9ba4ac32a7174ed8d45c832a0086b7ee5e`.
 
-Goal: verify the public SDK against a real disposable SQL Server using only synthetic Contract v1 schema/data.
+### Real SQL Server CI result
 
-Planned SQL-backed tests:
+SDK CI run `31969914826`: PASS.
 
-- Contract validator passes against the frozen schema.
-- Item-group Upsert returns Inserted / Unchanged / Updated correctly.
-- PLU Upsert leaves SQL rowversion unchanged when the semantic data is unchanged.
-- Real PLU update changes rowversion and reports Updated.
-- Sales reader tolerates identity gaps, preserves ascending cursor order and never mutates `SADR_Logs`.
-- Schema mismatch maps to `SadrContractMismatchException`.
+- existing restore/build/unit-test/pack job: PASS;
+- SQL Server 2022 service initialization: PASS;
+- SQL integration project restore/build: PASS;
+- SQL integration tests: **5/5 PASS**;
+- SQL integration build: 0 warnings / 0 errors.
 
-CI uses an ephemeral Microsoft SQL Server 2022 Linux container. Its SA password is a public synthetic CI-only value and has no relationship to company/customer credentials.
+Public Repository Guard run `31969914926`: PASS.
 
-## Retry decision
+Verified against disposable real SQL Server:
 
-Automatic write retry is intentionally **not** added yet. Microsoft.Data.SqlClient's built-in retry provider does not automatically retry a command executing inside an open transaction. More importantly, the SDK must not create duplicate/ambiguous writes after a connection failure. Retry will be added only after SQL integration coverage exists and read/open/write semantics are explicitly separated.
+- Contract validator accepts the frozen synthetic Contract v1 schema;
+- item-group Upsert reports Inserted / Unchanged / Updated correctly;
+- PLU Upsert preserves SQL rowversion on semantic no-op and changes it on real update;
+- sales reader handles intentional identity gaps in ascending order and does not mutate `SADR_Logs`;
+- a real schema mismatch maps to `SadrContractMismatchException`.
+
+The first SQL integration run (`31969825350`) was 4/5 because the mismatch **test harness** attempted to drop a UNIQUE table constraint using `DROP INDEX`. The test was corrected to `ALTER TABLE ... DROP CONSTRAINT`; no SDK runtime defect was found in that run.
+
+## Retry boundary
+
+Automatic transactional write retry remains intentionally deferred. Connection/read retry and write retry will be designed separately after this SQL-backed hardening PR. Retry must be bounded/cancellable and must not create ambiguous duplicate writes.
 
 ## Pre-v1.0 administrative gates
 
-Still open and must not be forgotten:
+Still open:
 
 - company-approved public software license;
 - GitHub owner/admin security-settings checklist;
@@ -61,10 +69,10 @@ Still open and must not be forgotten:
 
 ## Exact next step
 
-1. Get `m2/sql-integration-tests` green on both existing unit/package CI and the new SQL Server integration-test job.
-2. Fix every real SQL mismatch on the branch.
-3. Merge only after PR CI is green.
-4. Then add bounded transient retry for connection/read-safe operations, followed by .NET Framework 4.8 consumer compatibility and bounded PLU batch API.
+1. Open the SQL-backed hardening PR.
+2. Require SDK CI (including SQL Server job) and Public Repository Guard on the PR.
+3. Merge only when all jobs are green and verify `main` post-merge.
+4. Next engineering branch: bounded retry for connection/read-safe operations, then .NET Framework 4.8 consumer compatibility.
 
 ## Handoff rule
 
