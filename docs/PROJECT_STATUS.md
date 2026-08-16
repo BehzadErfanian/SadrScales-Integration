@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
-**Last updated:** 2026-08-16 22:54 +03:30  
-**Phase:** M1 — Contract v1 freeze and public documentation  
+**Last updated:** 2026-08-16  
+**Phase:** M1 — Contract v1 frozen; reference-release preparation remaining  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
@@ -15,40 +15,58 @@ The repository must contain source code, contract documentation, samples, compat
 ## M0 foundation — complete
 
 - Public GitHub repository: `BehzadErfanian/SadrScales-Integration`.
-- Repository visibility: Public.
-- Public/private security boundary documented.
+- Public/private security boundary documented and enforced by CI guard.
 - English and Persian README published.
-- Project continuity policy (`AGENTS.md`) published.
-- Roadmap, backlog, decision log, work log, compatibility and release policy published.
-- SQL Contract v1 concise documentation published in Persian and English.
-- Multi-language sample structure prepared.
-- GitHub issue/PR templates prepared.
-- Public repository security validator and GitHub Actions guard enabled.
-- First guard run exposed a PowerShell Core portability defect in the validator; the defect was fixed.
-- Corrected `Public repository guard` run passed on GitHub Actions.
-- No device protocol captures, private keys, customer databases/credentials or private Sadr Scales runtime source were published.
-- No public software `LICENSE` is published yet; the license requires explicit company approval.
-- Binary Word/PDF guide files are kept out of `main` and will be distributed as GitHub Release assets after M1 validation.
+- Project continuity/governance documents published.
+- No device protocol captures, private keys, customer databases/credentials or private runtime source published.
+- No public software `LICENSE` is published yet; license selection requires explicit company approval.
+- Binary Word/PDF guide files remain out of `main`; approved binaries are GitHub Release assets.
+
+## M1 Contract v1 freeze — complete
+
+The basic Contract v1 surface was re-validated against the effective Sadr Scales 5.2.1 schema after the application's own schema migration/check path.
+
+Frozen basic surface:
+
+- `dbo.SADR_ItemClass` — SELECT / INSERT / UPDATE.
+- `dbo.SADR_Item` — SELECT / INSERT / UPDATE; `PluNo` is the public item identity and logical removal is preferred.
+- `dbo.SADR_Logs` — SELECT only; destination-owned cursor by ascending `ID`.
+
+Additional freeze rules:
+
+- `SADR_Item.ID` / `IDitem` are legacy and not public identities.
+- SQL `TimeStamp` / `rowversion` is never caller-written.
+- `TaxNo` / `SendFlag` are not required caller inputs in the basic v1 path.
+- sales import is destination-idempotent; `(DeviceNo, FID, SubID)` is the preferred duplicate key.
+- sales IDs may contain gaps.
+- Registry/Mapping/structured-sales/runtime-state areas remain advanced/controlled.
+- breaking public changes require a new contract version.
+
+Public artifacts added for the freeze:
+
+- Persian and English Contract v1 specifications.
+- Persian and English Quick Starts.
+- `docs/CONTRACT_V1_FREEZE.md`.
+- `docs/CONTRACT_V1_REGRESSION_CHECKLIST.md`.
+- executable synthetic SQL validation/upsert/sales-read samples.
 
 ## What is intentionally not implemented yet
 
-- C# SDK/library code.
-- Final SDK API surface.
+- C# SDK/library code and final API surface.
 - Framework target decision.
 - NuGet package.
-- Executable C#/SQL/Python/Node.js/Java/PHP samples.
+- C#/Python/Node.js/Java/PHP executable samples.
 - GitHub Release `v1.0.0`.
 - Public website developer-page update.
+- REST/Webhook/no-code connector.
 
-## Exact next step — M1
+## Exact next step — finish M1
 
-1. Re-validate the public SQL Contract v1 fields/rules against the current Sadr Scales 5.2.1 source/schema.
-2. Freeze the basic public surface around `SADR_ItemClass`, `SADR_Item` and read-only `SADR_Logs`.
-3. Keep Registry/Mapping/structured-sales areas explicitly advanced/controlled unless a new decision promotes them.
-4. Produce the official PDF from the approved Persian Integration & Database Guide and prepare it for a GitHub Release asset.
-5. Add synthetic executable SQL examples and expected results.
-6. Review GitHub security settings available to the public repository (secret scanning/dependency alerts where available).
-7. Only after M1 is clean, begin M2 C# SDK/API design.
+1. Produce the official PDF from the approved Persian Integration & Database Guide.
+2. Generate SHA-256 for the official guide and prepare both as GitHub Release/reference assets.
+3. Review/enable repository security features available on GitHub (secret scanning/dependency/security settings where available).
+4. Add the remaining Contract v1 troubleshooting matrix if useful during final documentation QA.
+5. Once those M1 release/documentation gates are clean, begin **M2 — C# Integration SDK v1** and freeze its target framework/API design before implementation.
 
 ## Handoff rule
 
