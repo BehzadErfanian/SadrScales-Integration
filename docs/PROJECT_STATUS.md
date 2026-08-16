@@ -1,69 +1,79 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-16  
-**Phase:** M2 — C# Integration SDK v1 foundation ready for PR  
+**Phase:** M2 — SQL-backed SDK hardening ready for PR  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
 
-## Completed foundation
+## Completed
 
 ### M0
-
-Public repository, bilingual README, explicit security boundary, continuity documentation and source-controlled public repository guard.
+Public repository foundation, governance, bilingual entry documentation and Public Repository Guard.
 
 ### M1
-
-SQL Contract v1 source audit/freeze, bilingual contract/Quick Starts, executable synthetic SQL samples, regression checklist and official 34-page Persian guide preparation/QA.
+SQL Contract v1 source audit/freeze, bilingual contract/Quick Starts, executable SQL samples, regression checklist and official 34-page Persian guide preparation/QA.
 
 Official guide SHA-256: `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
 
-Pre-v1.0 administrative gates remain explicit: company-approved license, GitHub host-security checklist and official PDF/checksum Release upload.
+### M2 SDK foundation
 
-## M2 foundation implemented on `m2/sdk-foundation`
+PR #3 merged to `main` as `5fe058148a41385950e0800aff8f10e581668eeb`.
 
-Design:
+Post-merge validation:
 
-- `netstandard2.0` reusable library target;
-- `Microsoft.Data.SqlClient 7.0.2`;
-- caller-owned SQL connection/security configuration;
-- async-first operations with cancellation support;
-- short-lived pooled SQL connections;
-- explicit write transactions;
-- destination-owned sales cursor; no hidden Sadr-side consumer state.
+- SDK CI `31969619533`: PASS — restore/build/test/pack.
+- Public Repository Guard `31969619624`: PASS.
+- Unit baseline: 8/8.
+- Build: 0 warnings / 0 errors.
 
-Basic API:
+## SQL-backed hardening branch
 
-- `SadrScalesClient.ValidateAsync()`;
-- `ItemGroups.UpsertAsync(...)`;
-- `Items.UpsertAsync(...)`;
-- `Sales.ReadAfterAsync(...)`;
-- Inserted/Updated/Unchanged write result;
-- read-only sales batch with `LastReadId` cursor candidate.
+Branch: `m2/sql-integration-tests`
 
-## Branch validation
+Latest validated code commit: `19208d9ba4ac32a7174ed8d45c832a0086b7ee5e`.
 
-Latest branch commit before PR: `666ba48d381db73e7397f8be92ada02b7a3c153b`.
+### Real SQL Server CI result
 
-GitHub Actions results:
+SDK CI run `31969914826`: PASS.
 
-- Public Repository Guard: PASS.
-- SDK restore: PASS.
-- SDK build: PASS — 0 warnings / 0 errors.
-- Unit tests: PASS — 8/8.
-- NuGet package smoke test: PASS — `.nupkg` and `.snupkg` generated.
-- Initial NuGet missing-readme quality message was fixed with a dedicated package README; second pack is clean.
+- existing restore/build/unit-test/pack job: PASS;
+- SQL Server 2022 service initialization: PASS;
+- SQL integration project restore/build: PASS;
+- SQL integration tests: **5/5 PASS**;
+- SQL integration build: 0 warnings / 0 errors.
+
+Public Repository Guard run `31969914926`: PASS.
+
+Verified against disposable real SQL Server:
+
+- Contract validator accepts the frozen synthetic Contract v1 schema;
+- item-group Upsert reports Inserted / Unchanged / Updated correctly;
+- PLU Upsert preserves SQL rowversion on semantic no-op and changes it on real update;
+- sales reader handles intentional identity gaps in ascending order and does not mutate `SADR_Logs`;
+- a real schema mismatch maps to `SadrContractMismatchException`.
+
+The first SQL integration run (`31969825350`) was 4/5 because the mismatch **test harness** attempted to drop a UNIQUE table constraint using `DROP INDEX`. The test was corrected to `ALTER TABLE ... DROP CONSTRAINT`; no SDK runtime defect was found in that run.
+
+## Retry boundary
+
+Automatic transactional write retry remains intentionally deferred. Connection/read retry and write retry will be designed separately after this SQL-backed hardening PR. Retry must be bounded/cancellable and must not create ambiguous duplicate writes.
+
+## Pre-v1.0 administrative gates
+
+Still open:
+
+- company-approved public software license;
+- GitHub owner/admin security-settings checklist;
+- official Integration Guide PDF + checksum upload as GitHub Release assets.
 
 ## Exact next step
 
-1. Open M2 foundation PR.
-2. Require Public Repository Guard and SDK CI to pass on the PR.
-3. Review PR diff and merge only when both gates are green.
-4. Verify post-merge `main` CI.
-5. Continue M2 hardening: bounded transient retry, safe SQL integration tests, .NET Framework 4.8 consumer compatibility, bounded item batch API and executable C# Quick Start.
-
-Advanced Registry/Mapping/structured-sales/device protocol APIs remain outside the basic SDK foundation.
+1. Open the SQL-backed hardening PR.
+2. Require SDK CI (including SQL Server job) and Public Repository Guard on the PR.
+3. Merge only when all jobs are green and verify `main` post-merge.
+4. Next engineering branch: bounded retry for connection/read-safe operations, then .NET Framework 4.8 consumer compatibility.
 
 ## Handoff rule
 
-A future chat/session begins by reading `AGENTS.md`, this file, `DECISIONS.md`, `ROADMAP.md`, `BACKLOG.md`, `WORK_LOG.md`, `SDK_DESIGN_V1.md` and `SECURITY_BOUNDARY.md`.
+A future session begins by reading `AGENTS.md`, this file, `DECISIONS.md`, `ROADMAP.md`, `BACKLOG.md`, `WORK_LOG.md`, `SDK_DESIGN_V1.md` and `SECURITY_BOUNDARY.md`.
