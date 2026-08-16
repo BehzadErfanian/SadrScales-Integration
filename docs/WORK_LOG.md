@@ -1,37 +1,52 @@
 # Work Log
 
-This is a chronological engineering log. It complements `CHANGELOG.md`: the changelog is public/release-oriented, while this file records project progress and handoff context.
+This chronological engineering log preserves handoff context.
 
 ## 2026-08-16 — M0 foundation
 
-- Created dedicated public integration repository and governance structure.
-- Established public/private security boundary and CI guard.
-- Added bilingual README/contract baseline, roadmap, backlog, decision log and sample-language structure.
-- Removed proposed MIT license before publication because company approval is still required.
-- Public repository guard was made cross-platform and verified green on GitHub Actions.
+- Created dedicated public integration repository, governance documents and security boundary.
+- Added and verified cross-platform Public Repository Guard.
+- Withheld software license pending explicit company approval.
 
-## 2026-08-16 — M1 Contract v1 source audit and freeze
+## 2026-08-16 — M1 Contract v1 + reference
 
-- Re-validated the basic public contract against the effective Sadr Scales 5.2.1 schema after application migration/check.
-- Frozen basic surface: `SADR_ItemClass`, `SADR_Item`, read-only `SADR_Logs`.
-- Confirmed `PluNo` public identity, legacy `ID/IDitem`, SQL-owned rowversion, and destination-owned sales cursor/idempotency rules.
-- Kept Registry/Mapping/structured-sales/runtime-state advanced/controlled.
-- Added Persian/English frozen specs, Quick Starts, regression checklist and executable synthetic SQL samples.
-- M1 Contract Freeze PR #1 passed the public repository guard and was squash-merged to `main` as `5fdac401392a9709fcd68ba2846be7941f60a4a0`.
-- Post-merge public repository guard also completed successfully.
+- Re-validated/froze the basic public Contract v1 against effective Sadr Scales 5.2.1 post-migration schema.
+- Added bilingual specs/Quick Starts, regression checklist and executable synthetic SQL samples.
+- PR #1 merged as `5fdac401392a9709fcd68ba2846be7941f60a4a0` after guard PASS.
+- Generated/page-QA'd official 34-page Persian Integration Guide and recorded SHA-256 `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
+- Added GitHub host-security owner/admin checklist.
+- PR #2 merged as `b953db28a0c26af9655ddbf21bb52da9735bc92b` after guard PASS.
+- M1 engineering closed; release-asset/security UI/license administration remains pre-v1.0.
 
-## 2026-08-16 — M1 official reference preparation
+## 2026-08-16 — M2 SDK foundation
 
-- Selected the latest user-reviewed Integration & Database Guide as the publication source (SQL Contract v1, Sadr Scales 5.2.1, document revision 2.1).
-- Generated the official 34-page PDF.
-- Inspected all 34 rendered pages for clipping, overlap, broken glyphs, table/layout problems and page-flow defects.
-- PDF structural preflight passed; file is openable, unencrypted, text-based and uses embedded fonts.
-- Official PDF filename: `SadrScales_Integration_Database_Guide_5.2.1_FA.pdf`.
-- Official PDF SHA-256: `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
-- Binary remains out of `main` by policy and is ready to become a GitHub Release asset.
-- Repository-host security endpoints available through the connected GitHub integration did not expose the required admin settings, so an explicit owner/admin UI checklist was added rather than guessing their state.
-- M1 engineering work is complete; release-asset upload, host-security toggles and license approval remain pre-v1.0 administrative gates.
+### Decisions and implementation
 
-## Handoff
+- Chose `netstandard2.0` initial library target and `Microsoft.Data.SqlClient 7.0.2`.
+- Caller owns connection/security configuration; SDK does not silently weaken SQL security settings or log raw connection strings.
+- Implemented `SadrScalesClient`, Contract validator, semantic group/item upserts and read-only incremental sales batches.
+- Basic sales cursor remains destination-owned.
+- Added first unit tests, SDK design doc and GitHub Actions restore/build/test/pack workflow.
+- Rechecked public item/group SQL types and lengths against Sadr Scales source before CI.
 
-Current phase is M2: C# SDK foundation. Read `PROJECT_STATUS.md` and `ROADMAP.md` for the exact next work.
+### CI cycle 1 — commit `77587763bbda8c83516ed73253675b801dfb44a4`
+
+- Public Repository Guard: PASS.
+- Restore: PASS.
+- Build: PASS — 0 warnings / 0 errors.
+- Tests: PASS — 8/8.
+- Pack: PASS — `.nupkg` and `.snupkg` created.
+- NuGet package-quality message identified: missing internal package README.
+
+### Package cleanup — commit `666ba48d381db73e7397f8be92ada02b7a3c153b`
+
+- Added dedicated `PACKAGE_README.md` to the NuGet package.
+- Public Repository Guard: PASS.
+- Restore/build/test/pack: PASS.
+- Tests: 8/8.
+- Build: 0 warnings / 0 errors.
+- NuGet package and symbol package created with clean pack output; previous missing-readme message is gone.
+
+### Next
+
+Open M2 foundation PR, require both CI workflows on PR, review diff, merge only when green, then verify `main` post-merge CI.

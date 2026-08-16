@@ -9,21 +9,23 @@ The format follows the spirit of Keep a Changelog and Semantic Versioning.
 ### Added
 
 - Initial public repository foundation.
-- SQL Contract v1 documentation baseline for Sadr Scales 5.2.1.
-- Project roadmap, decision log, backlog, security boundary and release policy.
-- Multi-language sample structure.
-- Public-repository validation script and CI guardrail.
-- Contract v1 freeze record and regression checklist.
-- Executable synthetic SQL samples for schema validation, item upsert and incremental sales reading.
+- Frozen SQL Contract v1 documentation for Sadr Scales 5.2.1.
+- Project governance, security boundary and public-repository CI guard.
+- Contract regression checklist and executable synthetic SQL samples.
 - GitHub host-security administration checklist.
-- Official Persian Integration & Database Guide release identity (filename, page count and SHA-256).
+- Official Persian Integration & Database Guide release identity and SHA-256.
+- Initial `SadrScales.Integration` C# SDK foundation targeting `netstandard2.0`.
+- Contract schema validator and `SadrContractMismatchException`.
+- Basic item-group and item/PLU upsert clients with semantic no-op behavior.
+- Read-only incremental sales client and destination-owned cursor candidate.
+- SDK unit tests and GitHub Actions restore/build/test/pack workflow.
+- `SDK_DESIGN_V1.md`.
 
 ### Changed
 
-- Froze the basic SQL Contract v1 surface after re-validation against the effective Sadr Scales 5.2.1 migrated schema.
-- Expanded Persian and English Contract/Quick Start documentation with exact item identity, legacy-field, rowversion, sales-cursor and idempotency rules.
-- Clarified Registry/Mapping/structured-sales/runtime state as advanced/controlled rather than basic Contract v1 APIs.
-- Marked M1 engineering complete and moved active source work to M2 SDK foundation while retaining host-security, release-asset and license administration as explicit pre-v1.0 gates.
+- Moved active engineering from Contract/documentation M1 to SDK M2.
+- Basic SDK uses `Microsoft.Data.SqlClient 7.0.2` and caller-owned connection configuration.
+- Basic sales consumption remains destination-owned and does not mutate Sadr sales rows.
 
 ### Fixed
 
