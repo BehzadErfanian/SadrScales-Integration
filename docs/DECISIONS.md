@@ -5,49 +5,49 @@ Accepted decisions are recorded here so future work does not need to recover the
 ## D-001 — Dedicated public integration repository
 **Date:** 2026-08-16  
 **Status:** Accepted
-Integration tooling and public developer documentation live in `SadrScales-Integration`, separate from private runtime repositories.
+Integration tooling and developer docs live in `SadrScales-Integration`, separate from private runtime repositories.
 
 ## D-002 — GitHub is the developer source of truth
 **Date:** 2026-08-16  
 **Status:** Accepted
-Software vendors receive one public GitHub link. Source, docs, samples, compatibility and SDK releases are maintained here.
+Software vendors receive one public GitHub link for source, docs, samples, compatibility and SDK releases.
 
 ## D-003 — SQL Contract v1 is the 5.2.1 public contract
 **Date:** 2026-08-16  
 **Status:** Accepted
-Basic public surface is `SADR_ItemClass`, `SADR_Item` and read-only `SADR_Logs`. REST/Webhook is not a 5.2.1 capability.
+Basic public surface is `SADR_ItemClass`, `SADR_Item` and read-only `SADR_Logs`.
 
 ## D-004 — Device protocols remain private
 **Date:** 2026-08-16  
 **Status:** Accepted
-Direct PLUS/LSG/Aclas/device protocols, captures and reverse-engineering/vendor material are never published here.
+Direct device protocols, captures and vendor/reverse-engineering material are never published here.
 
 ## D-005 — One destination application per Sadr Scales installation
 **Date:** 2026-08-16  
 **Status:** Accepted
-Structured-sales processing status is not designed as a shared multi-consumer message bus.
+Structured-sales processing state is not designed as a shared multi-consumer bus.
 
 ## D-006 — Documentation is part of every change
 **Date:** 2026-08-16  
 **Status:** Accepted
-Accepted decisions, completed work, remaining work and next steps are recorded in repository docs.
+Decisions, completed work, remaining work and next steps are recorded in repository docs.
 
 ## D-007 — Full guide + short developer path
 **Date:** 2026-08-16  
 **Status:** Accepted
-The detailed guide is the full reference; README/Quick Start/SDK provide the short path.
+Full guide is the deep reference; README/Quick Start/SDK provide the short path.
 
 ## D-008 — GitHub Releases for distributable artifacts
 **Date:** 2026-08-16  
 **Status:** Accepted
-Compiled SDK/package, samples, official guide and checksums are GitHub Release assets rather than binary clutter in `main`.
+Compiled SDK/package, samples, guide and checksums are Release assets, not binary clutter in `main`.
 
 ## D-009 — Public license requires explicit approval
 **Date:** 2026-08-16  
 **Status:** Proposed / confirm before v1.0
-No `LICENSE` is published until the company explicitly approves the public software license.
+No public software `LICENSE` is added without company approval.
 
-## D-010 — Future no-code/REST work is separate from 5.2.1
+## D-010 — Future no-code/REST is separate
 **Date:** 2026-08-16  
 **Status:** Accepted
 No-code connector and REST/Webhook Gateway are separately versioned future work.
@@ -55,46 +55,49 @@ No-code connector and REST/Webhook Gateway are separately versioned future work.
 ## D-011 — Binary reference guides are release assets
 **Date:** 2026-08-16  
 **Status:** Accepted
-Editable Word and official PDF binaries remain out of `main`; approved PDF/checksum are Release assets.
+Word/PDF guide binaries remain out of `main`; approved PDF/checksum are Release assets.
 
-## D-012 — Basic SQL Contract v1 is frozen against effective 5.2.1 schema
+## D-012 — Contract v1 baseline is effective 5.2.1 migrated schema
 **Date:** 2026-08-16  
 **Status:** Accepted
-The baseline is the schema after Sadr Scales 5.2.1 completes its migration/check. Breaking public changes require a new contract version.
+Breaking public changes require a new contract version.
 
-## D-013 — M1 engineering does not block M2 on host/release administration
+## D-013 — M1 administration does not block M2 source engineering
 **Date:** 2026-08-16  
 **Status:** Accepted
-License, Release-asset upload and GitHub host settings remain explicit pre-v1.0 gates but do not block SDK source work.
+License, Release upload and host-security toggles remain explicit pre-v1.0 gates.
 
 ## D-014 — C# SDK v1 targets .NET Standard 2.0
 **Date:** 2026-08-16  
-**Status:** Accepted for pre-1.0 validation
-Real .NET Framework 4.8 consumer compatibility validation is required before v1.0.
+**Status:** Accepted
+The shared SDK assembly targets `netstandard2.0` to serve modern .NET and .NET Framework consumers.
 
-## D-015 — Microsoft.Data.SqlClient is the SDK SQL provider
-**Date:** 2026-08-16  
-**Status:** Accepted for pre-1.0 validation
-The foundation uses `Microsoft.Data.SqlClient 7.0.2`; caller owns connection/security configuration.
-
-## D-016 — Basic SDK does not own destination sales state
+## D-015 — Microsoft.Data.SqlClient is the SQL provider
 **Date:** 2026-08-16  
 **Status:** Accepted
-Sales reads are read-only and the destination owns its durable cursor/state.
+Pre-1.0 uses `Microsoft.Data.SqlClient 7.0.2`; caller owns connection/security configuration.
 
-## D-017 — Real SQL integration tests use a disposable synthetic SQL Server
+## D-016 — SDK does not own destination sales state
+**Date:** 2026-08-16  
+**Status:** Accepted
+Sales read is read-only and the destination owns durable cursor/state.
+
+## D-017 — SQL integration tests use disposable synthetic SQL Server
 **Date:** 2026-08-16  
 **Status:** Accepted
 CI uses disposable SQL Server 2022 with synthetic Contract v1 schema/data only.
 
-## D-018 — Do not automatically retry transactional writes before ambiguity is tested
+## D-018 — Transactional writes are not automatically replayed
 **Date:** 2026-08-16  
 **Status:** Accepted
-Connection/read retry and transactional write retry are separate. A write is not automatically replayed after command/transaction execution begins.
+Connection/read retry is separated from transactional write execution to avoid commit ambiguity.
 
 ## D-019 — Bounded retry is limited to safe connection/read boundaries
 **Date:** 2026-08-16  
-**Status:** Accepted for pre-1.0 validation
-The SDK implements a small explicit transient retry policy compatible with its `netstandard2.0` target. It retries connection establishment before any operation begins and replays complete read-only `ValidateAsync` / `Sales.ReadAfterAsync` attempts on fresh connections. It does not wrap transaction-scoped item/group writes in operation-level retry.
+**Status:** Accepted
+Connection open and complete read-only operations may use bounded/cancellable retry; transaction-scoped writes do not replay after execution begins.
 
-Defaults are 2 retries after the first attempt and 250 ms base delay with bounded exponential backoff capped at 5 seconds. Retry honors cancellation and rethrows the final native exception. Authentication/configuration failures are not blindly classified as transient.
+## D-020 — .NET Framework compatibility must be proved by consuming the package
+**Date:** 2026-08-16  
+**Status:** Accepted
+Before v1.0, compatibility with .NET Framework 4.8 is validated by building and running a real `net48` application on Windows that restores the generated `SadrScales.Integration` NuGet package. A project-reference-only build or theoretical TFM table is insufficient. The smoke consumer must also load the SqlClient dependency selected by the restored package graph.

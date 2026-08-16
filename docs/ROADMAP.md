@@ -1,48 +1,48 @@
 # Roadmap
 
-This roadmap is the canonical plan.
-
 ## M0 — Public repository foundation
-- [x] Public repository, bilingual README, security boundary, continuity docs and Public Repository Guard.
+- [x] Public repository, bilingual README, security boundary, continuity docs and Public Guard.
 
-## M1 — Contract v1 freeze and public documentation
-- [x] Freeze basic Contract v1 against effective 5.2.1 schema.
-- [x] Bilingual docs, SQL samples, regression checklist and official guide QA/SHA.
-- [ ] Upload approved guide PDF/checksum as GitHub Release assets before v1.0.
-- [ ] Complete owner/admin GitHub host-security checklist.
-
-**M1 engineering:** complete.
+## M1 — Contract v1 / public documentation
+- [x] Freeze Contract v1 against effective 5.2.1 schema.
+- [x] Bilingual docs/SQL samples/regression checklist/official guide QA+SHA.
+- [ ] Upload approved PDF/checksum as GitHub Release assets before v1.0.
+- [ ] Complete owner/admin GitHub security checklist.
 
 ## M2 — C# Integration SDK v1
 
 ### Foundation — complete
-- [x] `netstandard2.0` + `Microsoft.Data.SqlClient 7.0.2`.
-- [x] Schema validator, semantic item/group upserts and read-only incremental sales.
-- [x] Unit tests and restore/build/test/pack CI.
-- [x] PR #3 merged and post-merge CI green.
+- [x] `netstandard2.0`, `Microsoft.Data.SqlClient 7.0.2`.
+- [x] Contract validator, semantic item/group upserts, read-only incremental sales.
+- [x] Unit/package CI and docs.
 
 ### SQL-backed hardening — complete
-- [x] Disposable SQL Server 2022 CI tests using synthetic Contract v1 data.
-- [x] 5/5 real-SQL tests.
-- [x] PR #4 merged as `676a78fa0d2c0826d823571fad8882bb5585a90f`.
-- [x] Post-merge SDK CI `31970073088` PASS.
-- [x] Post-merge Public Guard `31970073055` PASS.
+- [x] Disposable SQL Server 2022 suite; 5/5 real-SQL tests.
+- [x] PR #4 + post-merge gates green.
 
-### Bounded transient retry — branch green
-- [x] Separate safe connection/read retry from transactional write execution.
-- [x] Add bounded/cancellable retry options and explicit transient classifier.
-- [x] Retry connection open before commands/transactions begin.
-- [x] Retry complete read-only Contract validation and sales reads on a fresh connection.
-- [x] Keep item/group transaction-scoped command execution non-retried.
-- [x] Add retry engine/classifier/options unit tests.
-- [x] Branch SDK CI `31970279834` PASS — 17/17 unit tests + 5/5 SQL tests + pack.
-- [x] Branch Public Guard `31970279841` PASS.
-- [ ] PR CI/review/merge and post-merge verification.
+### Bounded retry — complete
+- [x] Safe bounded connection/read retry; transactional writes non-replayed.
+- [x] PR #5 merged as `77d3c6330e0741a2c2f92eaec62fb8f50c781702`.
+- [x] Post-merge SDK CI/Public Guard green.
 
-### Next after retry merge
-- [ ] .NET Framework 4.8 consumer compatibility build/test.
-- [ ] Bounded item batch API.
-- [ ] Executable C# Console Quick Start.
+### .NET Framework 4.8 package compatibility — branch green
+- [x] Real `net48` package consumer application.
+- [x] Restore consumer from locally generated SDK NuGet package.
+- [x] Build/run on Windows Server 2022 with .NET Framework 4.8.
+- [x] Load SqlClient dependency from restored package graph.
+- [x] Final branch gate `31970792734`: all three SDK CI jobs PASS.
+- [x] net48 build: 0 warnings / 0 errors with warnings-as-errors.
+- [x] Public Guard `31970792738`: PASS.
+- [ ] PR CI/review/merge + post-merge verification.
+
+### Next — batch + developer sample
+- [ ] Atomic bounded PLU batch API.
+- [ ] Batch unit + real-SQL rollback/count/rowversion tests.
+- [ ] Executable C# Console Quick Start, read-only by default.
+- [ ] Safe environment-variable configuration example.
+- [ ] CI build/sample smoke validation.
+
+### Later v1.0 hardening
 - [ ] Source Link/package validation.
 - [ ] Strong-name decision before v1.0.
 
@@ -58,15 +58,14 @@ This roadmap is the canonical plan.
 - [ ] PHP.
 - [ ] Language-neutral SQL type/null mapping table.
 
-## M5 — Packaging and GitHub Releases
-- [x] SDK restore/build/test/pack CI on `main`.
-- [x] Public Repository Guard.
+## M5 — Packaging / Releases
+- [x] SDK CI + Public Guard on main.
 - [ ] NuGet/DLL packaging policy, Source Link, checksums and release procedure.
 - [ ] `v1.0.0` GitHub Release.
 
-## M6 — Sadr website developer experience
+## M6 — Website developer experience
 - [ ] Replace old developer guide with concise landing page.
-- [ ] Link GitHub as developer source of truth and link guide/latest SDK Release.
+- [ ] Link GitHub as developer source of truth, official guide and latest SDK Release.
 
-## Future — Integration Gateway / no-code connector
-Separately versioned future scope; not part of Sadr Scales 5.2.1 / SQL Contract v1.
+## Future
+No-code/REST/Webhook are separately versioned future scope.
