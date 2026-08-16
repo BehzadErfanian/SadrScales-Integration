@@ -74,3 +74,32 @@ jobs:
 
       - name: Test against disposable SQL Server 2022
         run: dotnet test tests/SadrScales.Integration.SqlTests/SadrScales.Integration.SqlTests.csproj --configuration Release --no-build --verbosity normal
+
+  net48-package-consumer:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Pack SDK for consumer test
+        run: dotnet pack src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --output artifacts/package
+
+      - name: Restore .NET Framework 4.8 consumer from local package
+        shell: pwsh
+        run: |
+          dotnet restore tests/SadrScales.Integration.Net48Consumer/SadrScales.Integration.Net48Consumer.csproj `
+            --source "$env:GITHUB_WORKSPACE\artifacts\package" `
+            --source "https://api.nuget.org/v3/index.json"
+
+      - name: Build .NET Framework 4.8 consumer
+        run: dotnet build tests/SadrScales.Integration.Net48Consumer/SadrScales.Integration.Net48Consumer.csproj --configuration Release --no-restore
+
+      - name: Run .NET Framework 4.8 package compatibility smoke test
+        shell: pwsh
+        run: '& "tests\SadrScales.Integration.Net48Consumer\bin\Release\net48\SadrScales.Integration.Net48Consumer.exe"'

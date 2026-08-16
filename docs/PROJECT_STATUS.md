@@ -1,62 +1,50 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-16  
-**Phase:** M2 — bounded connection/read retry ready for PR  
+**Phase:** M2 — .NET Framework 4.8 package-consumer compatibility  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
 
-## Completed milestones
+## Completed engineering gates
 
-### M0 — public foundation
-Public repository, governance/continuity docs, bilingual entry documentation, security boundary and Public Repository Guard.
+- M0 public repository/security/governance foundation.
+- M1 SQL Contract v1 source audit/freeze and official reference preparation.
+- M2 basic C# SDK foundation.
+- M2 real SQL Server 2022 integration-test hardening.
+- M2 bounded connection/read retry hardening.
 
-### M1 — Contract v1 + reference
-SQL Contract v1 frozen against the effective 5.2.1 migrated schema; bilingual Contract/Quick Starts; executable SQL samples; regression checklist; official 34-page Persian guide prepared and visually QA'd.
+### Latest `main` validation
 
-Official guide SHA-256: `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
+Retry PR #5 merged to `main` as:
 
-### M2 SDK foundation
-PR #3 merged as `5fe058148a41385950e0800aff8f10e581668eeb`; post-merge restore/build/unit-test/pack and Public Guard passed.
+`77d3c6330e0741a2c2f92eaec62fb8f50c781702`
 
-### M2 SQL-backed hardening
-PR #4 merged as `676a78fa0d2c0826d823571fad8882bb5585a90f`.
+Post-merge:
 
-Post-merge exact-SHA validation:
+- SDK CI `31970450480`: PASS — build/test/pack + SQL Server integration;
+- Public Repository Guard `31970450492`: PASS.
 
-- SDK CI run `31970073088`: PASS;
-- SQL Server 2022 integration: PASS — 5/5;
-- Public Repository Guard run `31970073055`: PASS.
+Current unit baseline: 17/17.  
+Current SQL integration baseline: 5/5.
 
-## Bounded retry branch
+## Active compatibility branch
 
-Branch: `m2/read-retry-policy`  
-Validated code commit: `4042efd6c50857622767224ea31e2c175241cd82`.
+`m2/net48-compatibility`
 
-Implemented boundary:
+Goal: prove the **generated NuGet package** is consumable by a real .NET Framework 4.8 application, not merely assert that `netstandard2.0` is theoretically compatible.
 
-- connection opening may retry before a command/transaction starts;
-- `ValidateAsync` and `Sales.ReadAfterAsync` may replay the complete read-only operation on a fresh connection;
-- `ItemGroups.UpsertAsync` and `Items.UpsertAsync` do **not** replay the transaction-scoped write command after execution begins;
-- retry is bounded, cancellation-aware and preserves the final native exception.
+The compatibility consumer:
 
-Public defaults:
+1. runs on GitHub `windows-2022`, which includes .NET Framework 4.8;
+2. creates the SDK `.nupkg`;
+3. restores a `net48` console application from that local package + public dependency feed;
+4. builds the net48 consumer;
+5. runs it under .NET Framework 4.8;
+6. exercises public SDK options/models/client construction;
+7. loads the `Microsoft.Data.SqlClient` dependency resolved for the net48 package graph.
 
-- `TransientRetryCount = 2`;
-- `TransientRetryBaseDelayMilliseconds = 250`;
-- exponential delay capped at 5000 ms.
-
-### Branch validation
-
-SDK CI run `31970279834`: PASS.
-
-- restore/build/test/pack: PASS;
-- build: 0 warnings / 0 errors;
-- unit tests: **17/17 PASS**;
-- NuGet + symbol package creation: PASS;
-- SQL Server 2022 integration: **5/5 PASS**.
-
-Public Repository Guard run `31970279841`: PASS.
+No SQL connection is opened by this smoke test; SQL runtime behavior remains covered separately by the disposable SQL Server 2022 integration suite.
 
 ## Pre-v1.0 administrative gates
 
@@ -68,10 +56,11 @@ Still open:
 
 ## Exact next step
 
-1. Open bounded-retry PR.
-2. Require SDK CI (including real SQL) and Public Repository Guard on the PR.
-3. Merge only when all PR jobs are green and verify `main` post-merge.
-4. Next engineering gate: .NET Framework 4.8 consumer compatibility validation.
+1. Get all three SDK CI jobs green on `m2/net48-compatibility`.
+2. Fix any package/binding/runtime compatibility issue found on Windows.
+3. Require Public Repository Guard.
+4. Merge only after PR CI is green and verify the exact `main` merge SHA.
+5. Next: bounded item batch API + executable C# Quick Start.
 
 ## Handoff rule
 
