@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Deterministic>true</Deterministic>
+    <AssemblyName>SadrScales.Integration</AssemblyName>
+    <RootNamespace>SadrScales.Integration</RootNamespace>
+    <PackageId>SadrScales.Integration</PackageId>
+    <Version>0.1.0-alpha.1</Version>
+    <Authors>Tozin Sadr</Authors>
+    <Description>Public SQL Contract v1 integration client for Sadr Scales.</Description>
+    <PackageProjectUrl>https://github.com/BehzadErfanian/SadrScales-Integration</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/BehzadErfanian/SadrScales-Integration.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>sadr scales pos erp sql integration</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+  </ItemGroup>
+</Project>

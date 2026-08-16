@@ -84,4 +84,22 @@ Breaking public changes require a new contract version.
 **Date:** 2026-08-16  
 **Status:** Accepted
 
-Once Contract v1 and the official reference PDF are validated and immutably identified by SHA-256, SDK source development may proceed. GitHub host-security toggles, binary Release upload and final license approval remain explicit pre-v1.0 administrative gates and must not be silently forgotten or treated as completed.
+Once Contract v1 and the official reference PDF are validated and immutably identified by SHA-256, SDK source development may proceed. GitHub host-security toggles, binary Release upload and final license approval remain explicit pre-v1.0 administrative gates.
+
+## D-014 — C# SDK v1 targets .NET Standard 2.0
+**Date:** 2026-08-16  
+**Status:** Accepted for pre-1.0 validation
+
+The reusable SDK library initially targets `netstandard2.0` so the same public API can be consumed by existing .NET Framework applications and modern .NET applications. Before v1.0, a real .NET Framework 4.8 consumer compatibility build/test is required.
+
+## D-015 — Microsoft.Data.SqlClient is the SDK SQL provider
+**Date:** 2026-08-16  
+**Status:** Accepted for pre-1.0 validation
+
+The foundation uses `Microsoft.Data.SqlClient 7.0.2`. The connection string remains caller-owned configuration. The SDK does not silently weaken encryption/certificate settings, rewrite credentials or log the raw connection string.
+
+## D-016 — Basic SDK does not own destination sales state
+**Date:** 2026-08-16  
+**Status:** Accepted
+
+`Sales.ReadAfterAsync` is read-only and returns rows plus a `LastReadId` cursor candidate. The destination application persists its own transaction and only then persists the new cursor. The SDK does not UPDATE/DELETE `SADR_Logs` or keep a hidden consumer cursor in the Sadr database.
