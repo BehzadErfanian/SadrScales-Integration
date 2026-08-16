@@ -91,11 +91,7 @@ jobs:
         run: dotnet pack src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --output artifacts/package
 
       - name: Restore .NET Framework 4.8 consumer from local package
-        shell: pwsh
-        run: |
-          dotnet restore tests/SadrScales.Integration.Net48Consumer/SadrScales.Integration.Net48Consumer.csproj `
-            --source "$env:GITHUB_WORKSPACE\artifacts\package" `
-            --source "https://api.nuget.org/v3/index.json"
+        run: dotnet restore tests/SadrScales.Integration.Net48Consumer/SadrScales.Integration.Net48Consumer.csproj --configfile tests/SadrScales.Integration.Net48Consumer/NuGet.CI.config
 
       - name: Build .NET Framework 4.8 consumer
         run: dotnet build tests/SadrScales.Integration.Net48Consumer/SadrScales.Integration.Net48Consumer.csproj --configuration Release --no-restore
