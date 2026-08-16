@@ -8,34 +8,37 @@ This is a chronological engineering log. It complements `CHANGELOG.md`: the chan
 
 - Build a dedicated repository named `SadrScales-Integration` for software vendors.
 - The repository is public and serves as the single developer link shared with POS/ERP/accounting vendors.
-- The repository contains source, documentation, language samples, compatibility information and future GitHub Releases.
+- Source, documentation, language samples, compatibility information and GitHub Releases belong in this project.
 - SQL Contract v1 is the current public integration contract for Sadr Scales 5.2.1.
 - The full Persian Integration & Database Guide is the detailed technical reference.
 - Direct device communication protocols and captures remain private.
 - Project state must be documented continuously so future chats/sessions can resume from repository files.
 
-### Completed
+### Foundation work completed
 
-- Created M0 repository structure.
-- Added Persian/English README.
+- Created repository governance structure and continuity rules.
+- Added Persian/English README and concise Contract v1 documentation.
 - Added security policy and explicit public/private boundary.
 - Added project status, roadmap, backlog, decision log, compatibility and release policy.
-- Added concise Persian/English Contract v1 docs.
 - Added planned sample folders for C#, SQL, Python, Node.js, Java and PHP.
-- Added pull-request/issue templates.
+- Added GitHub issue/PR templates.
 - Added public-repository validation script and CI workflow.
-- Created `BehzadErfanian/SadrScales-Integration` on GitHub as a public repository.
-- Reviewed the M0 files before first public push; no forbidden capture/key/database/credential material was found.
-- Removed the bootstrap MIT `LICENSE` because the public license still requires explicit company approval.
-- Kept binary guide/release assets out of the main branch; the official guide will be a GitHub Release asset after M1 validation.
-- Pushed the reviewed M0 foundation to `main` (`857a1d5ff4da1c79ffff1885b62f088cec00225d`).
+- Created `BehzadErfanian/SadrScales-Integration` as a public GitHub repository.
+- Reviewed the public bootstrap before push; no capture/key/database/customer-credential/private-runtime files were included.
+- Removed the initially proposed MIT `LICENSE` before public publication because the software license requires explicit company approval.
+- Kept the editable Word guide and future PDF/checksum binaries out of `main`; approved guide binaries will be GitHub Release assets after M1 validation.
 
-### CI follow-up
+### Public push and guard
 
-- First `Public repository guard` run reached the validator but failed because `TrimStart('\\','/')` is not portable to PowerShell Core on Linux (`'\\'` is a two-character string there).
-- This was a validator portability defect, not a security-boundary violation.
-- Replaced the path trim with a cross-platform regex normalization and queued a new guard run.
+- Public M0 foundation commit: `857a1d5ff4da1c79ffff1885b62f088cec00225d`.
+- GitHub Actions guard run #1 reached the validator but failed because the original `TrimStart('\\','/')` path normalization was Windows-specific under PowerShell Core/Linux. No forbidden public file was reported.
+- Portability fix commit: `2e91334d6f7c6e63c6f51c037a8d33b8ed8efa0c`.
+- Replaced path trimming with cross-platform regex normalization.
+- GitHub Actions `Public repository guard` run #2 completed successfully on Ubuntu / PowerShell Core.
 
-### Next exact action
+### Handoff
 
-Verify the corrected GitHub Actions guard passes, then mark M0 complete and begin M1 contract/documentation freeze.
+- M0 is closed.
+- Current phase is M1: Contract v1 freeze and public documentation.
+- Parallel repository-administration item remains: review/enable GitHub security features available to the public repository.
+- The exact next work is maintained in `PROJECT_STATUS.md` and `ROADMAP.md`.

@@ -5,11 +5,11 @@ Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **
 ## P0 — Foundation / security
 
 - [x] Create public GitHub repository `BehzadErfanian/SadrScales-Integration`.
-- [ ] Push M0 bootstrap.
-- [ ] Run `tools/Validate-PublicRepository.ps1` in local and CI environments.
+- [x] Push M0 bootstrap.
+- [x] Run `tools/Validate-PublicRepository.ps1` in CI; corrected GitHub Actions guard passes.
 - [ ] Confirm the public software license with the company before the first SDK release; no LICENSE is published until approval.
-- [ ] Enable GitHub security options available to the repository.
-- [ ] Review repository history before first public announcement for accidental sensitive files.
+- [ ] Enable/review GitHub security options available to the repository.
+- [x] Review initial public repository content/history for obvious sensitive files before continuing M1.
 
 ## P1 — Contract / docs
 

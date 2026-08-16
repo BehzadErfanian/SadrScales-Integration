@@ -11,13 +11,13 @@ This roadmap is the canonical plan. Update it when scope or sequencing changes.
 - [x] Security boundary.
 - [x] Project status / continuity / decisions / backlog.
 - [x] SQL Contract v1 documentation baseline.
-- [x] Full Persian reference guide policy defined.
+- [x] Full Persian reference-guide publication policy defined.
 - [x] Sample-language structure.
 - [x] Public-repository validation guard.
 - [x] Create GitHub repository.
-- [ ] Push reviewed M0 foundation and verify the public repository guard.
-- [ ] Review GitHub rendering and links.
-- [ ] Enable available GitHub security features.
+- [x] Push reviewed M0 foundation and verify the public repository guard.
+- [x] Verify tracked README/document link targets exist in the public repository tree.
+- [ ] Enable/review available GitHub security features.
 
 ## M1 — Contract v1 freeze and public documentation
 
@@ -27,7 +27,7 @@ This roadmap is the canonical plan. Update it when scope or sequencing changes.
 - [ ] Freeze basic public surface: `SADR_ItemClass`, `SADR_Item`, `SADR_Logs`.
 - [ ] Keep Registry/Mapping/structured sales clearly marked advanced/controlled unless explicitly promoted.
 - [ ] Produce official PDF from the latest Persian Integration & Database Guide.
-- [ ] Create concise Quick Start documents.
+- [ ] Complete concise Quick Start documents.
 - [ ] Complete English contract documentation.
 - [ ] Add synthetic example data and expected results.
 - [ ] Add contract regression checklist.
