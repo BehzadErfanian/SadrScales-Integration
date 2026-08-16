@@ -23,7 +23,7 @@ $violations = New-Object System.Collections.Generic.List[string]
 Get-ChildItem -LiteralPath $RepositoryRoot -Recurse -File -Force |
     Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' } |
     ForEach-Object {
-        $relative = $_.FullName.Substring($RepositoryRoot.Length).TrimStart('\\','/')
+        $relative = ($_.FullName.Substring($RepositoryRoot.Length) -replace '^[\\/]+', '')
         $ext = $_.Extension.ToLowerInvariant()
 
         if ($forbiddenExtensions -contains $ext) {

@@ -14,3 +14,7 @@ The format follows the spirit of Keep a Changelog and Semantic Versioning.
 - Reference policy for the approved Persian Integration & Database Guide (published as a release asset after M1 validation).
 - Multi-language sample structure.
 - Public-repository validation script and CI guardrail.
+
+### Fixed
+
+- Made the public-repository validator path normalization portable across Windows PowerShell and PowerShell Core on Linux/GitHub Actions.
