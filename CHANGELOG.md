@@ -2,31 +2,26 @@
 
 All notable public changes to this project will be documented here.
 
-The format follows the spirit of Keep a Changelog and Semantic Versioning.
-
 ## [Unreleased]
 
 ### Added
-
-- Initial public repository foundation.
+- Public repository foundation and security guard.
 - Frozen SQL Contract v1 documentation for Sadr Scales 5.2.1.
-- Project governance, security boundary and public-repository CI guard.
-- Contract regression checklist and executable synthetic SQL samples.
-- GitHub host-security administration checklist.
-- Official Persian Integration & Database Guide release identity and SHA-256.
-- Initial `SadrScales.Integration` C# SDK foundation targeting `netstandard2.0`.
-- Contract schema validator and `SadrContractMismatchException`.
-- Basic item-group and item/PLU upsert clients with semantic no-op behavior.
-- Read-only incremental sales client and destination-owned cursor candidate.
-- SDK unit tests and GitHub Actions restore/build/test/pack workflow.
-- `SDK_DESIGN_V1.md`.
+- Bilingual Quick Starts, regression checklist and synthetic SQL samples.
+- Official Persian Integration Guide release identity/SHA.
+- `SadrScales.Integration` C# SDK foundation targeting `netstandard2.0`.
+- Contract validator, semantic item-group/item upserts and read-only incremental sales client.
+- Unit tests and SDK restore/build/test/pack workflow.
+- Real SQL Server 2022 integration-test suite using disposable synthetic Contract v1 schema/data.
+- Bounded transient connection/read retry options and internal retry policy.
+- Retry-specific tests for exhaustion, non-transient failures, cancellation and bounded backoff.
 
 ### Changed
-
-- Moved active engineering from Contract/documentation M1 to SDK M2.
-- Basic SDK uses `Microsoft.Data.SqlClient 7.0.2` and caller-owned connection configuration.
-- Basic sales consumption remains destination-owned and does not mutate Sadr sales rows.
+- SQL-backed hardening is now part of normal SDK CI; Contract/item/rowversion/sales behavior is tested against real disposable SQL Server.
+- Connection establishment may retry recognized transient failures before an operation begins.
+- Read-only Contract validation and sales reads may replay completely on a fresh connection after recognized transient failures.
+- Transactional item/group write command execution remains deliberately non-retried to avoid commit ambiguity.
 
 ### Fixed
-
-- Made the public-repository validator path normalization portable across Windows PowerShell and PowerShell Core on Linux/GitHub Actions.
+- Public repository validator is portable across Windows PowerShell and PowerShell Core/Linux.
+- Corrected SQL mismatch test fixture to drop/recreate a UNIQUE table constraint using table-constraint DDL.

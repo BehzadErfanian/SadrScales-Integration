@@ -96,18 +96,22 @@ SELECT CAST(1 AS int);";
 
         public async Task ValidateAsync(CancellationToken cancellationToken)
         {
-            using (var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false))
-            using (var command = new SqlCommand(ValidationSql, connection))
+            try
             {
-                command.CommandTimeout = _options.CommandTimeoutSeconds;
-                try
-                {
-                    await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-                }
-                catch (SqlException exception) when (exception.Number >= 51001 && exception.Number <= 51099)
-                {
-                    throw new SadrContractMismatchException(exception.Message, exception.Number, exception);
-                }
+                await _connectionFactory.ExecuteReadAsync(
+                    async (connection, token) =>
+                    {
+                        using (var command = new SqlCommand(ValidationSql, connection))
+                        {
+                            command.CommandTimeout = _options.CommandTimeoutSeconds;
+                            return await command.ExecuteScalarAsync(token).ConfigureAwait(false);
+                        }
+                    },
+                    cancellationToken).ConfigureAwait(false);
+            }
+            catch (SqlException exception) when (exception.Number >= 51001 && exception.Number <= 51099)
+            {
+                throw new SadrContractMismatchException(exception.Message, exception.Number, exception);
             }
         }
     }

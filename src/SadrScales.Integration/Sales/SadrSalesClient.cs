@@ -35,12 +35,13 @@ ORDER BY ID ASC;";
 
         /// <summary>
         /// Reads the next batch after a destination-owned cursor without modifying Sadr Scales data.
+        /// Recognized transient connection/read failures are retried within the configured bounded policy.
         /// </summary>
         /// <remarks>
-        /// The caller must persist the destination data first and persist <see cref="SadrSalesBatch.LastReadId"/>
+        /// The caller must persist destination data first and persist <see cref="SadrSalesBatch.LastReadId"/>
         /// only after the destination transaction succeeds.
         /// </remarks>
-        public async Task<SadrSalesBatch> ReadAfterAsync(
+        public Task<SadrSalesBatch> ReadAfterAsync(
             long lastProcessedId,
             int batchSize = 100,
             CancellationToken cancellationToken = default(CancellationToken))
@@ -55,25 +56,29 @@ ORDER BY ID ASC;";
                 throw new ArgumentOutOfRangeException(nameof(batchSize), "Batch size must be between 1 and 5000.");
             }
 
-            var rows = new List<SadrSaleRow>(batchSize);
-
-            using (var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false))
-            using (var command = new SqlCommand(ReadSql, connection))
-            {
-                command.CommandTimeout = _options.CommandTimeoutSeconds;
-                command.Parameters.Add("@BatchSize", SqlDbType.Int).Value = batchSize;
-                command.Parameters.Add("@LastProcessedId", SqlDbType.BigInt).Value = lastProcessedId;
-
-                using (var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+            return _connectionFactory.ExecuteReadAsync(
+                async (connection, token) =>
                 {
-                    while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
-                    {
-                        rows.Add(Map(reader));
-                    }
-                }
-            }
+                    var rows = new List<SadrSaleRow>(batchSize);
 
-            return new SadrSalesBatch(rows, lastProcessedId);
+                    using (var command = new SqlCommand(ReadSql, connection))
+                    {
+                        command.CommandTimeout = _options.CommandTimeoutSeconds;
+                        command.Parameters.Add("@BatchSize", SqlDbType.Int).Value = batchSize;
+                        command.Parameters.Add("@LastProcessedId", SqlDbType.BigInt).Value = lastProcessedId;
+
+                        using (var reader = await command.ExecuteReaderAsync(token).ConfigureAwait(false))
+                        {
+                            while (await reader.ReadAsync(token).ConfigureAwait(false))
+                            {
+                                rows.Add(Map(reader));
+                            }
+                        }
+                    }
+
+                    return new SadrSalesBatch(rows, lastProcessedId);
+                },
+                cancellationToken);
         }
 
         private static SadrSaleRow Map(SqlDataReader reader)

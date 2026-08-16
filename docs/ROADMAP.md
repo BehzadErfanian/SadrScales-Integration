@@ -1,55 +1,54 @@
 # Roadmap
 
-This roadmap is the canonical plan. Update it when scope or sequencing changes.
+This roadmap is the canonical plan.
 
 ## M0 — Public repository foundation
-- [x] Repository structure, bilingual README, security boundary, continuity docs and Public Repository Guard.
+- [x] Public repository, bilingual README, security boundary, continuity docs and Public Repository Guard.
 
 ## M1 — Contract v1 freeze and public documentation
-- [x] Re-validate effective 5.2.1 schema and freeze basic Contract v1.
-- [x] Complete bilingual Contract/Quick Starts, executable SQL samples and regression checklist.
-- [x] Produce/page-QA official Persian guide and record SHA-256.
-- [ ] Upload approved PDF/checksum as GitHub Release assets before public v1.0 distribution.
+- [x] Freeze basic Contract v1 against effective 5.2.1 schema.
+- [x] Bilingual docs, SQL samples, regression checklist and official guide QA/SHA.
+- [ ] Upload approved guide PDF/checksum as GitHub Release assets before v1.0.
 - [ ] Complete owner/admin GitHub host-security checklist.
 
-**M1 engineering exit gate:** complete.
+**M1 engineering:** complete.
 
 ## M2 — C# Integration SDK v1
 
 ### Foundation — complete
 - [x] `netstandard2.0` + `Microsoft.Data.SqlClient 7.0.2`.
-- [x] Basic async API/caller-owned connection and sales cursor boundaries.
-- [x] Schema validator, semantic item-group/PLU upserts and read-only incremental sales batch.
+- [x] Schema validator, semantic item/group upserts and read-only incremental sales.
 - [x] Unit tests and restore/build/test/pack CI.
-- [x] PR #3 merged to `main` as `5fe058148a41385950e0800aff8f10e581668eeb`.
-- [x] Post-merge SDK CI and Public Repository Guard passed.
+- [x] PR #3 merged and post-merge CI green.
 
-### SQL-backed hardening — branch green
-- [x] Disposable SQL Server 2022 CI architecture with synthetic Contract v1 schema/data.
-- [x] SQL integration-test project and service-container CI job.
-- [x] Contract validation coverage.
-- [x] Item-group Inserted / Unchanged / Updated coverage.
-- [x] PLU semantic no-op/update + rowversion coverage.
-- [x] Sales ID-gap, ascending cursor and read-only coverage.
-- [x] Dedicated schema-mismatch exception coverage.
-- [x] Branch SDK CI green: 5/5 SQL integration tests + existing 8/8 unit tests/package job.
-- [x] Branch Public Repository Guard green.
-- [ ] PR CI/review and merge to `main`.
-- [ ] Post-merge `main` CI verification.
+### SQL-backed hardening — complete
+- [x] Disposable SQL Server 2022 CI tests using synthetic Contract v1 data.
+- [x] 5/5 real-SQL tests.
+- [x] PR #4 merged as `676a78fa0d2c0826d823571fad8882bb5585a90f`.
+- [x] Post-merge SDK CI `31970073088` PASS.
+- [x] Post-merge Public Guard `31970073055` PASS.
 
-### M2 next hardening
-- [ ] Bounded transient retry for connection/read-safe operations only.
+### Bounded transient retry — branch green
+- [x] Separate safe connection/read retry from transactional write execution.
+- [x] Add bounded/cancellable retry options and explicit transient classifier.
+- [x] Retry connection open before commands/transactions begin.
+- [x] Retry complete read-only Contract validation and sales reads on a fresh connection.
+- [x] Keep item/group transaction-scoped command execution non-retried.
+- [x] Add retry engine/classifier/options unit tests.
+- [x] Branch SDK CI `31970279834` PASS — 17/17 unit tests + 5/5 SQL tests + pack.
+- [x] Branch Public Guard `31970279841` PASS.
+- [ ] PR CI/review/merge and post-merge verification.
+
+### Next after retry merge
 - [ ] .NET Framework 4.8 consumer compatibility build/test.
 - [ ] Bounded item batch API.
 - [ ] Executable C# Console Quick Start.
 - [ ] Source Link/package validation.
 - [ ] Strong-name decision before v1.0.
 
-Advanced Registry/Mapping/structured invoice helpers are not part of the basic SDK foundation.
-
 ## M3 — Reference samples
-- [ ] C# Console Quick Start and end-to-end example.
-- [x] Raw SQL examples for Contract v1.
+- [ ] C# Console Quick Start/end-to-end example.
+- [x] Raw SQL Contract v1 examples.
 - [ ] Safe sample configuration/local synthetic DB instructions.
 
 ## M4 — Multi-language examples
@@ -60,17 +59,14 @@ Advanced Registry/Mapping/structured invoice helpers are not part of the basic S
 - [ ] Language-neutral SQL type/null mapping table.
 
 ## M5 — Packaging and GitHub Releases
-- [x] SDK restore/build/test/pack workflow green on `main` foundation.
-- [x] Public-repository security guard.
-- [ ] NuGet/DLL packaging policy finalized.
-- [ ] XML docs + Source Link/package metadata.
-- [ ] SHA-256/release procedure.
+- [x] SDK restore/build/test/pack CI on `main`.
+- [x] Public Repository Guard.
+- [ ] NuGet/DLL packaging policy, Source Link, checksums and release procedure.
 - [ ] `v1.0.0` GitHub Release.
 
 ## M6 — Sadr website developer experience
-- [ ] Replace old simple developer guide with concise landing page.
-- [ ] Link GitHub repo as developer source of truth.
-- [ ] Link official guide and latest SDK Release.
+- [ ] Replace old developer guide with concise landing page.
+- [ ] Link GitHub as developer source of truth and link guide/latest SDK Release.
 
 ## Future — Integration Gateway / no-code connector
-Not part of Sadr Scales 5.2.1 / SQL Contract v1. REST/Webhook/no-code work is separately versioned future scope.
+Separately versioned future scope; not part of Sadr Scales 5.2.1 / SQL Contract v1.
