@@ -1,63 +1,54 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-16  
-**Phase:** M2 — SQL-backed SDK hardening ready for PR  
+**Phase:** M2 — bounded connection/read retry hardening  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
 
-## Completed
+## Completed milestones
 
-### M0
-Public repository foundation, governance, bilingual entry documentation and Public Repository Guard.
+### M0 — public foundation
+Public repository, governance/continuity docs, bilingual entry documentation, security boundary and Public Repository Guard.
 
-### M1
-SQL Contract v1 source audit/freeze, bilingual contract/Quick Starts, executable SQL samples, regression checklist and official 34-page Persian guide preparation/QA.
+### M1 — Contract v1 + reference
+SQL Contract v1 frozen against the effective 5.2.1 migrated schema; bilingual Contract/Quick Starts; executable SQL samples; regression checklist; official 34-page Persian guide prepared and visually QA'd.
 
 Official guide SHA-256: `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
 
 ### M2 SDK foundation
+PR #3 merged as `5fe058148a41385950e0800aff8f10e581668eeb`; post-merge restore/build/unit-test/pack and Public Guard passed.
 
-PR #3 merged to `main` as `5fe058148a41385950e0800aff8f10e581668eeb`.
+### M2 SQL-backed hardening
+PR #4 merged as `676a78fa0d2c0826d823571fad8882bb5585a90f`.
 
-Post-merge validation:
+Post-merge exact-SHA validation:
 
-- SDK CI `31969619533`: PASS — restore/build/test/pack.
-- Public Repository Guard `31969619624`: PASS.
-- Unit baseline: 8/8.
-- Build: 0 warnings / 0 errors.
+- SDK CI run `31970073088`: PASS;
+- build/test/pack job: PASS;
+- SQL Server 2022 integration job: PASS — 5/5 SQL-backed tests;
+- Public Repository Guard run `31970073055`: PASS.
 
-## SQL-backed hardening branch
+The real-SQL suite verifies Contract validation, Inserted/Unchanged/Updated behavior, rowversion no-op/update behavior, sales ID gaps/read-only semantics and schema-mismatch exception mapping.
 
-Branch: `m2/sql-integration-tests`
+## Active branch
 
-Latest validated code commit: `19208d9ba4ac32a7174ed8d45c832a0086b7ee5e`.
+`m2/read-retry-policy`
 
-### Real SQL Server CI result
+Goal: add bounded transient retry without making transactional writes ambiguous.
 
-SDK CI run `31969914826`: PASS.
+### Retry boundary
 
-- existing restore/build/unit-test/pack job: PASS;
-- SQL Server 2022 service initialization: PASS;
-- SQL integration project restore/build: PASS;
-- SQL integration tests: **5/5 PASS**;
-- SQL integration build: 0 warnings / 0 errors.
+- Connection opening may retry before any SQL command/transaction begins.
+- `ValidateAsync` and `Sales.ReadAfterAsync` may retry the complete read-only operation on a fresh connection.
+- `ItemGroups.UpsertAsync` and `Items.UpsertAsync` do **not** automatically replay the write command after transaction execution begins.
+- Retry is bounded, cancellation-aware and rethrows the final native exception when exhausted.
 
-Public Repository Guard run `31969914926`: PASS.
+Initial public defaults under validation:
 
-Verified against disposable real SQL Server:
-
-- Contract validator accepts the frozen synthetic Contract v1 schema;
-- item-group Upsert reports Inserted / Unchanged / Updated correctly;
-- PLU Upsert preserves SQL rowversion on semantic no-op and changes it on real update;
-- sales reader handles intentional identity gaps in ascending order and does not mutate `SADR_Logs`;
-- a real schema mismatch maps to `SadrContractMismatchException`.
-
-The first SQL integration run (`31969825350`) was 4/5 because the mismatch **test harness** attempted to drop a UNIQUE table constraint using `DROP INDEX`. The test was corrected to `ALTER TABLE ... DROP CONSTRAINT`; no SDK runtime defect was found in that run.
-
-## Retry boundary
-
-Automatic transactional write retry remains intentionally deferred. Connection/read retry and write retry will be designed separately after this SQL-backed hardening PR. Retry must be bounded/cancellable and must not create ambiguous duplicate writes.
+- `TransientRetryCount = 2`;
+- `TransientRetryBaseDelayMilliseconds = 250`;
+- exponential delay capped at 5000 ms.
 
 ## Pre-v1.0 administrative gates
 
@@ -69,10 +60,10 @@ Still open:
 
 ## Exact next step
 
-1. Open the SQL-backed hardening PR.
-2. Require SDK CI (including SQL Server job) and Public Repository Guard on the PR.
-3. Merge only when all jobs are green and verify `main` post-merge.
-4. Next engineering branch: bounded retry for connection/read-safe operations, then .NET Framework 4.8 consumer compatibility.
+1. Build/test the retry branch with the existing unit and SQL Server integration suites.
+2. Add/fix retry-specific tests until CI is clean.
+3. Open PR only after branch Build/Test/Pack, SQL integration and Public Guard are green.
+4. After merge, begin .NET Framework 4.8 consumer compatibility validation.
 
 ## Handoff rule
 

@@ -4,29 +4,30 @@ Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **
 
 ## P0 — Public release administration / security
 - [ ] Confirm public software license with company before first SDK release.
-- [ ] Complete `docs/GITHUB_SECURITY_ADMIN_CHECKLIST.md` in GitHub Settings.
-- [ ] Upload approved Integration Guide PDF/checksum as GitHub Release assets before public v1.0 distribution.
+- [ ] Complete `docs/GITHUB_SECURITY_ADMIN_CHECKLIST.md`.
+- [ ] Upload approved Integration Guide PDF/checksum as GitHub Release assets before v1.0.
 
 ## P1 — Contract / docs
-- [x] Freeze SQL Contract v1 and publish bilingual docs/regression checklist.
-- [x] Add executable synthetic SQL samples.
-- [x] Produce/page-QA official guide PDF and record SHA-256.
+- [x] Frozen bilingual SQL Contract v1 + regression checklist + SQL samples.
+- [x] Official guide PDF prepared/QA'd and SHA recorded.
 - [ ] Add troubleshooting matrix for common SQL integration failures.
 
-## P1 — SDK foundation
-- [x] `netstandard2.0` + `Microsoft.Data.SqlClient 7.0.2`.
-- [x] Schema validator, item-group/PLU upsert and incremental sales reader.
-- [x] Unit tests, clean package smoke build and SDK CI.
-- [x] PR #3 merged; post-merge SDK CI + Public Guard green.
+## P1 — SDK foundation and real-SQL hardening
+- [x] Basic SDK + 8 unit tests + package CI.
+- [x] Disposable SQL Server 2022 integration tests.
+- [x] PR #4 merged; post-merge SDK/SQL/Public Guard green.
 
-## P1 — SQL-backed SDK hardening
-- [x] Disposable SQL Server 2022 integration-test job and synthetic Contract v1 database fixture.
-- [x] Real DB tests for Contract validator, semantic upserts, rowversion behavior, sales gaps/read-only semantics and mismatch exception.
-- [x] Branch SQL integration CI green: 5/5 SQL tests; existing unit/package job green.
-- [x] Branch Public Repository Guard green.
-- [ ] PR CI/review and merge.
-- [ ] Post-merge `main` verification.
-- [ ] Bounded transient retry for connection/read-safe operations.
+## P1 — Retry hardening
+- [x] Add bounded retry options.
+- [x] Add explicit transient classifier/backoff policy.
+- [x] Retry safe connection-open boundary.
+- [x] Retry complete read-only Contract/Sales operations.
+- [x] Keep transactional write command execution non-retried.
+- [x] Add retry unit tests including cancellation and non-transient behavior.
+- [ ] Branch/PR CI green and merge.
+- [ ] Post-merge verification.
+
+## P1 — Compatibility / developer experience
 - [ ] .NET Framework 4.8 consumer compatibility test.
 - [ ] Bounded item batch API.
 - [ ] C# console sample.
@@ -46,6 +47,6 @@ Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **
 - [ ] Java.
 - [ ] PHP.
 
-## P2 / Future generation
+## P2 / Future
 - [ ] Evaluate configurable no-code connector.
-- [ ] Design REST/Webhook Gateway as a separately versioned contract.
+- [ ] Separately versioned REST/Webhook Gateway.
