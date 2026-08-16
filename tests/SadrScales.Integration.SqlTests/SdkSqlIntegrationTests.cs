@@ -129,7 +129,10 @@ DELETE FROM dbo.SADR_Logs WHERE FID = 102;");
         [TestMethod]
         public async Task Contract_Validation_Should_Use_Dedicated_Exception_For_Schema_Mismatch()
         {
-            Database.ExecuteNonQuery("DROP INDEX UX_SADR_Item_PluNo ON dbo.SADR_Item;");
+            // UX_SADR_Item_PluNo is created by a UNIQUE table constraint in the real 5.2.1 schema,
+            // so it must be removed/restored as a constraint rather than through DROP INDEX.
+            Database.ExecuteNonQuery(
+                "ALTER TABLE dbo.SADR_Item DROP CONSTRAINT UX_SADR_Item_PluNo;");
 
             try
             {
@@ -143,7 +146,7 @@ DELETE FROM dbo.SADR_Logs WHERE FID = 102;");
             finally
             {
                 Database.ExecuteNonQuery(
-                    "CREATE UNIQUE NONCLUSTERED INDEX UX_SADR_Item_PluNo ON dbo.SADR_Item(PluNo);");
+                    "ALTER TABLE dbo.SADR_Item ADD CONSTRAINT UX_SADR_Item_PluNo UNIQUE NONCLUSTERED (PluNo);");
             }
         }
     }
