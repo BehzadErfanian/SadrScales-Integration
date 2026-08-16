@@ -13,11 +13,12 @@ Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **
 
 ## P1 — Contract / docs
 
-- [ ] Freeze SQL Contract v1 after source verification.
+- [x] Freeze SQL Contract v1 after 5.2.1 source/schema verification.
+- [x] Publish Contract v1 freeze record and regression checklist.
+- [x] Complete Persian/English Quick Start and contract docs for the basic surface.
+- [x] Add executable SQL samples with only synthetic values and expected results.
 - [ ] Export official Integration Guide PDF.
-- [ ] Publish the guide PDF in GitHub Release/reference area.
-- [ ] Complete English Quick Start and contract docs.
-- [ ] Add sample SQL scripts with only synthetic values.
+- [ ] Generate guide SHA-256 and prepare PDF/checksum as GitHub Release assets.
 - [ ] Add troubleshooting matrix for common SQL integration failures.
 
 ## P1 — SDK
@@ -28,14 +29,14 @@ Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **
 - [ ] Implement item-group API.
 - [ ] Implement item/PLU API and batch operation.
 - [ ] Implement incremental `SADR_Logs` sales reader.
-- [ ] Implement optional structured invoice helpers.
+- [ ] Implement optional structured invoice helpers as explicitly advanced APIs.
 - [ ] Add bounded transient-SQL retry policy.
 - [ ] Add tests against a safe test schema.
 - [ ] Add C# console sample.
 
 ## P1 — Release
 
-- [ ] GitHub Actions build/test.
+- [ ] GitHub Actions build/test for SDK.
 - [ ] Package and checksums.
 - [ ] Release notes template.
 - [ ] Create `v1.0.0` GitHub Release.

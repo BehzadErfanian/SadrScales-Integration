@@ -23,14 +23,17 @@ This roadmap is the canonical plan. Update it when scope or sequencing changes.
 
 **Goal:** ensure the public contract is accurate, stable and usable without access to private Sadr Scales source.
 
-- [ ] Re-validate Contract v1 fields and rules against Sadr Scales 5.2.1.
-- [ ] Freeze basic public surface: `SADR_ItemClass`, `SADR_Item`, `SADR_Logs`.
-- [ ] Keep Registry/Mapping/structured sales clearly marked advanced/controlled unless explicitly promoted.
+- [x] Re-validate Contract v1 fields and rules against the effective Sadr Scales 5.2.1 migrated schema.
+- [x] Freeze basic public surface: `SADR_ItemClass`, `SADR_Item`, `SADR_Logs`.
+- [x] Keep Registry/Mapping/structured sales clearly marked advanced/controlled.
 - [ ] Produce official PDF from the latest Persian Integration & Database Guide.
-- [ ] Complete concise Quick Start documents.
-- [ ] Complete English contract documentation.
-- [ ] Add synthetic example data and expected results.
-- [ ] Add contract regression checklist.
+- [x] Complete concise Quick Start documents.
+- [x] Complete English contract documentation.
+- [x] Add synthetic executable SQL examples and expected results.
+- [x] Add contract regression checklist.
+- [ ] Review/enable available GitHub security features.
+
+**M1 exit gate:** official guide PDF/checksum prepared, security settings reviewed, and public docs/samples pass final QA.
 
 ## M2 — C# Integration SDK v1
 
@@ -43,7 +46,7 @@ Planned functional areas:
 - item-group upsert;
 - item/PLU upsert and batch import;
 - incremental sales read with caller-owned cursor;
-- structured invoice lookup/ack helpers where explicitly enabled;
+- structured invoice lookup/ack helpers only when explicitly enabled as advanced APIs;
 - bounded retry for transient SQL failures;
 - idempotency helpers/examples;
 - clear advanced APIs separated from the basic contract.
@@ -63,7 +66,7 @@ Open design work:
 
 - [ ] C# Console Quick Start.
 - [ ] C# end-to-end item + sales example.
-- [ ] Raw SQL examples.
+- [x] Raw SQL examples for the frozen basic Contract v1.
 - [ ] Safe sample configuration template.
 - [ ] Local/synthetic test database instructions.
 
@@ -79,8 +82,8 @@ These examples implement SQL Contract v1 directly; they do not reimplement devic
 
 ## M5 — CI, packaging and GitHub Releases
 
-- [ ] Build/test GitHub Actions workflow.
-- [ ] Public-repository security guard on every PR.
+- [ ] Build/test GitHub Actions workflow for SDK code.
+- [x] Public-repository security guard on pushes/PRs.
 - [ ] Package SDK.
 - [ ] Generate XML docs/package metadata.
 - [ ] SHA-256 manifest.

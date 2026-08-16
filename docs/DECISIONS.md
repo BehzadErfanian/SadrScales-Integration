@@ -63,7 +63,7 @@ Compiled SDK/package, sample bundle, official guide and checksums are published 
 **Date:** 2026-08-16  
 **Status:** Proposed / confirm before v1.0
 
-The project intends to use a permissive license so software vendors can use and adapt the public integration source. No `LICENSE` is published during M0. The exact license (MIT or another approved permissive license) requires explicit company approval before the first public SDK release.
+The project intends to use a permissive license so software vendors can use and adapt the public integration source. No `LICENSE` is published during M0/M1. The exact license (MIT or another approved permissive license) requires explicit company approval before the first public SDK release.
 
 ## D-010 — Future no-code/REST work is separate from 5.2.1
 
@@ -78,3 +78,18 @@ A configurable no-code connector and REST/Webhook Gateway are future work and mu
 **Status:** Accepted
 
 The editable Word guide is not committed to the public main branch. After M1 validation, the official PDF and SHA-256 file are published through GitHub Releases. Markdown contract/quick-start documentation remains in Git for reviewability and history.
+
+## D-012 — Basic SQL Contract v1 is frozen against the effective 5.2.1 schema
+
+**Date:** 2026-08-16  
+**Status:** Accepted
+
+The Contract v1 baseline is the database schema after Sadr Scales 5.2.1 completes its own schema creation/migration checks. Legacy installer SQL or an unmigrated customer database does not override the effective runtime schema.
+
+The frozen basic surface is:
+
+- `SADR_ItemClass`: SELECT / INSERT / UPDATE;
+- `SADR_Item`: SELECT / INSERT / UPDATE, with `PluNo` as the public identity and logical removal preferred;
+- `SADR_Logs`: SELECT only, with destination-owned ascending `ID` cursor and `(DeviceNo, FID, SubID)` as the preferred destination duplicate key.
+
+Registry, Mapping, structured-sales and runtime-state objects remain advanced/controlled. Backward-compatible clarifications/examples may remain Contract v1; a breaking public change requires a new contract version.
