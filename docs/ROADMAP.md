@@ -28,14 +28,15 @@ This roadmap is the canonical plan.
 - [x] Post-merge SDK CI `31970073088` PASS.
 - [x] Post-merge Public Guard `31970073055` PASS.
 
-### Bounded transient retry — in progress
+### Bounded transient retry — branch green
 - [x] Separate safe connection/read retry from transactional write execution.
-- [x] Add bounded/cancellable retry options and internal policy.
+- [x] Add bounded/cancellable retry options and explicit transient classifier.
 - [x] Retry connection open before commands/transactions begin.
 - [x] Retry complete read-only Contract validation and sales reads on a fresh connection.
-- [x] Keep item/group write command execution non-retried.
+- [x] Keep item/group transaction-scoped command execution non-retried.
 - [x] Add retry engine/classifier/options unit tests.
-- [ ] Branch CI green (unit + SQL + pack + Public Guard).
+- [x] Branch SDK CI `31970279834` PASS — 17/17 unit tests + 5/5 SQL tests + pack.
+- [x] Branch Public Guard `31970279841` PASS.
 - [ ] PR CI/review/merge and post-merge verification.
 
 ### Next after retry merge

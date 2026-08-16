@@ -17,32 +17,36 @@ This chronological engineering log preserves handoff context.
 
 ## 2026-08-16 — M2 SQL-backed hardening
 - Added disposable SQL Server 2022 CI with synthetic Contract v1 schema/data.
-- Initial SQL run was 4/5 only because mismatch test harness used `DROP INDEX` on a UNIQUE table constraint; corrected to `ALTER TABLE DROP/ADD CONSTRAINT`.
+- Initial SQL run was 4/5 only because mismatch test harness used `DROP INDEX` on a UNIQUE table constraint; corrected to table-constraint DDL.
 - Second branch SQL run: 5/5 PASS.
 - PR #4 merged as `676a78fa0d2c0826d823571fad8882bb5585a90f`.
-- Post-merge SDK CI run `31970073088`: PASS for both build/test/pack and SQL integration jobs.
-- Post-merge Public Repository Guard run `31970073055`: PASS.
+- Post-merge SDK CI `31970073088`: PASS for build/test/pack and SQL integration.
+- Post-merge Public Repository Guard `31970073055`: PASS.
 
 ## 2026-08-16 — M2 bounded retry hardening
 
-### Research
-- Reviewed current Microsoft.Data.SqlClient configurable retry documentation before implementation.
-- SqlClient supports configurable retry on connections/commands, but its API surface/support differs by target; the public SDK remains `netstandard2.0`.
-- Microsoft guidance stresses choosing retriable exceptions deliberately rather than blindly retrying every SQL failure.
-- Transactional write replay remains unsafe without explicit commit-ambiguity semantics.
+### Research/design
+- Reviewed current Microsoft.Data.SqlClient retry documentation before implementation.
+- Kept transactional write replay separate from connection/read retry to avoid commit ambiguity.
+- Chose an explicit SDK-owned bounded policy compatible with the `netstandard2.0` library surface.
 
-### Implemented on `m2/read-retry-policy`
-- Added `TransientRetryCount` (default 2, range 0..5).
-- Added `TransientRetryBaseDelayMilliseconds` (default 250 ms, range 1..5000).
-- Added internal bounded exponential retry policy capped at 5000 ms per delay.
-- Added explicit conservative transient SQL error-number classifier.
-- Added cancellation-aware retry delays.
+### Implemented — commit `4042efd6c50857622767224ea31e2c175241cd82`
+- `TransientRetryCount`: default 2, range 0..5.
+- `TransientRetryBaseDelayMilliseconds`: default 250 ms, range 1..5000.
+- Bounded exponential delay capped at 5000 ms and cancellation-aware.
+- Conservative explicit transient SQL error classifier.
 - Connection opening retries only before any command/transaction begins.
-- `ValidateAsync` and `Sales.ReadAfterAsync` retry the complete read-only operation using a fresh connection.
-- Transaction-scoped `ItemGroups.UpsertAsync` / `Items.UpsertAsync` command execution remains non-retried; only safe pre-operation connection establishment can retry.
-- Added retry unit tests for success-after-retry, exhaustion, non-transient behavior, cancellation, error classification and bounded backoff.
-- Existing SQL integration suite remains the regression gate for real SQL behavior.
+- `ValidateAsync` and `Sales.ReadAfterAsync` replay the complete read-only operation on a fresh connection when the failure is recognized transient.
+- Transaction-scoped `ItemGroups.UpsertAsync` / `Items.UpsertAsync` command execution remains non-retried.
+- Added retry tests for success-after-retry, exhaustion, non-transient failure, cancellation, error classification and delay cap.
+
+### Branch validation
+- SDK CI `31970279834`: PASS.
+- Build: 0 warnings / 0 errors.
+- Unit tests: **17/17 PASS**.
+- NuGet + symbol package: PASS.
+- SQL Server 2022 integration suite: **5/5 PASS**.
+- Public Repository Guard `31970279841`: PASS.
 
 ### Next
-- Run branch SDK CI + SQL integration + Public Guard.
-- Fix any compile/runtime issue before PR.
+- Open bounded-retry PR, require both PR workflows, then merge/post-merge verify before starting .NET Framework 4.8 compatibility.

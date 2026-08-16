@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-16  
-**Phase:** M2 — bounded connection/read retry hardening  
+**Phase:** M2 — bounded connection/read retry ready for PR  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
@@ -25,30 +25,38 @@ PR #4 merged as `676a78fa0d2c0826d823571fad8882bb5585a90f`.
 Post-merge exact-SHA validation:
 
 - SDK CI run `31970073088`: PASS;
-- build/test/pack job: PASS;
-- SQL Server 2022 integration job: PASS — 5/5 SQL-backed tests;
+- SQL Server 2022 integration: PASS — 5/5;
 - Public Repository Guard run `31970073055`: PASS.
 
-The real-SQL suite verifies Contract validation, Inserted/Unchanged/Updated behavior, rowversion no-op/update behavior, sales ID gaps/read-only semantics and schema-mismatch exception mapping.
+## Bounded retry branch
 
-## Active branch
+Branch: `m2/read-retry-policy`  
+Validated code commit: `4042efd6c50857622767224ea31e2c175241cd82`.
 
-`m2/read-retry-policy`
+Implemented boundary:
 
-Goal: add bounded transient retry without making transactional writes ambiguous.
+- connection opening may retry before a command/transaction starts;
+- `ValidateAsync` and `Sales.ReadAfterAsync` may replay the complete read-only operation on a fresh connection;
+- `ItemGroups.UpsertAsync` and `Items.UpsertAsync` do **not** replay the transaction-scoped write command after execution begins;
+- retry is bounded, cancellation-aware and preserves the final native exception.
 
-### Retry boundary
-
-- Connection opening may retry before any SQL command/transaction begins.
-- `ValidateAsync` and `Sales.ReadAfterAsync` may retry the complete read-only operation on a fresh connection.
-- `ItemGroups.UpsertAsync` and `Items.UpsertAsync` do **not** automatically replay the write command after transaction execution begins.
-- Retry is bounded, cancellation-aware and rethrows the final native exception when exhausted.
-
-Initial public defaults under validation:
+Public defaults:
 
 - `TransientRetryCount = 2`;
 - `TransientRetryBaseDelayMilliseconds = 250`;
 - exponential delay capped at 5000 ms.
+
+### Branch validation
+
+SDK CI run `31970279834`: PASS.
+
+- restore/build/test/pack: PASS;
+- build: 0 warnings / 0 errors;
+- unit tests: **17/17 PASS**;
+- NuGet + symbol package creation: PASS;
+- SQL Server 2022 integration: **5/5 PASS**.
+
+Public Repository Guard run `31970279841`: PASS.
 
 ## Pre-v1.0 administrative gates
 
@@ -60,10 +68,10 @@ Still open:
 
 ## Exact next step
 
-1. Build/test the retry branch with the existing unit and SQL Server integration suites.
-2. Add/fix retry-specific tests until CI is clean.
-3. Open PR only after branch Build/Test/Pack, SQL integration and Public Guard are green.
-4. After merge, begin .NET Framework 4.8 consumer compatibility validation.
+1. Open bounded-retry PR.
+2. Require SDK CI (including real SQL) and Public Repository Guard on the PR.
+3. Merge only when all PR jobs are green and verify `main` post-merge.
+4. Next engineering gate: .NET Framework 4.8 consumer compatibility validation.
 
 ## Handoff rule
 

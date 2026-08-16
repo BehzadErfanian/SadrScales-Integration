@@ -13,18 +13,18 @@ Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **
 - [ ] Add troubleshooting matrix for common SQL integration failures.
 
 ## P1 — SDK foundation and real-SQL hardening
-- [x] Basic SDK + 8 unit tests + package CI.
+- [x] Basic SDK + unit/package CI.
 - [x] Disposable SQL Server 2022 integration tests.
 - [x] PR #4 merged; post-merge SDK/SQL/Public Guard green.
 
 ## P1 — Retry hardening
-- [x] Add bounded retry options.
-- [x] Add explicit transient classifier/backoff policy.
-- [x] Retry safe connection-open boundary.
-- [x] Retry complete read-only Contract/Sales operations.
-- [x] Keep transactional write command execution non-retried.
-- [x] Add retry unit tests including cancellation and non-transient behavior.
-- [ ] Branch/PR CI green and merge.
+- [x] Bounded retry options + explicit transient classifier/backoff.
+- [x] Safe connection-open retry.
+- [x] Complete read-only Contract/Sales retry on fresh connection.
+- [x] Transactional write command execution remains non-retried.
+- [x] Retry unit tests including cancellation and non-transient behavior.
+- [x] Branch CI: 17/17 unit tests, 5/5 SQL tests, package PASS, Public Guard PASS.
+- [ ] PR CI/review and merge.
 - [ ] Post-merge verification.
 
 ## P1 — Compatibility / developer experience
