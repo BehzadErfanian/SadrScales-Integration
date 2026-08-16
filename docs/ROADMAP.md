@@ -11,101 +11,89 @@ This roadmap is the canonical plan. Update it when scope or sequencing changes.
 - [x] Security boundary.
 - [x] Project status / continuity / decisions / backlog.
 - [x] SQL Contract v1 documentation baseline.
-- [x] Full Persian reference-guide publication policy defined.
 - [x] Sample-language structure.
 - [x] Public-repository validation guard.
-- [x] Create GitHub repository.
-- [x] Push reviewed M0 foundation and verify the public repository guard.
-- [x] Verify tracked README/document link targets exist in the public repository tree.
-- [ ] Enable/review available GitHub security features.
+- [x] Public GitHub repository and CI verification.
 
 ## M1 — Contract v1 freeze and public documentation
 
-**Goal:** ensure the public contract is accurate, stable and usable without access to private Sadr Scales source.
+**Goal:** ensure the public contract is accurate, stable and usable without private Sadr Scales source.
 
-- [x] Re-validate Contract v1 fields and rules against the effective Sadr Scales 5.2.1 migrated schema.
-- [x] Freeze basic public surface: `SADR_ItemClass`, `SADR_Item`, `SADR_Logs`.
-- [x] Keep Registry/Mapping/structured sales clearly marked advanced/controlled.
-- [ ] Produce official PDF from the latest Persian Integration & Database Guide.
-- [x] Complete concise Quick Start documents.
-- [x] Complete English contract documentation.
-- [x] Add synthetic executable SQL examples and expected results.
+- [x] Re-validate Contract v1 against the effective Sadr Scales 5.2.1 migrated schema.
+- [x] Freeze basic surface: `SADR_ItemClass`, `SADR_Item`, `SADR_Logs`.
+- [x] Keep Registry/Mapping/structured sales advanced/controlled.
+- [x] Complete Persian/English Quick Starts and contract docs.
+- [x] Add executable synthetic SQL examples and expected results.
 - [x] Add contract regression checklist.
-- [ ] Review/enable available GitHub security features.
+- [x] Produce and visually QA the official Persian Integration & Database Guide PDF.
+- [x] Record the approved PDF filename and SHA-256 in repository documentation.
+- [ ] Upload the approved PDF/checksum as GitHub Release assets at the appropriate release point.
+- [ ] Complete owner/admin GitHub host-security checklist.
 
-**M1 exit gate:** official guide PDF/checksum prepared, security settings reviewed, and public docs/samples pass final QA.
+**M1 engineering exit gate:** complete. Remaining host/release administration proceeds in parallel and must be closed before public `v1.0.0` distribution.
 
 ## M2 — C# Integration SDK v1
 
-**Goal:** make the common integration path small and safe.
+**Goal:** make the common integration path small, safe and source-available.
 
 Planned functional areas:
 
 - schema/contract validation;
 - connection handling without embedded credentials;
 - item-group upsert;
-- item/PLU upsert and batch import;
+- item/PLU upsert and bounded batch import;
 - incremental sales read with caller-owned cursor;
-- structured invoice lookup/ack helpers only when explicitly enabled as advanced APIs;
 - bounded retry for transient SQL failures;
-- idempotency helpers/examples;
-- clear advanced APIs separated from the basic contract.
+- idempotency guidance/helpers;
+- advanced APIs separated from the basic contract.
 
-Open design work:
+Design gates:
 
-- [ ] Select target framework(s).
-- [ ] Freeze public API names and sync/async model.
-- [ ] Decide packaging strategy (DLL + NuGet).
+- [ ] Freeze target framework(s) and SQL provider.
+- [ ] Freeze public API names and async model.
 - [ ] Define exception/result model.
-- [ ] Define logging abstraction without leaking secrets.
+- [ ] Define logging behavior without leaking secrets.
+- [ ] Scaffold SDK-style library.
 - [ ] Add unit and integration tests.
+- [ ] Add CI build/test workflow.
 
 ## M3 — Reference samples
 
-**Goal:** let a software vendor run a working sample quickly.
-
 - [ ] C# Console Quick Start.
 - [ ] C# end-to-end item + sales example.
-- [x] Raw SQL examples for the frozen basic Contract v1.
+- [x] Raw SQL examples for frozen basic Contract v1.
 - [ ] Safe sample configuration template.
 - [ ] Local/synthetic test database instructions.
 
 ## M4 — Multi-language examples
 
-These examples implement SQL Contract v1 directly; they do not reimplement device protocols.
-
 - [ ] Python.
 - [ ] Node.js.
 - [ ] Java.
 - [ ] PHP.
-- [ ] Language-neutral mapping table for SQL types and null handling.
+- [ ] Language-neutral SQL type/null mapping table.
 
-## M5 — CI, packaging and GitHub Releases
+## M5 — Packaging and GitHub Releases
 
 - [ ] Build/test GitHub Actions workflow for SDK code.
 - [x] Public-repository security guard on pushes/PRs.
 - [ ] Package SDK.
 - [ ] Generate XML docs/package metadata.
 - [ ] SHA-256 manifest.
-- [ ] Signed/tagged release procedure where appropriate.
+- [ ] Release procedure.
 - [ ] `v1.0.0` GitHub Release with SDK, samples, guide and checksums.
 
 ## M6 — Sadr website developer experience
 
-- [ ] Replace the old simple developer guide on `sadrgroup.ir/app/developers/` with a concise landing page.
-- [ ] Link to this GitHub repository as the developer source of truth.
-- [ ] Link/download the official full Integration Guide PDF.
-- [ ] Link the latest GitHub Release / SDK.
-- [ ] Keep the main Sadr Scales application download on the official Sadr website.
-- [ ] Keep the user guide at the user-facing documentation path.
+- [ ] Replace old simple developer guide with concise landing page.
+- [ ] Link this GitHub repository as developer source of truth.
+- [ ] Link/download official full Integration Guide PDF.
+- [ ] Link latest GitHub Release / SDK.
+- [ ] Keep main Sadr Scales application download on official Sadr website.
+- [ ] Keep user guide at user-facing documentation path.
 
 ## Future — Integration Gateway / no-code connector
 
-Not part of Sadr Scales 5.2.1 or SQL Contract v1.
+Not part of Sadr Scales 5.2.1 / SQL Contract v1.
 
-Potential future work:
-
-- REST API / Webhook gateway;
-- configurable connector utility for integrations requiring little or no custom code;
-- remote/realtime integration surfaces;
-- Contract v2 only when a real new public interface exists.
+Potential future work: REST/Webhook gateway, configurable no-code connector, remote/realtime integration surfaces, and a separately versioned future contract only when a real public interface exists.
