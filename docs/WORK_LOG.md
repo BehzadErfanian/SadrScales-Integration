@@ -1,65 +1,52 @@
 # Work Log
 
-This is a chronological engineering log. It complements `CHANGELOG.md` and preserves handoff context.
+This chronological engineering log preserves handoff context.
 
 ## 2026-08-16 — M0 foundation
 
-- Created dedicated public integration repository and governance structure.
-- Established public/private security boundary and CI guard.
-- Added bilingual README/contract baseline, roadmap, backlog, decision log and sample structure.
+- Created dedicated public integration repository, governance documents and security boundary.
+- Added and verified cross-platform Public Repository Guard.
 - Withheld software license pending explicit company approval.
-- Verified cross-platform public repository guard on GitHub Actions.
 
-## 2026-08-16 — M1 Contract v1 freeze
+## 2026-08-16 — M1 Contract v1 + reference
 
-- Re-validated basic public contract against effective Sadr Scales 5.2.1 post-migration schema.
-- Froze `SADR_ItemClass`, `SADR_Item` and read-only `SADR_Logs` basic surface.
+- Re-validated/froze the basic public Contract v1 against effective Sadr Scales 5.2.1 post-migration schema.
 - Added bilingual specs/Quick Starts, regression checklist and executable synthetic SQL samples.
-- PR #1 passed public repository guard and squash-merged as `5fdac401392a9709fcd68ba2846be7941f60a4a0`.
-- Post-merge guard passed.
-
-## 2026-08-16 — M1 reference preparation
-
-- Generated and page-by-page QA'd official 34-page Persian Integration & Database Guide PDF.
-- Recorded SHA-256 `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
-- Added GitHub host-security owner/admin checklist because connected API cannot verify/toggle those admin settings.
-- PR #2 passed public guard and squash-merged as `b953db28a0c26af9655ddbf21bb52da9735bc92b`.
+- PR #1 merged as `5fdac401392a9709fcd68ba2846be7941f60a4a0` after guard PASS.
+- Generated/page-QA'd official 34-page Persian Integration Guide and recorded SHA-256 `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
+- Added GitHub host-security owner/admin checklist.
+- PR #2 merged as `b953db28a0c26af9655ddbf21bb52da9735bc92b` after guard PASS.
 - M1 engineering closed; release-asset/security UI/license administration remains pre-v1.0.
 
-## 2026-08-16 — M2 SDK foundation implementation
+## 2026-08-16 — M2 SDK foundation
 
-### Decisions
+### Decisions and implementation
 
-- Initial library target: `netstandard2.0`, with .NET Framework 4.8 consumer compatibility required before v1.0.
-- SQL provider: `Microsoft.Data.SqlClient 7.0.2`.
-- Caller owns SQL connection-string/security configuration; SDK does not silently weaken encryption/trust settings and never logs the raw connection string.
-- Basic sales API is read-only and does not own the destination cursor.
+- Chose `netstandard2.0` initial library target and `Microsoft.Data.SqlClient 7.0.2`.
+- Caller owns connection/security configuration; SDK does not silently weaken SQL security settings or log raw connection strings.
+- Implemented `SadrScalesClient`, Contract validator, semantic group/item upserts and read-only incremental sales batches.
+- Basic sales cursor remains destination-owned.
+- Added first unit tests, SDK design doc and GitHub Actions restore/build/test/pack workflow.
+- Rechecked public item/group SQL types and lengths against Sadr Scales source before CI.
 
-### Implemented on `m2/sdk-foundation`
+### CI cycle 1 — commit `77587763bbda8c83516ed73253675b801dfb44a4`
 
-- SDK-style `SadrScales.Integration` project.
-- `SadrScalesClient` entry point and validated client options.
-- Contract v1 schema validator with dedicated mismatch exception.
-- Parameterized, transactional and semantic item-group upsert.
-- Parameterized, transactional and semantic item/PLU upsert without legacy/internal fields.
-- Read-only incremental sales batch ordered by `SADR_Logs.ID`.
-- Input guards that fail before SQL access.
-- First unit tests.
-- SDK GitHub Actions workflow for restore/build/test/pack.
-- `SDK_DESIGN_V1.md` describing API/security/error/cursor/packaging boundaries.
+- Public Repository Guard: PASS.
+- Restore: PASS.
+- Build: PASS — 0 warnings / 0 errors.
+- Tests: PASS — 8/8.
+- Pack: PASS — `.nupkg` and `.snupkg` created.
+- NuGet package-quality message identified: missing internal package README.
 
-### Verification
+### Package cleanup — commit `666ba48d381db73e7397f8be92ada02b7a3c153b`
 
-- Rechecked `SADR_ItemClass` and public `SADR_Item` SQL types/lengths against Sadr Scales source.
-- First SDK CI run on commit `77587763bbda8c83516ed73253675b801dfb44a4` completed restore/build/test/pack successfully.
-- Build result: 0 warnings, 0 errors.
-- Test result: 8/8 passed.
-- NuGet `.nupkg` and `.snupkg` were created successfully.
-- Public Repository Guard also passed.
-- NuGet emitted one package-quality message because the package had no internal README; a dedicated package README was added immediately rather than leaving that quality issue for later.
+- Added dedicated `PACKAGE_README.md` to the NuGet package.
+- Public Repository Guard: PASS.
+- Restore/build/test/pack: PASS.
+- Tests: 8/8.
+- Build: 0 warnings / 0 errors.
+- NuGet package and symbol package created with clean pack output; previous missing-readme message is gone.
 
 ### Next
 
-- Re-run both CI gates after the package README cleanup.
-- If clean, open M2 foundation PR and merge only after PR CI passes.
-- Then continue with bounded retry, safe SQL integration tests and .NET Framework 4.8 consumer compatibility.
+Open M2 foundation PR, require both CI workflows on PR, review diff, merge only when green, then verify `main` post-merge CI.

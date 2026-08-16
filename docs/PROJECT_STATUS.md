@@ -1,72 +1,69 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-16  
-**Phase:** M2 — C# Integration SDK v1 foundation implementation  
+**Phase:** M2 — C# Integration SDK v1 foundation ready for PR  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
-
-## Purpose
-
-Create one public, polished GitHub repository that software vendors can receive as the single developer link for integrating POS, ERP and accounting systems with Sadr Scales.
-
-The repository contains public source code, contract documentation, samples, compatibility information, release assets and enough project history to continue development without depending on chat history.
 
 ## Completed foundation
 
 ### M0
 
-- Public repository and bilingual README.
-- Explicit public/private security boundary.
-- Source-controlled public repository guard running on push and pull request.
-- Roadmap, backlog, decisions, work log, compatibility and release policy.
+Public repository, bilingual README, explicit security boundary, continuity documentation and source-controlled public repository guard.
 
 ### M1
 
-- SQL Contract v1 re-validated against effective Sadr Scales 5.2.1 migrated schema and frozen.
-- Basic public surface: `SADR_ItemClass`, `SADR_Item`, read-only `SADR_Logs`.
-- Persian/English Contract v1 and Quick Starts.
-- Executable synthetic SQL validation/upsert/sales samples.
-- Contract freeze record and regression checklist.
-- Official 34-page Persian Integration & Database Guide prepared and visually QA'd.
-- Official PDF SHA-256 recorded as `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
+SQL Contract v1 source audit/freeze, bilingual contract/Quick Starts, executable synthetic SQL samples, regression checklist and official 34-page Persian guide preparation/QA.
 
-Pre-v1.0 administrative gates remain explicit: company-approved license, GitHub host-security checklist, and official PDF/checksum Release upload.
+Official guide SHA-256: `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
 
-## M2 foundation being implemented
+Pre-v1.0 administrative gates remain explicit: company-approved license, GitHub host-security checklist and official PDF/checksum Release upload.
 
-Branch: `m2/sdk-foundation`
+## M2 foundation implemented on `m2/sdk-foundation`
 
-Design choices:
+Design:
 
-- library target: `netstandard2.0`;
-- SQL provider: `Microsoft.Data.SqlClient 7.0.2`;
-- caller owns the connection string and deployment security policy;
-- SDK never logs or rewrites the raw connection string;
-- async-first public operations with cancellation support;
+- `netstandard2.0` reusable library target;
+- `Microsoft.Data.SqlClient 7.0.2`;
+- caller-owned SQL connection/security configuration;
+- async-first operations with cancellation support;
 - short-lived pooled SQL connections;
-- explicit transactions for writes;
-- destination-owned sales cursor; SDK never acknowledges basic `SADR_Logs` by writing to Sadr data.
+- explicit write transactions;
+- destination-owned sales cursor; no hidden Sadr-side consumer state.
 
-Initial API surface under CI validation:
+Basic API:
 
 - `SadrScalesClient.ValidateAsync()`;
 - `ItemGroups.UpsertAsync(...)`;
 - `Items.UpsertAsync(...)`;
 - `Sales.ReadAfterAsync(...)`;
-- `SadrWriteResult` with Inserted/Updated/Unchanged semantics;
-- `SadrSalesBatch` returning a cursor candidate only after a successful read.
+- Inserted/Updated/Unchanged write result;
+- read-only sales batch with `LastReadId` cursor candidate.
 
-Advanced Registry/Mapping/structured-sales/device protocol APIs remain outside this basic SDK foundation.
+## Branch validation
+
+Latest branch commit before PR: `666ba48d381db73e7397f8be92ada02b7a3c153b`.
+
+GitHub Actions results:
+
+- Public Repository Guard: PASS.
+- SDK restore: PASS.
+- SDK build: PASS — 0 warnings / 0 errors.
+- Unit tests: PASS — 8/8.
+- NuGet package smoke test: PASS — `.nupkg` and `.snupkg` generated.
+- Initial NuGet missing-readme quality message was fixed with a dedicated package README; second pack is clean.
 
 ## Exact next step
 
-1. Commit the M2 SDK foundation to `m2/sdk-foundation`.
-2. Require both Public Repository Guard and SDK CI to build/test/pack successfully.
-3. Fix every CI issue on the branch before opening/merging the M2 PR.
-4. After the foundation is green, add bounded transient-SQL retry, safe integration-test infrastructure and .NET Framework 4.8 consumer compatibility validation.
-5. Add executable C# Quick Start only after the foundation API compiles cleanly and is reviewed.
+1. Open M2 foundation PR.
+2. Require Public Repository Guard and SDK CI to pass on the PR.
+3. Review PR diff and merge only when both gates are green.
+4. Verify post-merge `main` CI.
+5. Continue M2 hardening: bounded transient retry, safe SQL integration tests, .NET Framework 4.8 consumer compatibility, bounded item batch API and executable C# Quick Start.
+
+Advanced Registry/Mapping/structured-sales/device protocol APIs remain outside the basic SDK foundation.
 
 ## Handoff rule
 
-A future chat/session begins by reading `AGENTS.md`, this file, `DECISIONS.md`, `ROADMAP.md`, `BACKLOG.md`, `WORK_LOG.md`, `SDK_DESIGN_V1.md` and `SECURITY_BOUNDARY.md`. Chat history is not the project source of truth.
+A future chat/session begins by reading `AGENTS.md`, this file, `DECISIONS.md`, `ROADMAP.md`, `BACKLOG.md`, `WORK_LOG.md`, `SDK_DESIGN_V1.md` and `SECURITY_BOUNDARY.md`.

@@ -11,38 +11,35 @@ Priority meanings: **P0** blocks safe public release; **P1** needed for v1.0; **
 ## P1 — Contract / docs
 
 - [x] Freeze SQL Contract v1 after 5.2.1 source/schema verification.
-- [x] Publish bilingual Contract v1 / Quick Starts / freeze record / regression checklist.
+- [x] Publish bilingual Contract/Quick Starts/freeze record/regression checklist.
 - [x] Add executable synthetic SQL samples.
 - [x] Produce/page-QA official guide PDF and record SHA-256.
 - [ ] Add troubleshooting matrix for common SQL integration failures.
 
 ## P1 — SDK foundation
 
-- [x] Select `netstandard2.0` initial target.
-- [x] Select `Microsoft.Data.SqlClient 7.0.2`.
-- [x] Define `SadrScalesClient` basic API and security/cursor boundaries.
-- [x] Implement schema validator.
-- [x] Implement item-group upsert.
-- [x] Implement item/PLU upsert.
-- [x] Implement incremental read-only `SADR_Logs` reader.
-- [x] Add unit tests and SDK CI build/test/pack workflow.
-- [ ] Get branch/PR SDK CI green.
+- [x] Select `netstandard2.0` and `Microsoft.Data.SqlClient 7.0.2`.
+- [x] Define basic API/security/cursor boundaries.
+- [x] Implement schema validator, item-group upsert, PLU upsert and incremental sales reader.
+- [x] Add unit tests and SDK restore/build/test/pack CI.
+- [x] Branch CI green: 8/8 tests, 0 build warnings/errors, clean package creation.
+- [ ] PR CI/review and merge to `main`.
+- [ ] Verify post-merge CI.
 
 ## P1 — SDK hardening
 
-- [ ] Add bounded transient-SQL retry policy.
-- [ ] Add safe SQL integration tests.
-- [ ] Add .NET Framework 4.8 consumer compatibility test.
-- [ ] Add bounded item batch API.
-- [ ] Add C# console sample.
-- [ ] Add Source Link/package metadata.
-- [ ] Decide strong-name policy.
+- [ ] Bounded transient-SQL retry policy.
+- [ ] Safe SQL integration tests.
+- [ ] .NET Framework 4.8 consumer compatibility test.
+- [ ] Bounded item batch API.
+- [ ] C# console sample.
+- [ ] Source Link/package metadata.
+- [ ] Strong-name policy decision.
 
 ## P1 — Release
 
 - [ ] Final license approval.
-- [ ] Package and checksums.
-- [ ] Release notes template.
+- [ ] Package/checksums/release notes.
 - [ ] `v1.0.0` GitHub Release.
 - [ ] Update website developer landing page.
 
