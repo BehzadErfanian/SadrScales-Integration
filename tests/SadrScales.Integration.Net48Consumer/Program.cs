@@ -56,9 +56,16 @@ namespace SadrScales.Integration.Net48Consumer
                     .FirstOrDefault(reference =>
                         string.Equals(reference.Name, "Microsoft.Data.SqlClient", StringComparison.Ordinal));
 
-                Assert(sqlClientReference != null, "SDK assembly does not reference Microsoft.Data.SqlClient.");
-                var sqlClientAssembly = Assembly.Load(sqlClientReference!);
-                Assert(sqlClientAssembly != null, "Microsoft.Data.SqlClient could not be loaded by the net48 consumer.");
+                if (sqlClientReference == null)
+                {
+                    throw new InvalidOperationException("SDK assembly does not reference Microsoft.Data.SqlClient.");
+                }
+
+                var sqlClientAssembly = Assembly.Load(sqlClientReference);
+                if (sqlClientAssembly == null)
+                {
+                    throw new InvalidOperationException("Microsoft.Data.SqlClient could not be loaded by the net48 consumer.");
+                }
 
                 Console.WriteLine("PASS - SadrScales.Integration package loaded and executed from .NET Framework 4.8.");
                 Console.WriteLine("SDK assembly: " + typeof(SadrScalesClient).Assembly.FullName);

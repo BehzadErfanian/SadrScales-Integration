@@ -31,13 +31,20 @@
 - Runtime smoke checks public SDK options/client/models and loads the `Microsoft.Data.SqlClient` dependency resolved through the package graph.
 
 ### Compatibility CI cycle 1 — `aceb1d4cbae13df7511e88f264d4443dd5127e09`
-- Public Repository Guard: PASS.
-- Existing build/test/pack: PASS.
-- Existing SQL Server 2022 integration: PASS.
-- net48 job created the SDK package successfully, but failed **before package compatibility was evaluated**: the multiline PowerShell `dotnet restore --source ... --source https://...` command caused NuGet to interpret the nuget.org URL as a relative/local Windows path and return NU1301.
-- No net48 compile/runtime/package-graph incompatibility was observed in this run because restore never reached dependency resolution.
-- Replaced CLI source arguments with a dedicated `NuGet.CI.config` containing the local package source and nuget.org; restore now uses `--configfile` to avoid Windows quoting/path interpretation ambiguity.
+- Public Guard / existing build-test-pack / SQL Server integration: PASS.
+- net48 job packed SDK but restore never reached real dependency resolution because multiline PowerShell `--source` parsing turned the nuget.org URL into a local path (`NU1301`).
+- Replaced CLI source arguments with dedicated `NuGet.CI.config`.
+
+### Compatibility CI cycle 2 — `c60c23a84a6a8eaf92e82b90ef292d684aa02f8a`
+- SDK CI `31970684539`: PASS for all three jobs.
+- Package restore from local nupkg: PASS.
+- net48 build: PASS.
+- net48 runtime smoke: PASS.
+- Runtime loaded `SadrScales.Integration, Version=0.1.0.0` and `Microsoft.Data.SqlClient, Version=7.0.0.0`.
+- Existing SQL Server integration: PASS.
+- Public Repository Guard `31970684536`: PASS.
+- One nullable-flow compiler warning (`CS8602`) remained in the smoke harness because a custom Assert does not inform C# nullable flow analysis; runtime behavior was successful.
+- Replaced the custom null assertion with explicit `if (x == null) throw` flow and set the net48 consumer to `TreatWarningsAsErrors=true` so the final compatibility gate cannot be green with compiler warnings.
 
 ### Next
-- Re-run all SDK CI jobs after the source-configuration fix.
-- If restore reaches dependency resolution, address any real net48 package/binding/runtime issue revealed by that run.
+- Run compatibility CI cycle 3; require net48 restore/build/runtime plus existing SDK/SQL jobs and Public Guard to pass with zero consumer warnings before opening the PR.
