@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,11 @@ namespace SadrScales.Integration.Items
     /// </summary>
     public sealed class SadrItemClient
     {
+        /// <summary>
+        /// Maximum number of PLUs accepted by one atomic batch call.
+        /// </summary>
+        public const int MaxBatchSize = 200;
+
         private const string UpsertSql = @"
 IF NOT EXISTS (
     SELECT 1
@@ -108,22 +114,112 @@ END;";
 
             using (var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false))
             using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
-            using (var command = new SqlCommand(UpsertSql, connection, transaction))
             {
-                command.CommandTimeout = _options.CommandTimeoutSeconds;
-                AddParameters(command, item);
-
                 try
                 {
-                    var scalar = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+                    var operation = await ExecuteUpsertAsync(connection, transaction, item, cancellationToken).ConfigureAwait(false);
                     transaction.Commit();
-                    return new SadrWriteResult((SadrWriteOperation)Convert.ToInt32(scalar));
+                    return new SadrWriteResult(operation);
                 }
                 catch
                 {
                     TryRollback(transaction);
                     throw;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Upserts up to <see cref="MaxBatchSize"/> PLUs in one all-or-nothing transaction.
+        /// </summary>
+        /// <remarks>
+        /// The complete batch is validated before SQL access. Duplicate <c>PluNo</c> values in the same
+        /// call are rejected. If any SQL write fails, the transaction is rolled back and no item in that
+        /// call is committed. Larger workloads should be explicitly paged by the caller.
+        /// </remarks>
+        public async Task<SadrItemBatchWriteResult> UpsertBatchAsync(
+            IEnumerable<SadrItem> items,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (items == null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            var batch = new List<SadrItem>();
+            var pluNumbers = new HashSet<int>();
+
+            foreach (var item in items)
+            {
+                Validate(item);
+
+                if (!pluNumbers.Add(item.PluNo))
+                {
+                    throw new ArgumentException("A batch cannot contain duplicate PluNo values.", nameof(items));
+                }
+
+                batch.Add(item);
+                if (batch.Count > MaxBatchSize)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(items), "A single atomic batch cannot exceed " + MaxBatchSize + " PLUs.");
+                }
+            }
+
+            if (batch.Count == 0)
+            {
+                return new SadrItemBatchWriteResult(0, 0, 0);
+            }
+
+            using (var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false))
+            using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            {
+                var inserted = 0;
+                var updated = 0;
+                var unchanged = 0;
+
+                try
+                {
+                    foreach (var item in batch)
+                    {
+                        var operation = await ExecuteUpsertAsync(connection, transaction, item, cancellationToken).ConfigureAwait(false);
+                        switch (operation)
+                        {
+                            case SadrWriteOperation.Inserted:
+                                inserted++;
+                                break;
+                            case SadrWriteOperation.Updated:
+                                updated++;
+                                break;
+                            default:
+                                unchanged++;
+                                break;
+                        }
+                    }
+
+                    transaction.Commit();
+                    return new SadrItemBatchWriteResult(inserted, updated, unchanged);
+                }
+                catch
+                {
+                    TryRollback(transaction);
+                    throw;
+                }
+            }
+        }
+
+        private async Task<SadrWriteOperation> ExecuteUpsertAsync(
+            SqlConnection connection,
+            SqlTransaction transaction,
+            SadrItem item,
+            CancellationToken cancellationToken)
+        {
+            using (var command = new SqlCommand(UpsertSql, connection, transaction))
+            {
+                command.CommandTimeout = _options.CommandTimeoutSeconds;
+                AddParameters(command, item);
+
+                var scalar = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+                return (SadrWriteOperation)Convert.ToInt32(scalar);
             }
         }
 
