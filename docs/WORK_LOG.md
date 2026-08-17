@@ -30,4 +30,7 @@
 - Added real SQL Server tests for aggregate results and rollback-after-partial-progress.
 - Added read-only-by-default C# Quick Start using `SADR_SCALES_CONNECTION_STRING`; no embedded credentials and no payload dump.
 - Added CI build of the Quick Start.
-- Branch remains pending until exact-head SDK CI and Public Repository Guard both pass.
+- Validated implementation commit `0e32d53852209f052bedc1daf789d57d7ea624cf`.
+- SDK CI run `31997207988`: PASS for build/test/pack, C# Quick Start restore/build, SQL Server 2022 integration, and net48 package consumer.
+- Public Repository Guard run `31997207943`: PASS.
+- Documentation follow-up updated project status/work log before PR; PR-level checks remain required before merge.
