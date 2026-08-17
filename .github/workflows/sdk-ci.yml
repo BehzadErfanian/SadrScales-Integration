@@ -6,11 +6,13 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'samples/**'
       - '.github/workflows/sdk-ci.yml'
   pull_request:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'samples/**'
       - '.github/workflows/sdk-ci.yml'
 
 permissions:
@@ -37,6 +39,12 @@ jobs:
 
       - name: Test
         run: dotnet test tests/SadrScales.Integration.Tests/SadrScales.Integration.Tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Restore C# Quick Start
+        run: dotnet restore samples/csharp/SadrScales.Integration.QuickStart/SadrScales.Integration.QuickStart.csproj
+
+      - name: Build C# Quick Start
+        run: dotnet build samples/csharp/SadrScales.Integration.QuickStart/SadrScales.Integration.QuickStart.csproj --configuration Release --no-restore
 
       - name: Pack SDK smoke test
         run: dotnet pack src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --no-build --output artifacts/package

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SadrScales.Integration.Exceptions;
 using SadrScales.Integration.Items;
@@ -101,6 +102,71 @@ namespace SadrScales.Integration.SqlTests
         }
 
         [TestMethod]
+        public async Task Item_Batch_Should_Report_Aggregate_Operations()
+        {
+            var client = CreateClient();
+            var groupCode = "B" + Guid.NewGuid().ToString("N").Substring(0, 8);
+            var seed = 700000 + Math.Abs(Guid.NewGuid().GetHashCode() % 90000);
+
+            await client.ItemGroups.UpsertAsync(new SadrItemGroup
+            {
+                ItemClassCode = groupCode,
+                ItemClassName = "Batch Test"
+            });
+
+            var first = new SadrItem { ItemClassCode = groupCode, PluNo = seed + 1, PluUnit = 3, UnitPrice = 1000, PluName = "A" };
+            var second = new SadrItem { ItemClassCode = groupCode, PluNo = seed + 2, PluUnit = 3, UnitPrice = 2000, PluName = "B" };
+
+            var inserted = await client.Items.UpsertBatchAsync(new[] { first, second });
+            var unchanged = await client.Items.UpsertBatchAsync(new[] { first, second });
+            second.UnitPrice = 2500;
+            var mixed = await client.Items.UpsertBatchAsync(new[] { first, second });
+
+            Assert.AreEqual(2, inserted.Inserted);
+            Assert.AreEqual(0, inserted.Updated);
+            Assert.AreEqual(0, inserted.Unchanged);
+            Assert.AreEqual(2, unchanged.Unchanged);
+            Assert.AreEqual(1, mixed.Updated);
+            Assert.AreEqual(1, mixed.Unchanged);
+            Assert.AreEqual(2, mixed.Total);
+        }
+
+        [TestMethod]
+        public async Task Item_Batch_Should_Roll_Back_All_Writes_When_One_Row_Fails()
+        {
+            var client = CreateClient();
+            var groupCode = "R" + Guid.NewGuid().ToString("N").Substring(0, 8);
+            var missingGroupCode = "M" + Guid.NewGuid().ToString("N").Substring(0, 8);
+            var seed = 600000 + Math.Abs(Guid.NewGuid().GetHashCode() % 90000);
+            var firstPlu = seed + 1;
+            var secondPlu = seed + 2;
+
+            await client.ItemGroups.UpsertAsync(new SadrItemGroup
+            {
+                ItemClassCode = groupCode,
+                ItemClassName = "Rollback Test"
+            });
+
+            try
+            {
+                await client.Items.UpsertBatchAsync(new[]
+                {
+                    new SadrItem { ItemClassCode = groupCode, PluNo = firstPlu, PluUnit = 3, UnitPrice = 1000, PluName = "Would insert" },
+                    new SadrItem { ItemClassCode = missingGroupCode, PluNo = secondPlu, PluUnit = 3, UnitPrice = 2000, PluName = "Must fail FK" }
+                });
+                Assert.Fail("Expected SqlException from the missing item-group foreign key.");
+            }
+            catch (SqlException)
+            {
+                // Expected. The first insert must be rolled back with the second failure.
+            }
+
+            var persisted = Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM dbo.SADR_Item WHERE PluNo IN (" + firstPlu + ", " + secondPlu + ");");
+            Assert.AreEqual(0, persisted, "The batch must be all-or-nothing.");
+        }
+
+        [TestMethod]
         public async Task Sales_Read_Should_Handle_Identity_Gaps_And_Not_Mutate_Source_Rows()
         {
             Database.ExecuteNonQuery("TRUNCATE TABLE dbo.SADR_Logs;");
@@ -129,8 +195,6 @@ DELETE FROM dbo.SADR_Logs WHERE FID = 102;");
         [TestMethod]
         public async Task Contract_Validation_Should_Use_Dedicated_Exception_For_Schema_Mismatch()
         {
-            // UX_SADR_Item_PluNo is created by a UNIQUE table constraint in the real 5.2.1 schema,
-            // so it must be removed/restored as a constraint rather than through DROP INDEX.
             Database.ExecuteNonQuery(
                 "ALTER TABLE dbo.SADR_Item DROP CONSTRAINT UX_SADR_Item_PluNo;");
 

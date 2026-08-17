@@ -101,3 +101,8 @@ Connection open and complete read-only operations may use bounded/cancellable re
 **Date:** 2026-08-16  
 **Status:** Accepted
 Before v1.0, compatibility with .NET Framework 4.8 is validated by building and running a real `net48` application on Windows that restores the generated `SadrScales.Integration` NuGet package. A project-reference-only build or theoretical TFM table is insufficient. The smoke consumer must also load the SqlClient dependency selected by the restored package graph.
+
+## D-021 — PLU batch writes use explicit bounded atomic transactions
+**Date:** 2026-08-17  
+**Status:** Accepted
+`UpsertBatchAsync` accepts at most 200 unique PLUs per call. The complete batch is validated before SQL access and committed in one transaction. Any write failure rolls back the entire call. Larger imports are explicitly paged by the destination application rather than hidden inside one SDK call.
