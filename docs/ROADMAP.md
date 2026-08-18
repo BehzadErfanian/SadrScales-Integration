@@ -1,71 +1,83 @@
 # Roadmap
 
-## M0 — Public repository foundation
+## M0 — Public repository foundation — complete
 - [x] Public repository, bilingual README, security boundary, continuity docs and Public Guard.
 
-## M1 — Contract v1 / public documentation
-- [x] Freeze Contract v1 against effective 5.2.1 schema.
-- [x] Bilingual docs/SQL samples/regression checklist/official guide QA+SHA.
-- [ ] Upload approved PDF/checksum as GitHub Release assets before v1.0.
-- [ ] Complete owner/admin GitHub security checklist.
+## M1 — Contract v1 / public documentation — engineering complete
+- [x] Freeze Contract v1 against effective Sadr Scales 5.2.1 schema.
+- [x] Bilingual contract docs, SQL samples and regression checklist.
+- [x] Final 5.2.1 Integration Guide identity pinned to the 38-page release asset and SHA-256.
+- [x] Bilingual Getting Started and troubleshooting paths.
+- [ ] Actual Guide upload to stable GitHub Release after tag.
+- [ ] Complete/review owner/admin GitHub security checklist.
 
-## M2 — C# Integration SDK v1
+## M2 — C# Integration SDK v1 — release candidate
 
 ### Foundation — complete
 - [x] `netstandard2.0`, `Microsoft.Data.SqlClient 7.0.2`.
-- [x] Contract validator, semantic item/group upserts, read-only incremental sales.
-- [x] Unit/package CI and docs.
+- [x] Contract validator, semantic item/group upserts and read-only incremental sales.
+- [x] Unit/package CI and documentation.
 
 ### SQL-backed hardening — complete
-- [x] Disposable SQL Server 2022 suite; 5/5 real-SQL tests.
-- [x] PR #4 + post-merge gates green.
+- [x] Disposable SQL Server 2022 integration suite.
+- [x] Contract, write, batch and rollback paths exercised against real SQL Server.
 
-### Bounded retry — complete
-- [x] Safe bounded connection/read retry; transactional writes non-replayed.
-- [x] PR #5 merged as `77d3c6330e0741a2c2f92eaec62fb8f50c781702`.
-- [x] Post-merge SDK CI/Public Guard green.
+### Retry/reliability — complete
+- [x] Safe bounded/cancellable connection/read retry.
+- [x] Transaction-scoped writes deliberately non-replayed after execution begins.
 
-### .NET Framework 4.8 package compatibility — branch green
-- [x] Real `net48` package consumer application.
-- [x] Restore consumer from locally generated SDK NuGet package.
-- [x] Build/run on Windows Server 2022 with .NET Framework 4.8.
-- [x] Load SqlClient dependency from restored package graph.
-- [x] Final branch gate `31970792734`: all three SDK CI jobs PASS.
-- [x] net48 build: 0 warnings / 0 errors with warnings-as-errors.
-- [x] Public Guard `31970792738`: PASS.
-- [ ] PR CI/review/merge + post-merge verification.
+### PLU batch — complete
+- [x] Atomic `UpsertBatchAsync`, maximum 200 unique PLUs per call.
+- [x] Complete prevalidation, aggregate results and full transaction rollback on failure.
+- [x] Semantic no-op/rowversion behavior covered.
 
-### Next — batch + developer sample
-- [ ] Atomic bounded PLU batch API.
-- [ ] Batch unit + real-SQL rollback/count/rowversion tests.
-- [ ] Executable C# Console Quick Start, read-only by default.
-- [ ] Safe environment-variable configuration example.
-- [ ] CI build/sample smoke validation.
+### .NET Framework 4.8 compatibility — complete
+- [x] Real NuGet-package consumer application.
+- [x] Local generated-package restore.
+- [x] Windows Server 2022 `net48` build/runtime smoke.
+- [x] Warnings treated as errors.
+- [x] SDK + SqlClient dependency graph loads at runtime.
 
-### Later v1.0 hardening
-- [ ] Source Link/package validation.
-- [ ] Strong-name decision before v1.0.
+### Developer experience — complete for v1
+- [x] Executable read-only-by-default C# Quick Start.
+- [x] Environment-variable connection-string configuration.
+- [x] Root English/Persian developer landing pages.
+- [x] Bilingual troubleshooting guide.
+- [x] Raw SQL reference samples.
+- [x] Obsolete duplicate C# sample placeholder removed.
 
-## M3 — Reference samples
-- [ ] C# Console Quick Start/end-to-end example.
-- [x] Raw SQL Contract v1 examples.
-- [ ] Safe sample configuration/local synthetic DB instructions.
+### Package/release hardening — complete for release candidate
+- [x] Package version/metadata prepared for `1.0.0`.
+- [x] Source Link/repository metadata validated inside generated NuGet package.
+- [x] .NET package validation enabled.
+- [x] API/SemVer compatibility policy documented.
+- [x] Strong-name decision recorded: unsigned v1.0.0.
+- [x] Automated Binaries/Developer Kit bundles, release manifest and SHA-256 checksums.
+- [x] Release-bundle smoke gate in normal CI.
+- [x] Protected tag workflow reruns SDK/SQL/net48 gates, verifies final Guide SHA and creates a Draft GitHub Release.
 
-## M4 — Multi-language examples
+## M3 — Stable `v1.0.0` publication — pending administrative gates
+- [ ] Approve public software license and add `LICENSE`/package license metadata.
+- [ ] Review GitHub owner/admin security checklist.
+- [ ] Final PR CI/review/merge.
+- [ ] Tag exact merged source as `v1.0.0`.
+- [ ] Confirm protected release run passes.
+- [ ] Inspect Draft Release package/DLL/symbols/developer kit/guide/manifest/checksums.
+- [ ] Publish GitHub Release.
+
+## M4 — Multi-language reference examples — after v1
 - [ ] Python.
 - [ ] Node.js.
 - [ ] Java.
 - [ ] PHP.
 - [ ] Language-neutral SQL type/null mapping table.
 
-## M5 — Packaging / Releases
-- [x] SDK CI + Public Guard on main.
-- [ ] NuGet/DLL packaging policy, Source Link, checksums and release procedure.
-- [ ] `v1.0.0` GitHub Release.
+Until these wrappers exist, non-C# developers use the documented SQL Contract v1 and executable SQL samples as the language-neutral integration source of truth.
 
-## M6 — Website developer experience
-- [ ] Replace old developer guide with concise landing page.
-- [ ] Link GitHub as developer source of truth, official guide and latest SDK Release.
+## M5 — Developer distribution improvements — after v1
+- [ ] Website developer landing page linking to GitHub/release/guide.
+- [ ] Evaluate NuGet.org publication and package ownership policy.
 
 ## Future
-No-code/REST/Webhook are separately versioned future scope.
+
+No-code connectors, REST/Webhook Gateway and advanced structured-invoice helpers remain separately versioned future scope. Direct scale wire protocols remain private.
