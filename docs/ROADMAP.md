@@ -2,12 +2,16 @@
 
 ## M0 — Public repository foundation — complete
 - [x] Public repository, bilingual README, security boundary, continuity docs and Public Guard.
+- [x] Public support/contribution/code-of-conduct files.
+- [x] CODEOWNERS and hardened Issue/PR intake.
+- [x] Weekly Dependabot policy for NuGet and GitHub Actions.
 
 ## M1 — Contract v1 / public documentation — engineering complete
 - [x] Freeze Contract v1 against effective Sadr Scales 5.2.1 schema.
 - [x] Bilingual contract docs, SQL samples and regression checklist.
 - [x] Final 5.2.1 Integration Guide identity pinned to the 38-page release asset and SHA-256.
 - [x] Bilingual Getting Started and troubleshooting paths.
+- [x] Vendor production-readiness/go-live checklist.
 - [ ] Actual Guide upload to stable GitHub Release after tag.
 - [ ] Complete/review owner/admin GitHub security checklist.
 
@@ -44,20 +48,25 @@
 - [x] Root English/Persian developer landing pages.
 - [x] Bilingual troubleshooting guide.
 - [x] Raw SQL reference samples.
+- [x] Public support policy and production-readiness checklist.
 - [x] Obsolete duplicate C# sample placeholder removed.
 
 ### Package/release hardening — complete for release candidate
 - [x] Package version/metadata prepared for `1.0.0`.
+- [x] MIT license approved and committed.
+- [x] Package/provider identity: Tozin Sadr + Behzad Erfanian.
 - [x] Source Link/repository metadata validated inside generated NuGet package.
 - [x] .NET package validation enabled.
 - [x] API/SemVer compatibility policy documented.
 - [x] Strong-name decision recorded: unsigned v1.0.0.
 - [x] Automated Binaries/Developer Kit bundles, release manifest and SHA-256 checksums.
+- [x] Release bundle includes license/support/contribution/changelog/production-readiness material.
 - [x] Release-bundle smoke gate in normal CI.
 - [x] Protected tag workflow reruns SDK/SQL/net48 gates, verifies final Guide SHA and creates a Draft GitHub Release.
 
-## M3 — Stable `v1.0.0` publication — pending administrative gates
-- [ ] Approve public software license and add `LICENSE`/package license metadata.
+## M3 — Stable `v1.0.0` publication — final gate
+- [x] Approve MIT public software license and add `LICENSE`/package license metadata.
+- [x] Joint provider/copyright identity documented and package-validated.
 - [ ] Review GitHub owner/admin security checklist.
 - [ ] Final PR CI/review/merge.
 - [ ] Tag exact merged source as `v1.0.0`.
