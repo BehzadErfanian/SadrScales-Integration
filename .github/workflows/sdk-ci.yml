@@ -7,12 +7,14 @@ on:
       - 'src/**'
       - 'tests/**'
       - 'samples/**'
+      - 'tools/**'
       - '.github/workflows/sdk-ci.yml'
   pull_request:
     paths:
       - 'src/**'
       - 'tests/**'
       - 'samples/**'
+      - 'tools/**'
       - '.github/workflows/sdk-ci.yml'
 
 permissions:
@@ -25,6 +27,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
@@ -46,8 +50,17 @@ jobs:
       - name: Build C# Quick Start
         run: dotnet build samples/csharp/SadrScales.Integration.QuickStart/SadrScales.Integration.QuickStart.csproj --configuration Release --no-restore
 
-      - name: Pack SDK smoke test
+      - name: Pack SDK
         run: dotnet pack src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --no-build --output artifacts/package
+
+      - name: Validate NuGet package shape and Source Link metadata
+        shell: pwsh
+        run: |
+          $package = Get-ChildItem artifacts/package/SadrScales.Integration.*.nupkg |
+            Where-Object { $_.Name -notlike '*.snupkg' } |
+            Select-Object -First 1
+          if (-not $package) { throw 'SDK NuGet package was not produced.' }
+          ./tools/Validate-NuGetPackage.ps1 -PackagePath $package.FullName
 
   sql-integration-test:
     runs-on: ubuntu-latest
