@@ -2,11 +2,14 @@
 
 # یکپارچه‌سازی Sadr Scales
 
+[![SDK CI](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/sdk-ci.yml/badge.svg)](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/sdk-ci.yml)
+[![Public Repository Guard](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/public-repo-guard.yml/badge.svg)](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/public-repo-guard.yml)
+
 **مخزن عمومی رسمی قرارداد SQL، ابزار توسعه C# و نمونه‌های اتصال نرم‌افزارهای فروشگاهی، ERP و حسابداری به Sadr Scales.**
 
 **ارائه و نگهداری توسط Tozin Sadr و Behzad Erfanian.**
 
-[English](README.md) · [شروع سریع](docs/fa/getting-started.md) · [رفع اشکال](docs/fa/troubleshooting.md) · [قرارداد SQL v1](docs/fa/sql-contract-v1.md) · [سازگاری](docs/COMPATIBILITY.md) · [امنیت](SECURITY.md)
+[English](README.md) · [شروع سریع](docs/fa/getting-started.md) · [رفع اشکال](docs/fa/troubleshooting.md) · [چک‌لیست آمادگی بهره‌برداری](docs/PRODUCTION_READINESS_CHECKLIST.md) · [قرارداد SQL v1](docs/fa/sql-contract-v1.md) · [سازگاری](docs/COMPATIBILITY.md) · [پشتیبانی](SUPPORT.md) · [امنیت](SECURITY.md)
 
 ---
 
@@ -144,6 +147,10 @@ SDK فقط در مرزهایی که Replay امن است Retry خودکار دا
 
 Writeهای Transactional گروه و کالا پس از شروع اجرا **به‌صورت خودکار Replay نمی‌شوند**؛ چون با گم‌شدن پاسخ ممکن است وضعیت Commit مبهم شود.
 
+## تحویل برای بهره‌برداری واقعی
+
+پیش از فعال‌کردن اتصال در محیط مشتری، [چک‌لیست آمادگی بهره‌برداری](docs/PRODUCTION_READINESS_CHECKLIST.md) را کامل کنید. این چک‌لیست کنترل نسخه و Contract، امنیت دسترسی بانک، قواعد کالا، Cursor و جلوگیری از ثبت تکراری فروش، تست Restart/Rollback و تحویل عملیاتی را پوشش می‌دهد.
+
 ## سازگاری و پایداری API
 
 نسخه `1.0.0` اولین خط پایدار API است. نسخه‌های `1.x` از Semantic Versioning پیروی می‌کنند و نسخه SQL Contract جداگانه مدیریت می‌شود.
@@ -154,24 +161,29 @@ Writeهای Transactional گروه و کالا پس از شروع اجرا **ب�
 
 - [شروع سریع](docs/fa/getting-started.md)
 - [راهنمای رفع اشکال](docs/fa/troubleshooting.md)
+- [چک‌لیست آمادگی بهره‌برداری](docs/PRODUCTION_READINESS_CHECKLIST.md)
 - [SQL Contract v1](docs/fa/sql-contract-v1.md)
 - [سیاست سازگاری API](docs/API_COMPATIBILITY.md)
 - [طراحی SDK v1](docs/SDK_DESIGN_V1.md)
 - [سازگاری نسخه‌ها](docs/COMPATIBILITY.md)
 - [مرز امنیتی](docs/SECURITY_BOUNDARY.md)
 - [هویت راهنمای رسمی فارسی](docs/reference/README.md)
+- [سیاست پشتیبانی](SUPPORT.md)
+- [راهنمای مشارکت](CONTRIBUTING.md)
 
-## مرز امنیتی
+## پشتیبانی و امنیت
+
+برای ایرادهای قابل بازتولید SDK یا Contract که اطلاعات حساس ندارند از GitHub Issues استفاده کنید. پیش از انتشار اطلاعات مربوط به مشتری، [SUPPORT.md](SUPPORT.md) را بخوانید.
+
+گزارش‌های امنیتی باید طبق [SECURITY.md](SECURITY.md) ارسال شوند و نباید در Issue عمومی عادی منتشر شوند.
 
 پروتکل مستقیم دستگاه، Capture شبکه، کلید خصوصی، Credential، اطلاعات مشتری، Firmware/Vendor material و Source یا زیرساخت داخلی Sadr Scales اجازه ورود به این Repository عمومی را ندارند.
-
-در Issue عمومی Log و Stack Trace را بدون اطلاعات حساس بفرستید و هیچ رمز، Connection String واقعی یا اطلاعات مشتری منتشر نکنید.
 
 ## Gateهای Release
 
 قبل از ساخت Draft Release پایدار، Automation این موارد را کنترل می‌کند:
 
-- مرز امنیتی Repository عمومی؛
+- مرز امنیتی Repository عمومی و وجود فایل‌های الزامی حاکمیتی/Release؛
 - Restore/Build/Test SDK؛
 - ساختار NuGet Package، مشخصات هر دو ارائه‌دهنده، مجوز MIT و Source Link/Repository metadata؛
 - Quick Start اجرایی C#؛
