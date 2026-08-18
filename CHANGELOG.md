@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 
-No unreleased changes yet.
+### Changed
+- Post-release repository documentation now identifies `v1.0.0` as the stable public release and records the final release/security evidence.
+- `SDK CI` now runs on every pull request and every push to `main`/`m2/**`, so the branch-protection required checks are always produced even for documentation/governance-only changes.
 
 ## [1.0.0] — 2026-08-18
 
