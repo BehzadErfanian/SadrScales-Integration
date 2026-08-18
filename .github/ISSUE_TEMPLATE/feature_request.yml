@@ -1,7 +1,14 @@
 name: Feature request
-description: Suggest a public Integration SDK/documentation improvement.
+description: Suggest a public Integration SDK, Contract documentation or sample improvement.
 title: "[Feature] "
+labels:
+  - "enhancement"
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep requests inside the public Integration boundary. Direct device protocols, packet captures, private runtime source, credentials, customer data and vendor-confidential material are out of scope.
+
   - type: textarea
     id: use_case
     attributes:
@@ -9,8 +16,42 @@ body:
       description: Describe the software-vendor need without proprietary/customer-sensitive data.
     validations:
       required: true
+
+  - type: textarea
+    id: current_gap
+    attributes:
+      label: Current limitation
+      description: What cannot be done cleanly with the current SDK/SQL Contract/documentation?
+    validations:
+      required: true
+
   - type: textarea
     id: proposal
     attributes:
       label: Proposed public behavior
-      description: Explain the desired SDK/contract/sample behavior.
+      description: Explain the desired SDK/contract/sample behavior without prescribing private device-protocol changes.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - C# SDK
+        - SQL Contract v1 documentation
+        - C# sample
+        - Raw SQL sample
+        - Compatibility/documentation
+        - Packaging/release
+        - Other public integration surface
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This request contains no credentials, customer data, packet captures or private device-protocol material.
+          required: true

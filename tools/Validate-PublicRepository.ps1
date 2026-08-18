@@ -47,19 +47,50 @@ if ($violations.Count -gt 0) {
 $requiredFiles = @(
     'README.md',
     'README.fa.md',
+    'LICENSE',
+    'NOTICE.md',
     'SECURITY.md',
+    'SUPPORT.md',
+    'CONTRIBUTING.md',
+    'CODE_OF_CONDUCT.md',
     'AGENTS.md',
+    '.github/CODEOWNERS',
+    '.github/dependabot.yml',
+    '.github/ISSUE_TEMPLATE/config.yml',
+    '.github/ISSUE_TEMPLATE/bug_report.yml',
+    '.github/ISSUE_TEMPLATE/feature_request.yml',
+    '.github/pull_request_template.md',
+    '.github/workflows/public-repo-guard.yml',
+    '.github/workflows/sdk-ci.yml',
+    '.github/workflows/release.yml',
     'docs/PROJECT_STATUS.md',
     'docs/DECISIONS.md',
     'docs/ROADMAP.md',
     'docs/BACKLOG.md',
+    'docs/API_COMPATIBILITY.md',
+    'docs/COMPATIBILITY.md',
+    'docs/PRODUCTION_READINESS_CHECKLIST.md',
     'docs/SECURITY_BOUNDARY.md'
 )
 
 foreach ($file in $requiredFiles) {
     if (-not (Test-Path -LiteralPath (Join-Path $RepositoryRoot $file))) {
-        throw "Required governance file missing: $file"
+        throw "Required governance/release file missing: $file"
     }
+}
+
+$licensePath = Join-Path $RepositoryRoot 'LICENSE'
+$licenseText = Get-Content -LiteralPath $licensePath -Raw
+if ($licenseText -notmatch 'MIT License') {
+    throw 'LICENSE is not the expected MIT License.'
+}
+if ($licenseText -notmatch 'Tozin Sadr and Behzad Erfanian') {
+    throw 'LICENSE must identify both Tozin Sadr and Behzad Erfanian.'
+}
+
+$codeOwners = Get-Content -LiteralPath (Join-Path $RepositoryRoot '.github/CODEOWNERS') -Raw
+if ($codeOwners -notmatch '@BehzadErfanian') {
+    throw 'CODEOWNERS must identify @BehzadErfanian as repository owner/reviewer.'
 }
 
 Write-Host 'Public repository validation passed.' -ForegroundColor Green

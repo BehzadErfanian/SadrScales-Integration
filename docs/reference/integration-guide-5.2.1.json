@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "product": "Sadr Scales",
+  "productVersion": "5.2.1",
+  "sqlContract": "v1",
+  "fileName": "SadrScales_Integration_Database_Guide_5.2.1_FA.pdf",
+  "publicUrl": "https://sadrgroup.ir/downloads/docs/SadrScales_Integration_Database_Guide_5.2.1_FA.pdf",
+  "pages": 38,
+  "sha256": "182be9aa73348a35a299ab0fad22e5e9deeba800ef9222c0145ba582b02e281b",
+  "sourceReleaseCommit": "1048749f52faba35e69464b64983e772c1c857e3"
+}

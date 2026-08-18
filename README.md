@@ -1,114 +1,201 @@
 # Sadr Scales Integration
 
-**Official public integration toolkit and SQL contract for connecting POS, ERP and accounting software to Sadr Scales.**
+[![SDK CI](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/sdk-ci.yml/badge.svg)](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/sdk-ci.yml)
+[![Public Repository Guard](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/public-repo-guard.yml/badge.svg)](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/public-repo-guard.yml)
 
-[فارسی](README.fa.md) · [Getting Started](docs/en/getting-started.md) · [SQL Contract v1](docs/en/sql-contract-v1.md) · [SDK Design](docs/SDK_DESIGN_V1.md) · [Security](SECURITY.md)
+**Official public integration toolkit, SQL contract, C# SDK and samples for connecting POS, ERP and accounting software to Sadr Scales.**
+
+**Provided and maintained by Tozin Sadr and Behzad Erfanian.**
+
+[فارسی](README.fa.md) · [Getting Started](docs/en/getting-started.md) · [Troubleshooting](docs/en/troubleshooting.md) · [Production Readiness](docs/PRODUCTION_READINESS_CHECKLIST.md) · [SQL Contract v1](docs/en/sql-contract-v1.md) · [Compatibility](docs/COMPATIBILITY.md) · [Support](SUPPORT.md) · [Security](SECURITY.md)
 
 ---
 
-## Repository status
+## Status
 
-This repository is **pre-1.0**. The basic public integration contract for **Sadr Scales 5.2.1** is frozen as **SQL Contract v1**, and the first C# SDK foundation is now implemented and validated by CI.
+**`v1.0.0` release engineering is complete/in final review.** The stable tag is intentionally held until the remaining repository-owner security settings are explicitly reviewed.
 
-| Component | Status |
+The supported public baseline is:
+
+| Component | v1 baseline |
 |---|---|
-| SQL Contract v1 | Frozen basic surface for Sadr Scales 5.2.1 |
-| Persian technical guide | 34-page official PDF prepared and QA'd; release asset pending |
-| C# integration SDK | Pre-1.0 foundation builds, tests and packs successfully |
-| Raw SQL samples | Available |
-| Python / Node.js / Java / PHP samples | Planned |
-| GitHub Releases | Not published yet |
-| REST / Webhook gateway | Future generation; not part of 5.2.1 / Contract v1 |
+| Sadr Scales | `5.2.1` or later version explicitly verified as SQL Contract v1 compatible |
+| Public database contract | **SQL Contract v1** |
+| C# SDK | `SadrScales.Integration 1.0.0` |
+| SDK target | `netstandard2.0` |
+| SQL provider | `Microsoft.Data.SqlClient 7.0.2` |
+| .NET Framework | real `net48` package restore/build/runtime gate |
+| SQL validation | disposable SQL Server 2022 integration suite |
 
-## What this repository is for
+## Why integrate here?
 
-Software vendors integrate with **Sadr Scales**, rather than reimplementing the proprietary wire protocol of each scale model.
+Your software integrates with **Sadr Scales**, not with the proprietary wire protocol of each scale model.
 
 ```text
 POS / ERP / Accounting
         ↓
-Sadr Scales SQL Contract v1 / Integration SDK
+SadrScales.Integration / SQL Contract v1
         ↓
 Sadr Scales Runtime
         ↓
-Supported scale models
+PLUS / LSG / Aclas / supported scales
 ```
 
-The basic public contract allows an external application to:
+Sadr Scales keeps ownership of device sessions, retry/reconnect, model differences, Registry and direct scale communication.
 
-- create/update item groups and PLUs;
-- validate the expected Contract v1 database schema;
-- read accepted sales incrementally from Sadr Scales;
-- keep its own durable sales cursor/state;
-- integrate without knowing the direct communication protocol of PLUS, LSG, Aclas or other devices.
+## Five-minute C# path
 
-Registry, Mapping, structured invoice data and runtime state are documented as advanced/controlled areas rather than part of the basic SDK path.
-
-## Quick contract summary
-
-Public SQL Contract v1 is centered on:
-
-- `dbo.SADR_ItemClass` — item groups, SELECT / INSERT / UPDATE;
-- `dbo.SADR_Item` — PLU/item master, SELECT / INSERT / UPDATE; `PluNo` is the public identity;
-- `dbo.SADR_Logs` — accepted sales feed, **SELECT only**.
-
-The destination application persists imported sales first, then advances its own durable cursor. The basic SDK never updates or deletes `SADR_Logs` for acknowledgement.
-
-See [SQL Contract v1](docs/en/sql-contract-v1.md), the [Persian contract](docs/fa/sql-contract-v1.md), and the [Contract Freeze record](docs/CONTRACT_V1_FREEZE.md).
-
-## C# SDK — pre-1.0
-
-The current foundation targets `netstandard2.0` and uses `Microsoft.Data.SqlClient`. Its basic API is intentionally small:
+### 1. Validate the database contract
 
 ```csharp
 var client = new SadrScalesClient(connectionString);
-
 await client.ValidateAsync();
+```
+
+Do this before normal integration work. A schema mismatch is a stop condition, not something to bypass.
+
+### 2. Create/update groups and PLUs
+
+```csharp
 await client.ItemGroups.UpsertAsync(group);
 await client.Items.UpsertAsync(item);
+```
 
+For bounded bulk work:
+
+```csharp
+SadrItemBatchWriteResult result = await client.Items.UpsertBatchAsync(items);
+```
+
+A batch contains at most **200 unique PLUs**, is fully validated before SQL access and commits atomically. Larger imports are paged explicitly by your application.
+
+### 3. Read accepted sales incrementally
+
+```csharp
 SadrSalesBatch batch = await client.Sales.ReadAfterAsync(lastProcessedId, 100);
 ```
 
-Current foundation features:
+Your application owns durable import state:
 
-- Contract v1 schema validation;
-- parameterized, transactional item-group upsert;
-- parameterized, transactional semantic PLU upsert;
-- read-only incremental sales batches;
-- explicit caller-owned connection and destination-cursor behavior;
-- unit tests and GitHub Actions restore/build/test/pack validation.
+1. persist sales in your destination;
+2. commit destination data;
+3. only then persist `batch.LastReadId` as the next cursor.
 
-The API is still **pre-1.0** and may change before the first stable release. See [SDK Design v1](docs/SDK_DESIGN_V1.md).
+Use `(DeviceNo, FID, SubID)` as the preferred destination duplicate-protection key. Source `ID` values may contain gaps.
 
-## SQL samples
+## Executable Quick Start
 
-Executable synthetic samples are available in [`samples/SQL`](samples/SQL/README.md):
+A build-validated, read-only-by-default C# sample is included:
 
-- Contract schema validation;
+[`samples/csharp/SadrScales.Integration.QuickStart`](samples/csharp/SadrScales.Integration.QuickStart/README.md)
+
+It reads the connection string only from `SADR_SCALES_CONNECTION_STRING`.
+
+```powershell
+$env:SADR_SCALES_CONNECTION_STRING = "Server=...;Database=...;..."
+dotnet run --project samples/csharp/SadrScales.Integration.QuickStart
+```
+
+Never commit a real production connection string.
+
+## Package installation
+
+Stable SDK artifacts are distributed through **GitHub Releases**. After downloading `SadrScales.Integration.1.0.0.nupkg` to a local folder:
+
+```bash
+dotnet add package SadrScales.Integration --version 1.0.0 --source <download-folder>
+```
+
+The release also contains symbols, compiled DLL/XML documentation, a developer-kit ZIP, the official Persian Integration & Database Guide and SHA-256 checksums.
+
+## Raw SQL path
+
+C# is not required. Language-independent Contract v1 SQL samples are available in [`samples/SQL`](samples/SQL/README.md):
+
+- schema validation;
 - safe item-group/PLU upsert with rollback by default;
 - read-only incremental sales query.
+
+This is also the starting point for Java, Python, Node.js, PHP or other stacks until language-specific wrappers are added.
+
+## Public SQL Contract v1
+
+The basic contract intentionally stays small:
+
+- `dbo.SADR_ItemClass` — item groups; SELECT / INSERT / UPDATE;
+- `dbo.SADR_Item` — PLU/item master; SELECT / INSERT / UPDATE; `PluNo` is the public identity;
+- `dbo.SADR_Logs` — accepted sales feed; **SELECT only**.
+
+Important rules:
+
+- never write SQL `rowversion`;
+- do not use legacy `ID`/`IDitem` as the public PLU identity;
+- do not update/delete `SADR_Logs` for acknowledgement or cursor management;
+- destination software owns its own durable cursor and idempotency.
+
+Registry, Mapping, structured invoice internals and runtime state remain advanced/controlled surfaces unless a future public contract explicitly promotes them.
+
+## Reliability behavior
+
+The SDK retries only where replay is safe:
+
+- connection opening before a command starts;
+- complete read-only contract validation;
+- complete read-only sales reads.
+
+Transaction-scoped item/group writes are deliberately **not automatically replayed** after execution begins because a lost response can make commit state ambiguous.
+
+## Production handoff
+
+Before enabling an integration in a customer environment, use the [Production Readiness Checklist](docs/PRODUCTION_READINESS_CHECKLIST.md). It covers version/contract verification, database security, PLU rules, sales cursor/idempotency, restart/rollback testing and operational handoff.
+
+## Compatibility and API stability
+
+`1.0.0` establishes the first stable SDK API line. `1.x` follows Semantic Versioning and SQL Contract versioning remains separate.
+
+Read [SDK API Compatibility Policy](docs/API_COMPATIBILITY.md) for the compatibility promise, package-validation policy and strong-name decision.
 
 ## Documentation
 
 - [Getting Started](docs/en/getting-started.md)
+- [Troubleshooting](docs/en/troubleshooting.md)
+- [Production Readiness Checklist](docs/PRODUCTION_READINESS_CHECKLIST.md)
 - [SQL Contract v1](docs/en/sql-contract-v1.md)
+- [SDK API Compatibility Policy](docs/API_COMPATIBILITY.md)
 - [SDK Design v1](docs/SDK_DESIGN_V1.md)
-- [Project status](docs/PROJECT_STATUS.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Decision log](docs/DECISIONS.md)
-- [Compatibility](docs/COMPATIBILITY.md)
+- [Compatibility matrix](docs/COMPATIBILITY.md)
 - [Security boundary](docs/SECURITY_BOUNDARY.md)
-- [Full Persian guide release identity](docs/reference/README.md)
+- [Official Persian guide identity](docs/reference/README.md)
+- [Support policy](SUPPORT.md)
+- [Contributing](CONTRIBUTING.md)
 
-## Releases
+## Support and security
 
-Stable binaries/packages are published through **GitHub Releases**, not committed as binary clutter to `main`. The first stable release is not published yet. The intended release includes the SDK package/DLL, XML docs, samples, official technical guide, changelog and SHA-256 checksums.
+Use sanitized GitHub Issues for public reproducible SDK/Contract problems. Read [SUPPORT.md](SUPPORT.md) before posting customer-specific material.
 
-## Security
+Security-sensitive reports must follow [SECURITY.md](SECURITY.md) and must not be posted in a normal public issue.
 
-This repository intentionally excludes direct device protocols, packet captures, private keys, credentials, customer data, proprietary firmware/vendor material and internal Sadr Scales release infrastructure. Read [SECURITY.md](SECURITY.md) before contributing.
+This public repository intentionally excludes direct device protocols, packet captures, private keys, credentials, customer data, proprietary firmware/vendor material and internal Sadr Scales runtime/release infrastructure.
 
-## License
+## Release quality gates
 
-No open-source license has been granted yet. The exact public software license requires explicit company approval before stable SDK distribution. Until a `LICENSE` file is added, all rights remain reserved. See [NOTICE.md](NOTICE.md).
+Before a stable tag can create a Draft GitHub Release, automation verifies:
+
+- public-repository security boundary and required governance/release files;
+- SDK restore/build/tests;
+- NuGet package shape, joint provider metadata, MIT license metadata and Source Link/repository metadata;
+- executable C# Quick Start;
+- SQL Server 2022 integration tests;
+- real .NET Framework 4.8 package consumer;
+- release bundle/checksums;
+- official Integration Guide SHA-256.
+
+The GitHub Release remains **draft** until final human review.
+
+## License and providers
+
+The public `SadrScales-Integration` SDK and repository materials covered by [LICENSE](LICENSE) are distributed under the **MIT License**.
+
+**Copyright (c) 2026 Tozin Sadr and Behzad Erfanian.**
+
+This public license does not publish or license private Sadr Scales runtime source, proprietary device protocols, firmware, private keys, customer data or other material outside this repository. See [NOTICE.md](NOTICE.md).

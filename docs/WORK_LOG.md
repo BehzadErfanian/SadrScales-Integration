@@ -3,8 +3,8 @@
 ## 2026-08-16 — M0 / M1
 - Public foundation/security/governance created.
 - Contract v1 frozen against effective Sadr Scales 5.2.1 schema.
-- Bilingual docs, SQL samples, regression checklist and official 34-page Persian guide prepared/QA'd.
-- Official guide SHA-256: `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`.
+- Bilingual docs, SQL samples and regression checklist prepared.
+- An initial 34-page Persian guide artifact was prepared during M1; this was later superseded by the final 5.2.1 release guide recorded below.
 
 ## 2026-08-16 — M2 SDK / SQL / retry hardening
 - Basic `netstandard2.0` SDK built with `Microsoft.Data.SqlClient 7.0.2`.
@@ -17,24 +17,43 @@
 ## 2026-08-16 — M2 .NET Framework 4.8 compatibility
 - Generated NuGet package restored, built and executed by a real `net48` Console consumer on Windows Server 2022.
 - Final net48 build: 0 warnings / 0 errors.
-- Runtime loaded `SadrScales.Integration, Version=0.1.0.0` and `Microsoft.Data.SqlClient, Version=7.0.0.0`.
+- Runtime loaded SDK and `Microsoft.Data.SqlClient` from the restored package dependency graph.
 - PR #6 merged as `7af437c4394661b3c53321987c81477805049658`.
 - Post-merge SDK CI: build/test/pack PASS; SQL Server integration PASS; net48 package consumer PASS.
 - Post-merge Public Repository Guard: PASS.
 
 ## 2026-08-17 — M2 atomic batch + C# Quick Start
-- Started `m2/batch-and-csharp-sample` from merge SHA `7af437c4394661b3c53321987c81477805049658`.
-- Added bounded `UpsertBatchAsync` design: maximum 200 PLUs, unique `PluNo` per call, complete validation before SQL access, one transaction, full rollback on any failure.
+- Added bounded `UpsertBatchAsync`: maximum 200 PLUs, unique `PluNo` per call, complete validation before SQL access, one transaction, full rollback on any failure.
 - Added aggregate batch result counts.
-- Added unit tests for duplicate, oversized and empty batches.
-- Added real SQL Server tests for aggregate results and rollback-after-partial-progress.
+- Added unit and real-SQL coverage for invalid/duplicate/oversized batches, aggregate results, semantic no-op and rollback-after-partial-progress behavior.
 - Added read-only-by-default C# Quick Start using `SADR_SCALES_CONNECTION_STRING`; no embedded credentials and no payload dump.
-- Added CI build of the Quick Start.
-- Validated implementation commit `0e32d53852209f052bedc1daf789d57d7ea624cf`.
-- SDK CI run `31997207988`: PASS for build/test/pack, C# Quick Start restore/build, SQL Server 2022 integration, and net48 package consumer.
-- Public Repository Guard run `31997207943`: PASS.
-- PR #7 PR-level SDK CI and Public Repository Guard: PASS.
 - PR #7 squash-merged as `39b0beac63c4e30974283a0306cedb330c433f6e`.
-- Exact post-merge SDK CI run `31997736325`: PASS for build/test/pack, Quick Start, SQL Server integration, and net48 package consumer.
+- Exact post-merge SDK CI run `31997736325`: PASS for build/test/pack, Quick Start, SQL Server integration and net48 package consumer.
 - Exact post-merge Public Repository Guard run `31997736339`: PASS.
-- Next public-engineering session continues M2 package/release hardening: Source Link, package validation/API compatibility, strong-name decision, and release packaging/checksum automation.
+- Continuity commit brought `main` to `50a8c2694b044f7112f4824f3fd40e261a3dbb98` before v1 release hardening began.
+
+## 2026-08-18 — M2 v1.0.0 release hardening
+- Created `m2/v1-release-hardening` from exact `main` SHA `50a8c2694b044f7112f4824f3fd40e261a3dbb98`.
+- Opened Draft PR #8: `M2: Prepare SadrScales Integration v1.0.0 release`.
+- Prepared SDK package metadata for version `1.0.0`.
+- Added CI-oriented deterministic/repository metadata and enabled .NET package validation.
+- Added explicit NuGet package validation for DLL/XML/readme/repository/commit metadata.
+- Updated net48 consumer to restore the `1.0.0` package.
+- Added bilingual developer troubleshooting guides.
+- Rewrote bilingual Getting Started docs for the real SDK 1.x/Quick Start/package path.
+- Rewrote root English/Persian README files as developer onboarding pages.
+- Added `API_COMPATIBILITY.md` with post-1.0 SemVer/API/Contract compatibility policy.
+- Recorded D-022: `1.0.0` remains unsigned; strong-name signing is deferred unless a concrete supported-consumer requirement appears.
+- Removed obsolete duplicate `samples/CSharp` placeholder; executable sample remains under `samples/csharp`.
+- Reconciled the official Integration Guide to the final Sadr Scales 5.2.1 asset:
+  - file `SadrScales_Integration_Database_Guide_5.2.1_FA.pdf`;
+  - 38 pages;
+  - SHA-256 `182be9aa73348a35a299ab0fad22e5e9deeba800ef9222c0145ba582b02e281b`;
+  - source release commit `1048749f52faba35e69464b64983e772c1c857e3`.
+- Added machine-readable guide identity so release automation can download and hash-verify the public PDF.
+- Added `New-ReleaseBundle.ps1` producing package/symbol, Binaries ZIP, Developer Kit ZIP, release notes, manifest and `SHA256SUMS.txt`.
+- Normal SDK CI now smoke-builds the full release bundle and uploads release evidence.
+- Added protected `v*.*.*` tag release workflow that reruns SDK/Quick Start, SQL Server 2022 and net48 package-consumer gates, verifies tag/version match, downloads/verifies the official Guide and creates/updates a Draft GitHub Release.
+- SDK CI run `32106867152`: all jobs PASS, including NuGet metadata validation and release-bundle smoke generation.
+- Public Repository Guard run `32106867174`: PASS.
+- Remaining pre-v1 blockers are administrative: approved public software license, owner/admin GitHub security-settings review, final PR merge/tag/Draft Release inspection.

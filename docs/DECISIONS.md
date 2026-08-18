@@ -42,10 +42,10 @@ Full guide is the deep reference; README/Quick Start/SDK provide the short path.
 **Status:** Accepted
 Compiled SDK/package, samples, guide and checksums are Release assets, not binary clutter in `main`.
 
-## D-009 — Public license requires explicit approval
-**Date:** 2026-08-16  
-**Status:** Proposed / confirm before v1.0
-No public software `LICENSE` is added without company approval.
+## D-009 — Public SDK uses MIT with joint providers
+**Date:** 2026-08-18  
+**Status:** Accepted
+The public `SadrScales-Integration` SDK and repository materials covered by `LICENSE` are distributed under the MIT License. The public copyright/provider identity is `Tozin Sadr and Behzad Erfanian`, and package metadata must identify both. This public license does not publish or license private Sadr Scales runtime source, proprietary device protocols, firmware, private keys, customer data or other material outside the licensed public repository.
 
 ## D-010 — Future no-code/REST is separate
 **Date:** 2026-08-16  
@@ -65,7 +65,7 @@ Breaking public changes require a new contract version.
 ## D-013 — M1 administration does not block M2 source engineering
 **Date:** 2026-08-16  
 **Status:** Accepted
-License, Release upload and host-security toggles remain explicit pre-v1.0 gates.
+Release upload and host-security toggles remain explicit pre-v1.0 gates.
 
 ## D-014 — C# SDK v1 targets .NET Standard 2.0
 **Date:** 2026-08-16  
@@ -75,7 +75,7 @@ The shared SDK assembly targets `netstandard2.0` to serve modern .NET and .NET F
 ## D-015 — Microsoft.Data.SqlClient is the SQL provider
 **Date:** 2026-08-16  
 **Status:** Accepted
-Pre-1.0 uses `Microsoft.Data.SqlClient 7.0.2`; caller owns connection/security configuration.
+SDK v1 uses `Microsoft.Data.SqlClient 7.0.2`; caller owns connection/security configuration.
 
 ## D-016 — SDK does not own destination sales state
 **Date:** 2026-08-16  
@@ -106,3 +106,13 @@ Before v1.0, compatibility with .NET Framework 4.8 is validated by building and 
 **Date:** 2026-08-17  
 **Status:** Accepted
 `UpsertBatchAsync` accepts at most 200 unique PLUs per call. The complete batch is validated before SQL access and committed in one transaction. Any write failure rolls back the entire call. Larger imports are explicitly paged by the destination application rather than hidden inside one SDK call.
+
+## D-022 — SDK 1.0.0 is not strong-name signed
+**Date:** 2026-08-18  
+**Status:** Accepted
+The tested v1 consumer surface does not require a strong-name identity. A real .NET Framework 4.8 package consumer already restores/builds/runs the unsigned SDK successfully. Strong names are treated as assembly identity/compatibility infrastructure rather than a security boundary. Introducing signing would also create a long-lived key and assembly-identity commitment. Therefore `1.0.0` remains unsigned; any future supported consumer that genuinely requires a strong-named dependency must trigger an explicit compatibility/key-lifecycle decision rather than an incidental packaging change.
+
+## D-023 — Public repository host security is a release gate
+**Date:** 2026-08-18  
+**Status:** Accepted
+Before the first stable public release, the repository must have Secret Scanning, Push Protection, Dependabot vulnerability alerts/security updates, Private Vulnerability Reporting and C# CodeQL default setup enabled/configured. These controls were verified on 2026-08-18. `main` branch protection is configured only after the release-hardening PR is merged, using the exact validated post-merge check identities. While the repository has one maintainer, branch protection does not require an unavailable second approving reviewer; it does require validated checks and disallows force-push/deletion.

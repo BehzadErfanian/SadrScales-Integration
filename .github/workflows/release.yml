@@ -1,0 +1,202 @@
+name: SDK Protected Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sadrscales-integration-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-test-pack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Validate public repository boundary
+        shell: pwsh
+        run: ./tools/Validate-PublicRepository.ps1
+
+      - name: Require release tag to match package version
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        run: |
+          [xml]$project = Get-Content 'src/SadrScales.Integration/SadrScales.Integration.csproj' -Raw
+          $version = [string]$project.SelectSingleNode('/Project/PropertyGroup/Version').InnerText
+          $expectedTag = "v$version"
+          if ('${{ github.ref_name }}' -ne $expectedTag) {
+            throw "Release tag '${{ github.ref_name }}' does not match SDK version '$version' (expected '$expectedTag')."
+          }
+
+      - name: Restore SDK tests
+        run: dotnet restore tests/SadrScales.Integration.Tests/SadrScales.Integration.Tests.csproj
+
+      - name: Build SDK tests
+        run: dotnet build tests/SadrScales.Integration.Tests/SadrScales.Integration.Tests.csproj --configuration Release --no-restore
+
+      - name: Run SDK tests
+        run: dotnet test tests/SadrScales.Integration.Tests/SadrScales.Integration.Tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Restore C# Quick Start
+        run: dotnet restore samples/csharp/SadrScales.Integration.QuickStart/SadrScales.Integration.QuickStart.csproj
+
+      - name: Build C# Quick Start
+        run: dotnet build samples/csharp/SadrScales.Integration.QuickStart/SadrScales.Integration.QuickStart.csproj --configuration Release --no-restore
+
+      - name: Pack SDK
+        run: dotnet pack src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --no-build --output artifacts/package
+
+      - name: Validate NuGet package
+        shell: pwsh
+        run: ./tools/Validate-NuGetPackage.ps1 -PackagePath artifacts/package/SadrScales.Integration.1.0.0.nupkg
+
+  sql-integration-test:
+    runs-on: ubuntu-latest
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: SadrCi_Test_2026!
+        ports:
+          - 1433:1433
+
+    env:
+      # Disposable CI-only credential; never use this value outside the ephemeral GitHub runner.
+      SADR_INTEGRATION_TEST_SQL: Server=localhost,1433;Database=master;User ID=sa;Password=SadrCi_Test_2026!;Encrypt=False;TrustServerCertificate=True
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore SQL integration tests
+        run: dotnet restore tests/SadrScales.Integration.SqlTests/SadrScales.Integration.SqlTests.csproj
+
+      - name: Build SQL integration tests
+        run: dotnet build tests/SadrScales.Integration.SqlTests/SadrScales.Integration.SqlTests.csproj --configuration Release --no-restore
+
+      - name: Test against disposable SQL Server 2022
+        run: dotnet test tests/SadrScales.Integration.SqlTests/SadrScales.Integration.SqlTests.csproj --configuration Release --no-build --verbosity normal
+
+  net48-package-consumer:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Pack SDK for consumer test
+        run: dotnet pack src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --output artifacts/package
+
+      - name: Restore .NET Framework 4.8 consumer from local package
+        run: dotnet restore tests/SadrScales.Integration.Net48Consumer/SadrScales.Integration.Net48Consumer.csproj --configfile tests/SadrScales.Integration.Net48Consumer/NuGet.CI.config
+
+      - name: Build .NET Framework 4.8 consumer
+        run: dotnet build tests/SadrScales.Integration.Net48Consumer/SadrScales.Integration.Net48Consumer.csproj --configuration Release --no-restore
+
+      - name: Run .NET Framework 4.8 package compatibility smoke test
+        shell: pwsh
+        run: '& "tests\SadrScales.Integration.Net48Consumer\bin\Release\net48\SadrScales.Integration.Net48Consumer.exe"'
+
+  draft-release:
+    if: github.ref_type == 'tag'
+    needs: [build-test-pack, sql-integration-test, net48-package-consumer]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore SDK
+        run: dotnet restore src/SadrScales.Integration/SadrScales.Integration.csproj
+
+      - name: Build SDK
+        run: dotnet build src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --no-restore
+
+      - name: Pack tagged SDK
+        run: dotnet pack src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --no-build --output artifacts/package
+
+      - name: Validate tagged NuGet package
+        shell: pwsh
+        run: ./tools/Validate-NuGetPackage.ps1 -PackagePath artifacts/package/SadrScales.Integration.1.0.0.nupkg
+
+      - name: Download and verify official Integration Guide
+        shell: pwsh
+        run: |
+          $definition = Get-Content 'docs/reference/integration-guide-5.2.1.json' -Raw | ConvertFrom-Json
+          New-Item -ItemType Directory -Path 'artifacts/guide' -Force | Out-Null
+          $guidePath = Join-Path 'artifacts/guide' ([string]$definition.fileName)
+          Invoke-WebRequest -Uri ([string]$definition.publicUrl) -OutFile $guidePath
+          $actual = (Get-FileHash -LiteralPath $guidePath -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expected = ([string]$definition.sha256).ToLowerInvariant()
+          if ($actual -ne $expected) {
+            throw "Official Integration Guide SHA-256 mismatch. Expected $expected but got $actual."
+          }
+          Write-Host "Official Integration Guide verified: $actual"
+
+      - name: Build final release bundle and checksums
+        shell: pwsh
+        run: |
+          $definition = Get-Content 'docs/reference/integration-guide-5.2.1.json' -Raw | ConvertFrom-Json
+          $guidePath = Join-Path 'artifacts/guide' ([string]$definition.fileName)
+          ./tools/New-ReleaseBundle.ps1 `
+            -Version 1.0.0 `
+            -PackageDirectory artifacts/package `
+            -OutputDirectory artifacts/release `
+            -GuidePath $guidePath
+
+      - name: Upload release engineering evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: SadrScales-Integration-v1.0.0-${{ github.run_number }}
+          path: artifacts/release/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Create or update draft GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = '${{ github.ref_name }}'
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release edit $tag --title "SadrScales Integration $tag" --notes-file artifacts/release/RELEASE_NOTES.md --draft
+            gh release upload $tag artifacts/release/* --clobber
+          }
+          else {
+            gh release create $tag artifacts/release/* --draft --title "SadrScales Integration $tag" --notes-file artifacts/release/RELEASE_NOTES.md
+          }

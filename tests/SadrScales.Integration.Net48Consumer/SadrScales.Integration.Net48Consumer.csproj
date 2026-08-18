@@ -11,6 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SadrScales.Integration" Version="0.1.0-alpha.1" />
+    <PackageReference Include="SadrScales.Integration" Version="1.0.0" />
   </ItemGroup>
 </Project>

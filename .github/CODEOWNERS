@@ -1,0 +1,10 @@
+# Public integration repository ownership
+* @BehzadErfanian
+
+# Release/security-sensitive paths
+/.github/ @BehzadErfanian
+/src/ @BehzadErfanian
+/tools/ @BehzadErfanian
+/docs/SECURITY_BOUNDARY.md @BehzadErfanian
+/SECURITY.md @BehzadErfanian
+/LICENSE @BehzadErfanian
