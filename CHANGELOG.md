@@ -26,6 +26,7 @@
 - Release-bundle smoke validation in normal pull-request CI.
 - Machine-readable final Sadr Scales 5.2.1 Integration Guide identity.
 - MIT `LICENSE` with joint provider/copyright identity for Tozin Sadr and Behzad Erfanian.
+- Verified GitHub host-security baseline: Secret Scanning, Push Protection, Dependabot vulnerability alerts/security updates, Private Vulnerability Reporting and C# CodeQL default setup.
 
 ### Changed
 - Package metadata is prepared for the first stable `1.0.0` line and identifies both Tozin Sadr and Behzad Erfanian as authors/providers.
@@ -44,7 +45,11 @@
 - SDK `1.0.0` remains unsigned (no strong-name) unless a concrete supported-consumer identity requirement is demonstrated in the future.
 - Direct device protocols, captures, private keys, customer data and internal Sadr Scales runtime/release infrastructure remain outside the public repository.
 - Security-sensitive reports are explicitly routed away from normal public Issues.
+- Public repository host-security controls are a stable-release gate.
+- `main` branch protection is configured after the release-hardening PR merges, using exact validated post-merge checks and without requiring an unavailable second reviewer in the current single-maintainer repository.
 
 ### Release blockers still open
-- Owner/admin review of GitHub repository host-security settings.
-- Final PR merge, stable `v1.0.0` tag and Draft Release verification/publication.
+- Final PR #8 CI/review/merge.
+- Exact merged `main` validation and branch protection configuration.
+- Stable `v1.0.0` tag.
+- Protected Draft Release asset/checksum verification and publication.
