@@ -1,23 +1,28 @@
 # Reference documents
 
-The approved full Persian Integration & Database Guide is the source reference for Sadr Scales 5.2.1 / SQL Contract v1 / document revision 2.1.
+The final Persian **Sadr Scales Integration & Database Guide** for Sadr Scales 5.2.1 / SQL Contract v1 is a release/reference asset rather than source clutter in this repository.
 
-## Official prepared PDF
+## Final release identity
 
-The release-ready PDF was generated from the latest reviewed Word source and visually inspected page-by-page on 2026-08-16.
+The authoritative machine-readable identity is:
+
+[`integration-guide-5.2.1.json`](integration-guide-5.2.1.json)
+
+Current final asset:
 
 - File: `SadrScales_Integration_Database_Guide_5.2.1_FA.pdf`
-- Pages: `34`
-- SHA-256: `5a9e36cfe633d41ff8f9a6f0453299ad37edfd28562c76d2d0dc097e499f0258`
-- Document ID on cover: `SADR-SC-INTEGRATION-5.2.1-01`
-- Software: `Sadr Scales 5.2.1`
+- Pages: `38`
+- SHA-256: `182be9aa73348a35a299ab0fad22e5e9deeba800ef9222c0145ba582b02e281b`
+- Software baseline: `Sadr Scales 5.2.1`
 - SQL Contract: `v1`
-- Document revision: `2.1`
+- Source release commit: `1048749f52faba35e69464b64983e772c1c857e3`
 
-The PDF passed structural preflight and a complete visual render review. Fonts are embedded and the file is not encrypted.
+This identity supersedes the earlier 34-page pre-release guide artifact recorded during M1. The final 5.2.1 documentation was regenerated and validated as part of the final Sadr Scales release pipeline.
 
 ## Binary publication policy
 
-The editable Word file and official PDF are intentionally **not committed to the main branch**. The approved PDF and its checksum are distributed as GitHub Release assets so repository history remains lightweight while Markdown contract/Quick Start documents stay reviewable in Git.
+The editable Word file and official PDF are intentionally **not committed to `main`**.
 
-Until the release asset is uploaded, the SHA-256 above is the immutable identity of the approved PDF that must be published.
+For the Integration SDK release, release engineering downloads the public final PDF, verifies it against the pinned SHA-256 above, and only then includes it as a GitHub Release asset. A hash mismatch is a release blocker.
+
+This keeps repository history lightweight while preserving an exact, auditable identity for the official guide.
