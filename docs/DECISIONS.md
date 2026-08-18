@@ -42,10 +42,10 @@ Full guide is the deep reference; README/Quick Start/SDK provide the short path.
 **Status:** Accepted
 Compiled SDK/package, samples, guide and checksums are Release assets, not binary clutter in `main`.
 
-## D-009 — Public license requires explicit approval
-**Date:** 2026-08-16  
-**Status:** Proposed / confirm before v1.0
-No public software `LICENSE` is added without company approval.
+## D-009 — Public SDK uses MIT with joint providers
+**Date:** 2026-08-18  
+**Status:** Accepted
+The public `SadrScales-Integration` SDK and repository materials covered by `LICENSE` are distributed under the MIT License. The public copyright/provider identity is `Tozin Sadr and Behzad Erfanian`, and package metadata must identify both. This public license does not publish or license private Sadr Scales runtime source, proprietary device protocols, firmware, private keys, customer data or other material outside the licensed public repository.
 
 ## D-010 — Future no-code/REST is separate
 **Date:** 2026-08-16  
@@ -65,7 +65,7 @@ Breaking public changes require a new contract version.
 ## D-013 — M1 administration does not block M2 source engineering
 **Date:** 2026-08-16  
 **Status:** Accepted
-License, Release upload and host-security toggles remain explicit pre-v1.0 gates.
+Release upload and host-security toggles remain explicit pre-v1.0 gates.
 
 ## D-014 — C# SDK v1 targets .NET Standard 2.0
 **Date:** 2026-08-16  
@@ -75,7 +75,7 @@ The shared SDK assembly targets `netstandard2.0` to serve modern .NET and .NET F
 ## D-015 — Microsoft.Data.SqlClient is the SQL provider
 **Date:** 2026-08-16  
 **Status:** Accepted
-Pre-1.0 uses `Microsoft.Data.SqlClient 7.0.2`; caller owns connection/security configuration.
+SDK v1 uses `Microsoft.Data.SqlClient 7.0.2`; caller owns connection/security configuration.
 
 ## D-016 — SDK does not own destination sales state
 **Date:** 2026-08-16  
