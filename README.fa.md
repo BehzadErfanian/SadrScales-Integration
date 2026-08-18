@@ -9,15 +9,15 @@
 
 **ارائه و نگهداری توسط Tozin Sadr و Behzad Erfanian.**
 
-[English](README.md) · [شروع سریع](docs/fa/getting-started.md) · [رفع اشکال](docs/fa/troubleshooting.md) · [چک‌لیست آمادگی بهره‌برداری](docs/PRODUCTION_READINESS_CHECKLIST.md) · [قرارداد SQL v1](docs/fa/sql-contract-v1.md) · [سازگاری](docs/COMPATIBILITY.md) · [پشتیبانی](SUPPORT.md) · [امنیت](SECURITY.md)
+[English](README.md) · [نسخه پایدار v1.0.0](https://github.com/BehzadErfanian/SadrScales-Integration/releases/tag/v1.0.0) · [شروع سریع](docs/fa/getting-started.md) · [رفع اشکال](docs/fa/troubleshooting.md) · [چک‌لیست آمادگی بهره‌برداری](docs/PRODUCTION_READINESS_CHECKLIST.md) · [قرارداد SQL v1](docs/fa/sql-contract-v1.md) · [سازگاری](docs/COMPATIBILITY.md) · [پشتیبانی](SUPPORT.md) · [امنیت](SECURITY.md)
 
 ---
 
 ## وضعیت
 
-کار مهندسی **`v1.0.0`** و آماده‌سازی Release در مرحله بازبینی نهایی است. Tag پایدار عمداً تا بازبینی تنظیمات امنیتی مالک Repository منتشر نمی‌شود.
+**نسخه عمومی پایدار: `v1.0.0`.**
 
-مبنای عمومی نسخه 1:
+مبنای پشتیبانی نسخه 1:
 
 | بخش | مبنا |
 |---|---|
@@ -28,6 +28,9 @@
 | SQL Provider | `Microsoft.Data.SqlClient 7.0.2` |
 | .NET Framework | مصرف واقعی Package روی `net48` در CI |
 | تست SQL | SQL Server 2022 با Schema و داده ساختگی Contract v1 |
+| مجوز | MIT |
+
+نسخه `v1.0.0` از Commit دقیق `a6bccc7c13a8afba29b6860869d2a942b1231803` و پس از CI محافظت‌شده، Branch Protection، کنترل بسته Release و اعتبارسنجی SHA-256 منتشر شده است.
 
 ## چرا از این مسیر یکپارچه‌سازی کنیم؟
 
@@ -102,13 +105,15 @@ Connection String واقعی را داخل Source Code قرار ندهید.
 
 ## نصب Package
 
-فایل‌های SDK پایدار از طریق **GitHub Releases** منتشر می‌شوند. پس از دانلود `SadrScales.Integration.1.0.0.nupkg` در یک پوشه محلی:
+فایل‌های SDK پایدار از [GitHub Release نسخه v1.0.0](https://github.com/BehzadErfanian/SadrScales-Integration/releases/tag/v1.0.0) منتشر می‌شوند.
+
+پس از دانلود `SadrScales.Integration.1.0.0.nupkg` در یک پوشه محلی:
 
 ```bash
 dotnet add package SadrScales.Integration --version 1.0.0 --source <download-folder>
 ```
 
-Release همچنین Symbol Package، DLL و XML Documentation، بسته Developer Kit، راهنمای رسمی فارسی و SHA-256 همه فایل‌ها را دارد.
+نسخه پایدار همچنین شامل Symbol Package، DLL و XML Documentation، بسته Developer Kit، راهنمای رسمی فارسی، Release Manifest، SHA-256 و Release Notes است.
 
 ## مسیر Raw SQL
 
@@ -135,9 +140,9 @@ Release همچنین Symbol Package، DLL و XML Documentation، بسته Develo
 - برای Ack یا Cursor جدول `SADR_Logs` را Update/Delete نکنید؛
 - Cursor پایدار و Idempotency متعلق به نرم‌افزار مقصد است.
 
-Registry، Mapping، جزئیات داخلی فاکتور ساخت‌یافته و Runtime State تا زمانی که Contract عمومی جداگانه‌ای تصویب نشود، سطح پیشرفته/کنترل‌شده باقی می‌مانند.
+Registry، Mapping، جزئیات داخلی فاکتور ساخت‌یافته و Runtime State تا زمانی که Contract عمومی جداگانه‌ای تصویب نشود، سطح کنترل‌شده باقی می‌مانند.
 
-## رفتار ارتباط و Retry
+## رفتار Retry و اطمینان‌پذیری
 
 SDK فقط در مرزهایی که Replay امن است Retry خودکار دارد:
 
@@ -179,20 +184,11 @@ Writeهای Transactional گروه و کالا پس از شروع اجرا **ب�
 
 پروتکل مستقیم دستگاه، Capture شبکه، کلید خصوصی، Credential، اطلاعات مشتری، Firmware/Vendor material و Source یا زیرساخت داخلی Sadr Scales اجازه ورود به این Repository عمومی را ندارند.
 
-## Gateهای Release
+## کیفیت Release و حفاظت Repository
 
-قبل از ساخت Draft Release پایدار، Automation این موارد را کنترل می‌کند:
+نسخه پایدار با Public Repository Guard، Build/Test SDK، Quick Start اجرایی، کنترل NuGet Package و Source Link، SQL Server 2022، مصرف واقعی .NET Framework 4.8، Protected Tag Release، SHA-256 راهنمای رسمی و کنترل کامل Release Manifest/Assetها اعتبارسنجی شده است.
 
-- مرز امنیتی Repository عمومی و وجود فایل‌های الزامی حاکمیتی/Release؛
-- Restore/Build/Test SDK؛
-- ساختار NuGet Package، مشخصات هر دو ارائه‌دهنده، مجوز MIT و Source Link/Repository metadata؛
-- Quick Start اجرایی C#؛
-- تست واقعی SQL Server 2022؛
-- مصرف واقعی Package در .NET Framework 4.8؛
-- ساخت Release bundle و SHA-256؛
-- Hash راهنمای رسمی Integration.
-
-GitHub Release پس از این مراحل همچنان **Draft** باقی می‌ماند تا بازبینی انسانی انجام شود.
+Secret Scanning، Push Protection، Dependabot alerts/security updates، Private Vulnerability Reporting و CodeQL برای C# فعال هستند. شاخه `main` با Checkهای الزامی، Conversation Resolution و Admin Enforcement محافظت می‌شود و Force Push و حذف Branch غیرفعال هستند.
 
 ## مجوز و ارائه‌دهندگان
 

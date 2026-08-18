@@ -7,13 +7,13 @@
 
 **Provided and maintained by Tozin Sadr and Behzad Erfanian.**
 
-[فارسی](README.fa.md) · [Getting Started](docs/en/getting-started.md) · [Troubleshooting](docs/en/troubleshooting.md) · [Production Readiness](docs/PRODUCTION_READINESS_CHECKLIST.md) · [SQL Contract v1](docs/en/sql-contract-v1.md) · [Compatibility](docs/COMPATIBILITY.md) · [Support](SUPPORT.md) · [Security](SECURITY.md)
+[فارسی](README.fa.md) · [Stable v1.0.0 Release](https://github.com/BehzadErfanian/SadrScales-Integration/releases/tag/v1.0.0) · [Getting Started](docs/en/getting-started.md) · [Troubleshooting](docs/en/troubleshooting.md) · [Production Readiness](docs/PRODUCTION_READINESS_CHECKLIST.md) · [SQL Contract v1](docs/en/sql-contract-v1.md) · [Compatibility](docs/COMPATIBILITY.md) · [Support](SUPPORT.md) · [Security](SECURITY.md)
 
 ---
 
 ## Status
 
-**`v1.0.0` release engineering is complete/in final review.** The stable tag is intentionally held until the remaining repository-owner security settings are explicitly reviewed.
+**Stable public release: `v1.0.0`.**
 
 The supported public baseline is:
 
@@ -26,6 +26,9 @@ The supported public baseline is:
 | SQL provider | `Microsoft.Data.SqlClient 7.0.2` |
 | .NET Framework | real `net48` package restore/build/runtime gate |
 | SQL validation | disposable SQL Server 2022 integration suite |
+| License | MIT |
+
+`v1.0.0` was published from exact commit `a6bccc7c13a8afba29b6860869d2a942b1231803` after protected CI, branch protection, release-bundle verification and SHA-256 validation.
 
 ## Why integrate here?
 
@@ -52,7 +55,7 @@ var client = new SadrScalesClient(connectionString);
 await client.ValidateAsync();
 ```
 
-Do this before normal integration work. A schema mismatch is a stop condition, not something to bypass.
+A schema mismatch is a stop condition. Do not bypass contract validation.
 
 ### 2. Create/update groups and PLUs
 
@@ -100,13 +103,23 @@ Never commit a real production connection string.
 
 ## Package installation
 
-Stable SDK artifacts are distributed through **GitHub Releases**. After downloading `SadrScales.Integration.1.0.0.nupkg` to a local folder:
+Stable SDK artifacts are distributed through [GitHub Releases](https://github.com/BehzadErfanian/SadrScales-Integration/releases/tag/v1.0.0).
+
+After downloading `SadrScales.Integration.1.0.0.nupkg` to a local folder:
 
 ```bash
 dotnet add package SadrScales.Integration --version 1.0.0 --source <download-folder>
 ```
 
-The release also contains symbols, compiled DLL/XML documentation, a developer-kit ZIP, the official Persian Integration & Database Guide and SHA-256 checksums.
+The stable release also contains:
+
+- symbol package (`.snupkg`);
+- compiled DLL/XML documentation bundle;
+- Developer Kit ZIP;
+- official Persian Integration & Database Guide for Sadr Scales 5.2.1;
+- release manifest;
+- SHA-256 checksums;
+- release notes.
 
 ## Raw SQL path
 
@@ -116,11 +129,11 @@ C# is not required. Language-independent Contract v1 SQL samples are available i
 - safe item-group/PLU upsert with rollback by default;
 - read-only incremental sales query.
 
-This is also the starting point for Java, Python, Node.js, PHP or other stacks until language-specific wrappers are added.
+This is the starting point for Java, Python, Node.js, PHP or other stacks until language-specific wrappers are added.
 
 ## Public SQL Contract v1
 
-The basic contract intentionally stays small:
+The basic public contract intentionally stays small:
 
 - `dbo.SADR_ItemClass` — item groups; SELECT / INSERT / UPDATE;
 - `dbo.SADR_Item` — PLU/item master; SELECT / INSERT / UPDATE; `PluNo` is the public identity;
@@ -133,7 +146,7 @@ Important rules:
 - do not update/delete `SADR_Logs` for acknowledgement or cursor management;
 - destination software owns its own durable cursor and idempotency.
 
-Registry, Mapping, structured invoice internals and runtime state remain advanced/controlled surfaces unless a future public contract explicitly promotes them.
+Registry, Mapping, structured-invoice internals and runtime state remain controlled surfaces unless a future public contract explicitly promotes them.
 
 ## Reliability behavior
 
@@ -147,7 +160,7 @@ Transaction-scoped item/group writes are deliberately **not automatically replay
 
 ## Production handoff
 
-Before enabling an integration in a customer environment, use the [Production Readiness Checklist](docs/PRODUCTION_READINESS_CHECKLIST.md). It covers version/contract verification, database security, PLU rules, sales cursor/idempotency, restart/rollback testing and operational handoff.
+Before enabling an integration in a customer environment, complete the [Production Readiness Checklist](docs/PRODUCTION_READINESS_CHECKLIST.md). It covers version/contract verification, database security, PLU rules, sales cursor/idempotency, restart/rollback testing and operational handoff.
 
 ## Compatibility and API stability
 
@@ -177,20 +190,20 @@ Security-sensitive reports must follow [SECURITY.md](SECURITY.md) and must not b
 
 This public repository intentionally excludes direct device protocols, packet captures, private keys, credentials, customer data, proprietary firmware/vendor material and internal Sadr Scales runtime/release infrastructure.
 
-## Release quality gates
+## Release quality and repository protection
 
-Before a stable tag can create a Draft GitHub Release, automation verifies:
+The stable release was validated through:
 
-- public-repository security boundary and required governance/release files;
-- SDK restore/build/tests;
-- NuGet package shape, joint provider metadata, MIT license metadata and Source Link/repository metadata;
-- executable C# Quick Start;
+- Public Repository Guard;
+- SDK build/tests and executable Quick Start;
+- NuGet package/license/provider/Source Link validation;
 - SQL Server 2022 integration tests;
 - real .NET Framework 4.8 package consumer;
-- release bundle/checksums;
-- official Integration Guide SHA-256.
+- protected tag release workflow;
+- official Integration Guide SHA-256 verification;
+- release manifest and full asset SHA-256 verification.
 
-The GitHub Release remains **draft** until final human review.
+GitHub host controls include Secret Scanning, Push Protection, Dependabot alerts/security updates, Private Vulnerability Reporting and CodeQL default setup for C#. `main` is protected with required validated checks, conversation resolution, admin enforcement, and force-push/deletion disabled.
 
 ## License and providers
 
