@@ -4,7 +4,8 @@
 
 ## P0 — Release administration/security
 - [x] MIT public software license approved; `LICENSE` and NuGet package metadata identify Tozin Sadr and Behzad Erfanian.
-- [ ] Complete/review `docs/GITHUB_SECURITY_ADMIN_CHECKLIST.md` owner/admin host settings.
+- [x] Repository-owner host security verified: Secret Scanning, Push Protection, Dependabot alerts/security updates, Private Vulnerability Reporting and C# CodeQL default setup are enabled/configured.
+- [ ] Configure `main` branch protection after PR #8 merge using the validated post-merge checks.
 - [ ] Publish the final verified Integration Guide/checksum as GitHub Release assets. Release automation is implemented; actual asset publication waits for the stable tag.
 
 ## P1 — Contract/docs
@@ -45,6 +46,10 @@
 - [x] Contribution policy documents test/security/license expectations.
 - [x] Security policy routes sensitive reports away from public Issues.
 - [x] Public Repository Guard requires stable-release governance/security files.
+- [x] Secret Scanning and Push Protection enabled.
+- [x] Dependabot vulnerability alerts and security updates enabled.
+- [x] Private Vulnerability Reporting enabled.
+- [x] CodeQL default setup configured for C#.
 
 ## P1 — Release engineering
 - [x] `1.0.0` package metadata prepared.
@@ -58,7 +63,8 @@
 - [x] Tag workflow creates/updates a **Draft** GitHub Release only after all gates pass.
 - [x] Normal PR CI smoke-builds the release bundle.
 - [ ] Merge release-hardening PR after final CI/review.
-- [ ] Create stable `v1.0.0` tag after P0 gates are closed.
+- [ ] Validate exact merged `main` and configure branch protection.
+- [ ] Create stable `v1.0.0` tag on the validated merge commit.
 - [ ] Verify Draft Release assets/checksums and publish it.
 
 ## P2 — Developer reach
