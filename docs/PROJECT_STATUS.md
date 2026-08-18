@@ -1,10 +1,22 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-18  
-**Phase:** `v1.0.0` stable public release — published  
+**Phase:** `v1.0.0` stable public release — published; next-generation Integration Platform planning accepted  
 **Current stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
-**Public integration contract:** `SQL Contract v1`
+**Current published integration contract:** `SQL Contract v1`
+
+## Canonical next-generation plan
+
+The accepted future direction is recorded in:
+
+- `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`
+
+That master plan is the canonical source for the next-generation product goal, completeness-first priorities, repository simplification, full capability audit, transport-independent domain design, coding/comment/region rules, testing strategy, Developer Sample App, seeded/random demo-data generation, internal simulator completion, protected public scale emulator, POS simulator and full single-PC Integration Lab.
+
+The existing `v1.0.0` release remains immutable and valid for its published Basic SQL Contract. The next public version number is intentionally undecided until the new Contract/API compatibility design is complete.
+
+**Next exact step:** Phase 1 — Full Integration Surface Audit of final Sadr Scales 5.2.1. No large Public API or repository redesign should begin before that audit is reviewed.
 
 ## Stable release identity
 
@@ -128,16 +140,24 @@ GitHub is the developer source of truth. Stable SDK packages, compiled binaries,
 
 NuGet.org publication remains a separate post-v1 decision because it requires package-account/ownership/publication-policy administration.
 
-## Scope boundary
+## Scope boundary of published v1.0.0
 
 `v1.0.0` does not expose direct device protocols, packet captures, private firmware/vendor data, customer data, private keys or internal Sadr Scales runtime source.
 
-Python/Node.js/Java/PHP wrappers, REST/Webhook Gateway, no-code connectors and advanced structured-invoice helpers remain post-v1/future work. Non-C# developers can use SQL Contract v1 and the executable SQL samples now.
+Its Basic SQL Contract is intentionally narrower than the newly accepted long-term Integration Platform goal. That gap will be addressed through the Phase 1 audit and subsequent Contract/Domain design rather than by silently changing the published v1 contract.
 
 ## Next phase
 
-The first stable public SDK release is closed. Normal work moves to post-v1 maintenance and developer reach. Any breaking SDK API change requires Semantic Versioning discipline, and any breaking SQL surface change requires a new SQL Contract version.
+The stable `v1.0.0` release is closed and frozen.
+
+Active planning now moves to **Phase 1 — Full Integration Surface Audit** from the canonical master plan. The audit must identify every externally useful capability in final Sadr Scales 5.2.1 and classify it as:
+
+- Safe Data Contract;
+- Managed Runtime Command;
+- Internal / Do Not Expose.
+
+The audit is the prerequisite for the next Public API, repository simplification, full samples and Integration Lab work.
 
 ## Handoff rule
 
-A future session begins by reading `AGENTS.md`, this file, `DECISIONS.md`, `ROADMAP.md`, `BACKLOG.md`, `WORK_LOG.md`, `SDK_DESIGN_V1.md`, `API_COMPATIBILITY.md`, `PRODUCTION_READINESS_CHECKLIST.md` and `SECURITY_BOUNDARY.md`.
+A future session begins with `AGENTS.md`, then `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`, then this status file and only the current-state/contract references relevant to the task.
