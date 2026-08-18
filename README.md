@@ -2,13 +2,15 @@
 
 **Official public integration toolkit, SQL contract, C# SDK and samples for connecting POS, ERP and accounting software to Sadr Scales.**
 
+**Provided and maintained by Tozin Sadr and Behzad Erfanian.**
+
 [فارسی](README.fa.md) · [Getting Started](docs/en/getting-started.md) · [Troubleshooting](docs/en/troubleshooting.md) · [SQL Contract v1](docs/en/sql-contract-v1.md) · [Compatibility](docs/COMPATIBILITY.md) · [Security](SECURITY.md)
 
 ---
 
 ## Status
 
-**`v1.0.0` release engineering is complete/in final review.** The stable tag is intentionally held until the remaining administrative release gates (public software license and repository-owner security settings) are explicitly approved.
+**`v1.0.0` release engineering is complete/in final review.** The stable tag is intentionally held until the remaining repository-owner security settings are explicitly reviewed.
 
 The supported public baseline is:
 
@@ -169,7 +171,7 @@ Before a stable tag can create a Draft GitHub Release, automation verifies:
 
 - public-repository security boundary;
 - SDK restore/build/tests;
-- NuGet package shape and Source Link/repository metadata;
+- NuGet package shape, joint provider metadata, MIT license metadata and Source Link/repository metadata;
 - executable C# Quick Start;
 - SQL Server 2022 integration tests;
 - real .NET Framework 4.8 package consumer;
@@ -178,6 +180,10 @@ Before a stable tag can create a Draft GitHub Release, automation verifies:
 
 The GitHub Release remains **draft** until final human review.
 
-## License
+## License and providers
 
-A stable public software license must be explicitly approved before the `v1.0.0` tag is published. Until a `LICENSE` file is added, all rights remain reserved. See [NOTICE.md](NOTICE.md).
+The public `SadrScales-Integration` SDK and repository materials covered by [LICENSE](LICENSE) are distributed under the **MIT License**.
+
+**Copyright (c) 2026 Tozin Sadr and Behzad Erfanian.**
+
+This public license does not publish or license private Sadr Scales runtime source, proprietary device protocols, firmware, private keys, customer data or other material outside this repository. See [NOTICE.md](NOTICE.md).
