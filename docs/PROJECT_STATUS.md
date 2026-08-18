@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-18  
-**Phase:** M2 engineering complete — `v1.0.0` release candidate / administrative gates open  
+**Phase:** M2 engineering complete — `v1.0.0` release candidate / final host-security gate open  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
@@ -12,7 +12,7 @@
 - Draft PR: `#8 — M2: Prepare SadrScales Integration v1.0.0 release`
 - Base: `main`
 
-`main` remains the last merged public baseline until PR #8 passes final review and the pre-release administrative gates are closed.
+`main` remains the last merged public baseline until PR #8 passes final review and the remaining pre-release administrative gate is closed.
 
 ## Completed engineering
 
@@ -32,10 +32,13 @@
 - Automated Binaries ZIP / Developer Kit ZIP / release manifest / SHA-256 checksums.
 - Protected tag release workflow with tag/version matching, final Guide SHA verification and Draft GitHub Release creation.
 - Final Sadr Scales 5.2.1 Integration Guide identity reconciled to the final 38-page release asset.
+- MIT License approved for the public repository/SDK.
+- Public provider/copyright identity set to **Tozin Sadr and Behzad Erfanian** in `LICENSE`, NuGet authors/copyright/license metadata, package README, repository README and NOTICE.
+- Package validation now fails if either provider identity or the MIT license expression is missing.
 
 ## Latest release-engineering validation
 
-SDK CI run `32106867152` exercised the new release-bundle path and passed all three jobs:
+SDK CI run `32106867152` exercised the release-bundle path and passed all three jobs before the final license-metadata change:
 
 - SDK restore/build/tests: PASS;
 - C# Quick Start restore/build: PASS;
@@ -47,16 +50,15 @@ SDK CI run `32106867152` exercised the new release-bundle path and passed all th
 
 Public Repository Guard run `32106867174`: PASS.
 
-The release-bundle smoke gate proves that the candidate package can be transformed into the distributable package/symbol/binary/developer-kit/manifest/checksum set before any public tag is created.
+A fresh final PR run is required after the joint-provider/MIT metadata change; that run becomes the release-candidate evidence before merge.
 
 ## Stable-release gates still open
 
-1. **Public software license** — company approval is required before adding `LICENSE` and package license metadata.
-2. **GitHub owner/admin security settings** — review `docs/GITHUB_SECURITY_ADMIN_CHECKLIST.md`.
-3. **Final PR #8 verification/merge** after the license decision and final CI.
-4. **Tag `v1.0.0`** on the exact merged source.
-5. **Protected Release verification** — all release jobs must pass, including download/hash verification of the final Integration Guide.
-6. **Draft GitHub Release inspection** — verify package, symbols, Binaries ZIP, Developer Kit ZIP, Guide, manifest and SHA-256 checksums before publishing.
+1. **GitHub owner/admin security settings** — review `docs/GITHUB_SECURITY_ADMIN_CHECKLIST.md`.
+2. **Final PR #8 verification/merge** after the fresh CI run is green.
+3. **Tag `v1.0.0`** on the exact merged source.
+4. **Protected Release verification** — all release jobs must pass, including download/hash verification of the final Integration Guide.
+5. **Draft GitHub Release inspection** — verify package, symbols, Binaries ZIP, Developer Kit ZIP, Guide, manifest and SHA-256 checksums before publishing.
 
 ## Distribution model for v1.0.0
 
@@ -72,7 +74,7 @@ Python/Node.js/Java/PHP wrappers, REST/Webhook Gateway, no-code connectors and a
 
 ## Exact next step
 
-Close the two administrative gates (public software license + GitHub host security review), then run final PR #8 CI/review, merge, tag `v1.0.0`, inspect the automatically created Draft Release and publish it.
+Wait for the fresh PR #8 CI after the joint MIT/provider metadata change, review the GitHub host-security settings, then merge, tag `v1.0.0`, inspect the automatically created Draft Release and publish it.
 
 ## Handoff rule
 
