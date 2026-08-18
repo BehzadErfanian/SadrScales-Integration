@@ -52,8 +52,33 @@
   - source release commit `1048749f52faba35e69464b64983e772c1c857e3`.
 - Added machine-readable guide identity so release automation can download and hash-verify the public PDF.
 - Added `New-ReleaseBundle.ps1` producing package/symbol, Binaries ZIP, Developer Kit ZIP, release notes, manifest and `SHA256SUMS.txt`.
-- Normal SDK CI now smoke-builds the full release bundle and uploads release evidence.
+- Normal SDK CI smoke-builds the full release bundle and uploads release evidence.
 - Added protected `v*.*.*` tag release workflow that reruns SDK/Quick Start, SQL Server 2022 and net48 package-consumer gates, verifies tag/version match, downloads/verifies the official Guide and creates/updates a Draft GitHub Release.
-- SDK CI run `32106867152`: all jobs PASS, including NuGet metadata validation and release-bundle smoke generation.
-- Public Repository Guard run `32106867174`: PASS.
-- Remaining pre-v1 blockers are administrative: approved public software license, owner/admin GitHub security-settings review, final PR merge/tag/Draft Release inspection.
+- Added MIT License with joint provider/copyright identity: Tozin Sadr and Behzad Erfanian.
+- Added CODEOWNERS, Dependabot configuration, hardened Issue forms, support policy, contribution guidance and production-readiness checklist.
+- Verified GitHub host security: Secret Scanning, Push Protection, Dependabot alerts/security updates, Private Vulnerability Reporting and C# CodeQL default setup.
+- Final exact PR #8 SDK CI run `32111436949` / #98: PASS.
+- Final exact PR #8 Public Repository Guard run `32111437048` / #169: PASS.
+- PR #8 merged to `main` as `a6bccc7c13a8afba29b6860869d2a942b1231803`.
+
+## 2026-08-18 — Stable v1.0.0 publication
+- Exact merged `main` commit verified: `a6bccc7c13a8afba29b6860869d2a942b1231803`.
+- SDK CI on exact `main`: run `32111583869` — PASS.
+- Public Repository Guard on exact `main`: run `32112295906` — PASS.
+- Required checks verified: `build-test-pack`, `sql-integration-test`, `net48-package-consumer`, `validate-public-boundary`.
+- Configured protected `main` with strict required checks, admin enforcement and conversation resolution; force pushes/deletion disabled; zero external approvals while there is one maintainer.
+- Stable tag `v1.0.0` verified on exact stable commit; tag is governed as immutable-by-policy and must never be moved/reused.
+- Protected Release run `32112295891`: PASS.
+- Protected Release job `draft-release`: PASS, including official Guide download/hash verification, final bundle/checksum creation, evidence upload and Draft Release creation.
+- Release engineering artifact: `SadrScales-Integration-v1.0.0-1`, artifact ID `9315377547`.
+- Draft GitHub Release found as Release ID `372167195`, `Draft=True`, `Prerelease=False` before publication.
+- Verified exact eight primary release assets: NuGet package, symbols, Binaries ZIP, Developer Kit ZIP, final Guide, manifest, SHA256SUMS and release notes.
+- Directly downloaded Draft assets; GitHub asset sizes matched.
+- `SHA256SUMS.txt` verification passed.
+- Release manifest verification passed for product/version/Contract/baseline/commit/MIT/both providers.
+- NuGet metadata verification passed for package ID/version/MIT/Tozin Sadr/Behzad Erfanian.
+- Binaries ZIP contained compiled SDK DLL and XML API documentation.
+- Developer Kit contained license, support, contribution, changelog and production-readiness material.
+- Official 38-page Integration Guide SHA-256 verified as `182be9aa73348a35a299ab0fad22e5e9deeba800ef9222c0145ba582b02e281b`.
+- Draft Release published successfully as stable, non-prerelease `v1.0.0`.
+- `v1.0.0` is now the official stable public SadrScales Integration release.
