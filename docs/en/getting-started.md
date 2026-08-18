@@ -1,71 +1,114 @@
 # Getting Started — Sadr Scales Integration
 
-This is the basic integration path for **Sadr Scales 5.2.1 / SQL Contract v1**.
+This is the shortest supported path for **Sadr Scales 5.2.1 / SQL Contract v1 / SadrScales.Integration 1.x**.
 
 ## 1. Architecture
 
 ```text
 POS / ERP / Accounting
         ↓
-Sadr Scales SQL Contract v1
+SadrScales.Integration / SQL Contract v1
         ↓
 Sadr Scales Runtime
         ↓
 Supported scales
 ```
 
-Your application works with the SQL Server database used by Sadr Scales. Sadr Scales remains responsible for device sessions, retries, Registry, model differences and direct scale communication.
+Your application integrates with Sadr Scales. Sadr Scales remains responsible for device sessions, retries, Registry, model differences and direct scale communication.
 
-## 2. Before integrating
+## 2. Prerequisites
 
-1. Run Sadr Scales 5.2.1 so its own schema migration/check completes.
-2. In a test environment, run [`samples/SQL/00-validate-contract.sql`](../../samples/SQL/00-validate-contract.sql).
-3. Keep real credentials out of source and sample configuration.
+- Sadr Scales 5.2.1 or a later release explicitly compatible with SQL Contract v1.
+- Access to the SQL Server database used by that Sadr Scales installation.
+- For the C# SDK: .NET Framework 4.8 or a modern .NET runtime capable of consuming `netstandard2.0`.
 
-## 3. Basic public objects
+Run Sadr Scales once first so its own schema migration/check completes.
 
-- `dbo.SADR_ItemClass` — item groups; SELECT/INSERT/UPDATE.
-- `dbo.SADR_Item` — PLU/item master; SELECT/INSERT/UPDATE.
-- `dbo.SADR_Logs` — accepted sales feed; SELECT only.
+## 3. Validate the contract first
 
-Registry, Mapping and Structured Sales are outside the basic path.
+C#:
 
-## 4. Items
+```csharp
+var client = new SadrScalesClient(connectionString);
+await client.ValidateAsync();
+```
+
+Or run the read-only SQL validator:
+
+[`samples/SQL/00-validate-contract.sql`](../../samples/SQL/00-validate-contract.sql)
+
+Do not continue against an unknown/mismatched schema.
+
+## 4. Try the executable C# Quick Start
+
+The repository contains a build-validated sample:
+
+[`samples/csharp/SadrScales.Integration.QuickStart`](../../samples/csharp/SadrScales.Integration.QuickStart/README.md)
+
+It reads the connection string only from `SADR_SCALES_CONNECTION_STRING`, validates Contract v1 and performs a read-only sales query by default.
+
+```powershell
+$env:SADR_SCALES_CONNECTION_STRING = "Server=...;Database=...;..."
+dotnet run --project samples/csharp/SadrScales.Integration.QuickStart
+```
+
+Never commit a real connection string.
+
+## 5. Use the release NuGet package
+
+For a GitHub Release package downloaded to a local folder:
+
+```bash
+dotnet add package SadrScales.Integration --version 1.0.0 --source <download-folder>
+```
+
+Then:
+
+```csharp
+var client = new SadrScalesClient(connectionString);
+
+await client.ValidateAsync();
+await client.ItemGroups.UpsertAsync(group);
+await client.Items.UpsertAsync(item);
+
+SadrSalesBatch batch = await client.Sales.ReadAfterAsync(lastProcessedId, 100);
+```
+
+## 6. Items and PLUs
 
 - Create the referenced group before the item.
 - `PluNo` must be unique and non-zero.
-- `PluNo` is the Contract v1 item identity; do not use legacy `ID`/`IDitem` as integration identities.
+- `PluNo` is the Contract v1 public item identity; do not use legacy `ID`/`IDitem` as integration identities.
 - Never write `TimeStamp/rowversion`.
-- Prefer `DeleteFlag` to physical deletion for normal integration.
-- See the safe dry-run sample: [`01-upsert-item.sql`](../../samples/SQL/01-upsert-item.sql).
+- `UpsertAsync` avoids unnecessary updates when semantic values are unchanged.
+- `UpsertBatchAsync` accepts at most **200 unique PLUs** in one atomic transaction. Larger imports must be paged by the caller.
+- Transaction-scoped writes are not automatically replayed after execution begins.
 
-## 5. Sales
+Raw SQL dry-run: [`samples/SQL/01-upsert-item.sql`](../../samples/SQL/01-upsert-item.sql).
 
-Basic cursor shape:
+## 7. Sales
 
-```sql
-SELECT TOP (@BatchSize) *
-FROM dbo.SADR_Logs
-WHERE ID > @LastProcessedId
-ORDER BY ID ASC;
-```
-
-Production code should select explicit columns; see [`02-read-sales-incremental.sql`](../../samples/SQL/02-read-sales-incremental.sql).
+The SDK reads accepted sales incrementally and never updates/deletes `SADR_Logs` for acknowledgement.
 
 Consumer rules:
 
 - keep the cursor in destination-owned durable state;
-- commit destination data first, then advance the cursor;
+- persist destination data first, then advance the cursor;
 - use `(DeviceNo, FID, SubID)` for destination duplicate protection;
-- never update/delete `SADR_Logs` for cursor management;
 - tolerate gaps in `ID` values.
 
-## 6. Next documentation
+Raw SQL sample: [`samples/SQL/02-read-sales-incremental.sql`](../../samples/SQL/02-read-sales-incremental.sql).
+
+## 8. If something fails
+
+Start with [Troubleshooting](troubleshooting.md).
+
+Then read:
 
 - [SQL Contract v1](sql-contract-v1.md)
-- [Contract Freeze Record](../CONTRACT_V1_FREEZE.md)
-- [Regression Checklist](../CONTRACT_V1_REGRESSION_CHECKLIST.md)
-- [Full Persian technical guide](../reference/README.md)
+- [SDK Design v1](../SDK_DESIGN_V1.md)
+- [Compatibility](../COMPATIBILITY.md)
 - [Security boundary](../SECURITY_BOUNDARY.md)
+- [Full Persian technical guide](../reference/README.md)
 
-The C# SDK is planned for M2. Until it is released, this repository's Contract v1 and SQL samples are the public integration source of truth.
+Direct PLUS/LSG/Aclas wire protocols are intentionally outside this public integration surface.
