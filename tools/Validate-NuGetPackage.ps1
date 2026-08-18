@@ -57,6 +57,8 @@ try {
     $id = Get-NuspecText 'id'
     $version = Get-NuspecText 'version'
     $readme = Get-NuspecText 'readme'
+    $authors = Get-NuspecText 'authors'
+    $copyright = Get-NuspecText 'copyright'
 
     if ($id -ne 'SadrScales.Integration') {
         throw "Unexpected package id: $id"
@@ -68,6 +70,25 @@ try {
 
     if ($readme -ne 'PACKAGE_README.md') {
         throw "Unexpected package readme metadata: $readme"
+    }
+
+    if ($authors -notmatch 'Tozin Sadr' -or $authors -notmatch 'Behzad Erfanian') {
+        throw "Package authors must identify both Tozin Sadr and Behzad Erfanian. Actual: $authors"
+    }
+
+    if ($copyright -notmatch 'Tozin Sadr' -or $copyright -notmatch 'Behzad Erfanian') {
+        throw "Package copyright must identify both Tozin Sadr and Behzad Erfanian. Actual: $copyright"
+    }
+
+    $license = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']/*[local-name()='license']")
+    if ($null -eq $license) {
+        throw 'NuGet license metadata is missing.'
+    }
+
+    $licenseType = [string]$license.GetAttribute('type')
+    $licenseValue = [string]$license.InnerText
+    if ($licenseType -ne 'expression' -or $licenseValue -ne 'MIT') {
+        throw "Expected MIT license expression metadata. Actual type='$licenseType', value='$licenseValue'."
     }
 
     $repository = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']/*[local-name()='repository']")
@@ -91,9 +112,12 @@ try {
         throw "Repository commit metadata is missing or invalid: $repositoryCommit"
     }
 
-    Write-Host "NuGet package validation passed."
-    Write-Host "Package : $id $version"
-    Write-Host "Commit  : $repositoryCommit"
+    Write-Host 'NuGet package validation passed.'
+    Write-Host "Package   : $id $version"
+    Write-Host "Authors   : $authors"
+    Write-Host "License   : $licenseValue"
+    Write-Host "Copyright : $copyright"
+    Write-Host "Commit    : $repositoryCommit"
 }
 finally {
     $archive.Dispose()
