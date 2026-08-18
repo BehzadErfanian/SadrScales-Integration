@@ -12,10 +12,10 @@
 - [x] Final 5.2.1 Integration Guide identity pinned to the 38-page release asset and SHA-256.
 - [x] Bilingual Getting Started and troubleshooting paths.
 - [x] Vendor production-readiness/go-live checklist.
+- [x] Complete/review repository-owner GitHub host-security controls.
 - [ ] Actual Guide upload to stable GitHub Release after tag.
-- [ ] Complete/review owner/admin GitHub security checklist.
 
-## M2 — C# Integration SDK v1 — release candidate
+## M2 — C# Integration SDK v1 — release candidate complete
 
 ### Foundation — complete
 - [x] `netstandard2.0`, `Microsoft.Data.SqlClient 7.0.2`.
@@ -64,12 +64,22 @@
 - [x] Release-bundle smoke gate in normal CI.
 - [x] Protected tag workflow reruns SDK/SQL/net48 gates, verifies final Guide SHA and creates a Draft GitHub Release.
 
-## M3 — Stable `v1.0.0` publication — final gate
+### GitHub host security — complete before v1
+- [x] Secret Scanning enabled.
+- [x] Push Protection enabled.
+- [x] Dependabot vulnerability alerts enabled.
+- [x] Dependabot security updates enabled.
+- [x] Private Vulnerability Reporting enabled.
+- [x] C# CodeQL default setup configured.
+
+## M3 — Stable `v1.0.0` publication — in progress
 - [x] Approve MIT public software license and add `LICENSE`/package license metadata.
 - [x] Joint provider/copyright identity documented and package-validated.
-- [ ] Review GitHub owner/admin security checklist.
+- [x] Complete GitHub owner/admin host-security gate.
 - [ ] Final PR CI/review/merge.
-- [ ] Tag exact merged source as `v1.0.0`.
+- [ ] Validate exact merged `main`.
+- [ ] Configure `main` branch protection using validated post-merge checks.
+- [ ] Tag exact validated source as `v1.0.0`.
 - [ ] Confirm protected release run passes.
 - [ ] Inspect Draft Release package/DLL/symbols/developer kit/guide/manifest/checksums.
 - [ ] Publish GitHub Release.
