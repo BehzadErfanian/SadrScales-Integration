@@ -60,7 +60,7 @@ $requiredFiles = @(
     '.github/ISSUE_TEMPLATE/bug_report.yml',
     '.github/ISSUE_TEMPLATE/feature_request.yml',
     '.github/pull_request_template.md',
-    '.github/workflows/public-repository-guard.yml',
+    '.github/workflows/public-repo-guard.yml',
     '.github/workflows/sdk-ci.yml',
     '.github/workflows/release.yml',
     'docs/PROJECT_STATUS.md',
