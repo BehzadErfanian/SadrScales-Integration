@@ -8,6 +8,10 @@ on:
       - 'tests/**'
       - 'samples/**'
       - 'tools/**'
+      - 'docs/releases/**'
+      - 'docs/reference/**'
+      - 'docs/API_COMPATIBILITY.md'
+      - 'LICENSE'
       - '.github/workflows/sdk-ci.yml'
   pull_request:
     paths:
@@ -15,6 +19,10 @@ on:
       - 'tests/**'
       - 'samples/**'
       - 'tools/**'
+      - 'docs/releases/**'
+      - 'docs/reference/**'
+      - 'docs/API_COMPATIBILITY.md'
+      - 'LICENSE'
       - '.github/workflows/sdk-ci.yml'
 
 permissions:
@@ -61,6 +69,18 @@ jobs:
             Select-Object -First 1
           if (-not $package) { throw 'SDK NuGet package was not produced.' }
           ./tools/Validate-NuGetPackage.ps1 -PackagePath $package.FullName
+
+      - name: Build release bundle smoke test
+        shell: pwsh
+        run: ./tools/New-ReleaseBundle.ps1 -Version 1.0.0 -PackageDirectory artifacts/package -OutputDirectory artifacts/release-smoke
+
+      - name: Upload release bundle smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: SadrScales-Integration-release-smoke-${{ github.run_number }}
+          path: artifacts/release-smoke/
+          if-no-files-found: error
+          retention-days: 14
 
   sql-integration-test:
     runs-on: ubuntu-latest
