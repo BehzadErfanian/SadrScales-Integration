@@ -2,6 +2,8 @@
 
 Official C# SDK for the public **Sadr Scales SQL Contract v1**.
 
+**Provided and maintained by:** Tozin Sadr and Behzad Erfanian  
+**License:** MIT  
 **SDK line:** 1.x  
 **Baseline:** Sadr Scales 5.2.1 or a later release explicitly compatible with SQL Contract v1  
 **Target framework:** `netstandard2.0`
@@ -86,3 +88,9 @@ Start with:
 - The caller owns the SQL Server connection string and deployment security configuration.
 - Never embed production credentials in source code or public issue reports.
 - Do not update/delete `SADR_Logs` to manage a consumer cursor.
+
+## License
+
+The public SDK is released under the MIT License.
+
+Copyright (c) 2026 Tozin Sadr and Behzad Erfanian.
