@@ -12,8 +12,10 @@
 - [x] Final Sadr Scales 5.2.1 Integration Guide identity reconciled to the final 38-page release asset.
 - [x] Bilingual Getting Started updated for SDK 1.x.
 - [x] Bilingual troubleshooting matrix.
+- [x] Vendor production-readiness/go-live checklist.
 - [x] SDK API compatibility/versioning policy.
 - [x] Root English/Persian developer landing README.
+- [x] Public support policy.
 
 ## P1 — SDK foundation/hardening
 - [x] Basic SDK + unit/package CI.
@@ -36,10 +38,20 @@
 - [x] net48 build/runtime succeeds with warnings-as-errors.
 - [x] SqlClient dependency graph loads from restored package.
 
+## P1 — Public repository operations
+- [x] CODEOWNERS identifies the public repository owner/reviewer.
+- [x] Weekly Dependabot policy for NuGet and GitHub Actions.
+- [x] Hardened bug/feature Issue forms and disabled blank public Issues.
+- [x] Contribution policy documents test/security/license expectations.
+- [x] Security policy routes sensitive reports away from public Issues.
+- [x] Public Repository Guard requires stable-release governance/security files.
+
 ## P1 — Release engineering
 - [x] `1.0.0` package metadata prepared.
 - [x] Automated Binaries ZIP + Developer Kit ZIP.
+- [x] Developer Kit includes support/contribution/changelog/production-readiness material.
 - [x] Automated release manifest + `SHA256SUMS.txt`.
+- [x] Release manifest records providers + MIT license.
 - [x] Final guide download + pinned SHA-256 verification in protected release workflow.
 - [x] Tag/version match gate.
 - [x] Tag release reruns SDK, SQL Server and net48 gates.
