@@ -3,7 +3,7 @@
 **P0** blocks public `v1.0.0`; **P1** is engineering required for v1; **P2** is post-v1 expansion.
 
 ## P0 — Release administration/security
-- [ ] Company-approved public software license + `LICENSE` file/package metadata.
+- [x] MIT public software license approved; `LICENSE` and NuGet package metadata identify Tozin Sadr and Behzad Erfanian.
 - [ ] Complete/review `docs/GITHUB_SECURITY_ADMIN_CHECKLIST.md` owner/admin host settings.
 - [ ] Publish the final verified Integration Guide/checksum as GitHub Release assets. Release automation is implemented; actual asset publication waits for the stable tag.
 
@@ -26,6 +26,7 @@
 - [x] Source Link/repository package metadata.
 - [x] NuGet package shape validation.
 - [x] .NET package validation enabled.
+- [x] Package validator checks MIT license plus both provider identities.
 - [x] Strong-name policy decided: v1.0.0 remains unsigned unless a concrete supported-consumer requirement appears.
 
 ## P1 — .NET Framework compatibility
