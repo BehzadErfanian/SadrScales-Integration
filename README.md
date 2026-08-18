@@ -1,10 +1,13 @@
 # Sadr Scales Integration
 
+[![SDK CI](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/sdk-ci.yml/badge.svg)](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/sdk-ci.yml)
+[![Public Repository Guard](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/public-repo-guard.yml/badge.svg)](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/public-repo-guard.yml)
+
 **Official public integration toolkit, SQL contract, C# SDK and samples for connecting POS, ERP and accounting software to Sadr Scales.**
 
 **Provided and maintained by Tozin Sadr and Behzad Erfanian.**
 
-[فارسی](README.fa.md) · [Getting Started](docs/en/getting-started.md) · [Troubleshooting](docs/en/troubleshooting.md) · [SQL Contract v1](docs/en/sql-contract-v1.md) · [Compatibility](docs/COMPATIBILITY.md) · [Security](SECURITY.md)
+[فارسی](README.fa.md) · [Getting Started](docs/en/getting-started.md) · [Troubleshooting](docs/en/troubleshooting.md) · [Production Readiness](docs/PRODUCTION_READINESS_CHECKLIST.md) · [SQL Contract v1](docs/en/sql-contract-v1.md) · [Compatibility](docs/COMPATIBILITY.md) · [Support](SUPPORT.md) · [Security](SECURITY.md)
 
 ---
 
@@ -142,6 +145,10 @@ The SDK retries only where replay is safe:
 
 Transaction-scoped item/group writes are deliberately **not automatically replayed** after execution begins because a lost response can make commit state ambiguous.
 
+## Production handoff
+
+Before enabling an integration in a customer environment, use the [Production Readiness Checklist](docs/PRODUCTION_READINESS_CHECKLIST.md). It covers version/contract verification, database security, PLU rules, sales cursor/idempotency, restart/rollback testing and operational handoff.
+
 ## Compatibility and API stability
 
 `1.0.0` establishes the first stable SDK API line. `1.x` follows Semantic Versioning and SQL Contract versioning remains separate.
@@ -152,24 +159,29 @@ Read [SDK API Compatibility Policy](docs/API_COMPATIBILITY.md) for the compatibi
 
 - [Getting Started](docs/en/getting-started.md)
 - [Troubleshooting](docs/en/troubleshooting.md)
+- [Production Readiness Checklist](docs/PRODUCTION_READINESS_CHECKLIST.md)
 - [SQL Contract v1](docs/en/sql-contract-v1.md)
 - [SDK API Compatibility Policy](docs/API_COMPATIBILITY.md)
 - [SDK Design v1](docs/SDK_DESIGN_V1.md)
 - [Compatibility matrix](docs/COMPATIBILITY.md)
 - [Security boundary](docs/SECURITY_BOUNDARY.md)
 - [Official Persian guide identity](docs/reference/README.md)
+- [Support policy](SUPPORT.md)
+- [Contributing](CONTRIBUTING.md)
 
-## Security boundary
+## Support and security
+
+Use sanitized GitHub Issues for public reproducible SDK/Contract problems. Read [SUPPORT.md](SUPPORT.md) before posting customer-specific material.
+
+Security-sensitive reports must follow [SECURITY.md](SECURITY.md) and must not be posted in a normal public issue.
 
 This public repository intentionally excludes direct device protocols, packet captures, private keys, credentials, customer data, proprietary firmware/vendor material and internal Sadr Scales runtime/release infrastructure.
-
-If you report a problem, sanitize logs and stack traces. Never post real credentials or customer data in a public issue.
 
 ## Release quality gates
 
 Before a stable tag can create a Draft GitHub Release, automation verifies:
 
-- public-repository security boundary;
+- public-repository security boundary and required governance/release files;
 - SDK restore/build/tests;
 - NuGet package shape, joint provider metadata, MIT license metadata and Source Link/repository metadata;
 - executable C# Quick Start;
