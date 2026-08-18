@@ -62,13 +62,15 @@ var client = new SadrScalesClient(options);
 
 Connection establishment can retry before any command starts. Complete read-only contract validation and sales reads can replay on a fresh connection. Transaction-scoped item/group writes are deliberately **not automatically replayed** after execution begins because commit state can become ambiguous when a response is lost.
 
-## Compatibility
+## Compatibility proof
 
 The package is CI-tested against:
 
 - a disposable SQL Server 2022 Contract v1 database;
 - a real .NET Framework 4.8 application that restores and runs the generated NuGet package;
-- a modern .NET C# Quick Start.
+- a modern .NET C# Quick Start;
+- package metadata/Source Link validation;
+- release-bundle checksum generation.
 
 ## Documentation and sample
 
@@ -80,7 +82,9 @@ Start with:
 
 - `docs/en/getting-started.md`
 - `docs/en/troubleshooting.md`
+- `docs/PRODUCTION_READINESS_CHECKLIST.md`
 - `samples/csharp/SadrScales.Integration.QuickStart`
+- `SUPPORT.md`
 
 ## Security boundary
 
@@ -88,6 +92,10 @@ Start with:
 - The caller owns the SQL Server connection string and deployment security configuration.
 - Never embed production credentials in source code or public issue reports.
 - Do not update/delete `SADR_Logs` to manage a consumer cursor.
+
+## Support
+
+Use sanitized GitHub Issues for public reproducible SDK/Contract problems. Customer-specific/commercial deployment support belongs in Tozin Sadr's official support channels. Security-sensitive reports must follow `SECURITY.md` and must not be posted publicly.
 
 ## License
 
