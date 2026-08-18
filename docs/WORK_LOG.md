@@ -82,3 +82,12 @@
 - Official 38-page Integration Guide SHA-256 verified as `182be9aa73348a35a299ab0fad22e5e9deeba800ef9222c0145ba582b02e281b`.
 - Draft Release published successfully as stable, non-prerelease `v1.0.0`.
 - `v1.0.0` is now the official stable public SadrScales Integration release.
+
+## 2026-08-18 — Post-release documentation/CI closure
+- Created `docs/post-v1.0.0-release-closure` from the exact stable source commit without modifying the published tag.
+- Updated English/Persian developer landing pages from release-candidate wording to stable `v1.0.0` status.
+- Closed release status/backlog/roadmap/security-administration documentation with final evidence.
+- Finalized the historical `1.0.0` changelog and opened a clean `Unreleased` section for post-v1 changes.
+- Found a branch-protection governance edge case: required `SDK CI` job contexts could be absent on documentation-only PRs because the workflow used path filters.
+- Removed the `SDK CI` path filters so required SDK/SQL/net48 checks run on every pull request and every push to `main`/`m2/**`, keeping Branch Protection deterministic.
+- The post-release closure is intentionally outside tag `v1.0.0`; the stable release source remains `a6bccc7c13a8afba29b6860869d2a942b1231803`.
