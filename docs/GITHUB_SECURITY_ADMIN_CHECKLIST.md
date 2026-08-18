@@ -1,19 +1,32 @@
 # GitHub Security Administration Checklist
 
-This repository has source-controlled security/governance gates and a public release pipeline. The items in the first section are GitHub **host settings** and must be verified on the repository itself by an owner/admin.
+This repository has source-controlled security/governance gates and a public release pipeline. Host-security controls were verified by the repository owner on 2026-08-18 before the first stable public release.
 
-## Host settings required before public v1.0.0
+## Host settings verified before public v1.0.0
 
-- [ ] Secret scanning is enabled for the public repository.
-- [ ] Push protection for detected secrets is enabled.
-- [ ] Dependabot vulnerability alerts are enabled.
-- [ ] Dependabot security updates are enabled.
-- [ ] Private vulnerability reporting is enabled.
-- [ ] Code scanning / CodeQL default setup is configured for C#.
+- [x] Secret scanning is enabled for the public repository.
+- [x] Push protection for detected secrets is enabled.
+- [x] Dependabot vulnerability alerts are enabled.
+- [x] Dependabot security updates are enabled and not paused.
+- [x] Private vulnerability reporting is enabled.
+- [x] Code scanning / CodeQL default setup is configured for C# with the default query suite and `remote_and_local` threat model.
 - [ ] `main` branch protection is configured after PR #8 is merged and the final required checks are known on `main`.
 - [ ] `main` requires the validated CI/security checks before normal contributor merges.
 - [ ] Force pushes and branch deletion are disabled for protected `main`.
-- [ ] Release tags are not moved/reused after a stable release is published.
+- [x] Release tags are governed by policy: stable release tags are never moved/reused after publication.
+
+### Verification evidence — 2026-08-18
+
+Repository-owner verification returned:
+
+- Dependabot vulnerability alerts: HTTP 204 / enabled;
+- Dependabot security updates: `enabled = True`, `paused = False`;
+- Secret scanning: `status = enabled`;
+- Secret scanning push protection: `status = enabled`;
+- Private vulnerability reporting: `enabled = True`;
+- CodeQL default setup: `state = configured`, `query_suite = default`, `threat_model = remote_and_local`, standard runner.
+
+Branch protection remains intentionally deferred until PR #8 is merged, because the exact post-merge `main` checks should be used as the required-check identities.
 
 ## Single-maintainer branch-protection policy
 
@@ -51,4 +64,4 @@ When additional maintainers are formally added, review this policy and consider 
 
 After the first stable Release has been verified and published, evaluate GitHub **Immutable Releases**. Do not enable immutability before the Draft Release workflow and human asset verification are complete, because the current release process intentionally needs to create/update Draft assets before publication.
 
-The host-setting results should be recorded in this file and `PROJECT_STATUS.md` once verified. Source-controlled protections must never be weakened to compensate for a missing host toggle.
+Source-controlled protections must never be weakened to compensate for a missing host toggle.
