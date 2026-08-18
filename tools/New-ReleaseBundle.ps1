@@ -79,6 +79,7 @@ try {
     Copy-Item -LiteralPath $xmlPath -Destination $binaryStage
     Copy-Item -LiteralPath (Join-Path $repoRoot 'src/SadrScales.Integration/PACKAGE_README.md') -Destination (Join-Path $binaryStage 'README.md')
     Copy-Item -LiteralPath (Join-Path $repoRoot 'NOTICE.md') -Destination $binaryStage
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'SUPPORT.md') -Destination $binaryStage
 
     $licensePath = Join-Path $repoRoot 'LICENSE'
     if (Test-Path -LiteralPath $licensePath -PathType Leaf) {
@@ -106,11 +107,15 @@ try {
         'README.md',
         'README.fa.md',
         'NOTICE.md',
+        'SUPPORT.md',
+        'CONTRIBUTING.md',
+        'CHANGELOG.md',
         'docs/COMPATIBILITY.md',
         'docs/API_COMPATIBILITY.md',
         'docs/SDK_DESIGN_V1.md',
         'docs/SECURITY_BOUNDARY.md',
-        'docs/CONTRACT_V1_FREEZE.md'
+        'docs/CONTRACT_V1_FREEZE.md',
+        'docs/PRODUCTION_READINESS_CHECKLIST.md'
     )) {
         $source = Join-Path $repoRoot $file
         $destination = Join-Path $developerStage $file
@@ -180,6 +185,8 @@ try {
         version = $Version
         sqlContract = 'v1'
         sadrScalesBaseline = '5.2.1'
+        providers = @('Tozin Sadr', 'Behzad Erfanian')
+        license = 'MIT'
         gitCommit = $gitCommit
         generatedUtc = [DateTime]::UtcNow.ToString('o')
         files = $records
