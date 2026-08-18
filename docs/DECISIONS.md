@@ -106,3 +106,8 @@ Before v1.0, compatibility with .NET Framework 4.8 is validated by building and 
 **Date:** 2026-08-17  
 **Status:** Accepted
 `UpsertBatchAsync` accepts at most 200 unique PLUs per call. The complete batch is validated before SQL access and committed in one transaction. Any write failure rolls back the entire call. Larger imports are explicitly paged by the destination application rather than hidden inside one SDK call.
+
+## D-022 — SDK 1.0.0 is not strong-name signed
+**Date:** 2026-08-18  
+**Status:** Accepted
+The tested v1 consumer surface does not require a strong-name identity. A real .NET Framework 4.8 package consumer already restores/builds/runs the unsigned SDK successfully. Strong names are treated as assembly identity/compatibility infrastructure rather than a security boundary. Introducing signing would also create a long-lived key and assembly-identity commitment. Therefore `1.0.0` remains unsigned; any future supported consumer that genuinely requires a strong-named dependency must trigger an explicit compatibility/key-lifecycle decision rather than an incidental packaging change.
