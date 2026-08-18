@@ -4,13 +4,15 @@
 
 **مخزن عمومی رسمی قرارداد SQL، ابزار توسعه C# و نمونه‌های اتصال نرم‌افزارهای فروشگاهی، ERP و حسابداری به Sadr Scales.**
 
+**ارائه و نگهداری توسط Tozin Sadr و Behzad Erfanian.**
+
 [English](README.md) · [شروع سریع](docs/fa/getting-started.md) · [رفع اشکال](docs/fa/troubleshooting.md) · [قرارداد SQL v1](docs/fa/sql-contract-v1.md) · [سازگاری](docs/COMPATIBILITY.md) · [امنیت](SECURITY.md)
 
 ---
 
 ## وضعیت
 
-کار مهندسی **`v1.0.0`** و آماده‌سازی Release در مرحله بازبینی نهایی است. Tag پایدار عمداً تا تأیید دو Gate مدیریتی باقی‌مانده — مجوز عمومی نرم‌افزار و تنظیمات امنیتی مالک Repository — منتشر نمی‌شود.
+کار مهندسی **`v1.0.0`** و آماده‌سازی Release در مرحله بازبینی نهایی است. Tag پایدار عمداً تا بازبینی تنظیمات امنیتی مالک Repository منتشر نمی‌شود.
 
 مبنای عمومی نسخه 1:
 
@@ -171,7 +173,7 @@ Writeهای Transactional گروه و کالا پس از شروع اجرا **ب�
 
 - مرز امنیتی Repository عمومی؛
 - Restore/Build/Test SDK؛
-- ساختار NuGet Package و Source Link/Repository metadata؛
+- ساختار NuGet Package، مشخصات هر دو ارائه‌دهنده، مجوز MIT و Source Link/Repository metadata؛
 - Quick Start اجرایی C#؛
 - تست واقعی SQL Server 2022؛
 - مصرف واقعی Package در .NET Framework 4.8؛
@@ -180,8 +182,12 @@ Writeهای Transactional گروه و کالا پس از شروع اجرا **ب�
 
 GitHub Release پس از این مراحل همچنان **Draft** باقی می‌ماند تا بازبینی انسانی انجام شود.
 
-## مجوز
+## مجوز و ارائه‌دهندگان
 
-قبل از انتشار Tag پایدار `v1.0.0` باید مجوز عمومی نرم‌افزار به‌صورت صریح تأیید و فایل `LICENSE` اضافه شود. تا آن زمان همه حقوق محفوظ است. [NOTICE.md](NOTICE.md) را ببینید.
+SDK عمومی `SadrScales-Integration` و محتوای عمومی مشمول فایل [LICENSE](LICENSE) با مجوز **MIT** منتشر می‌شوند.
+
+**Copyright (c) 2026 Tozin Sadr and Behzad Erfanian.**
+
+این مجوز شامل Source خصوصی Sadr Scales، پروتکل‌های اختصاصی ترازو، Firmware، کلیدهای خصوصی، اطلاعات مشتری یا سایر موارد خارج از این Repository نمی‌شود. برای مرزبندی کامل [NOTICE.md](NOTICE.md) را ببینید.
 
 </div>
