@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-18  
-**Phase:** `v1.0.0` release candidate — engineering/public-developer readiness complete; GitHub host-security review remains  
+**Phase:** `v1.0.0` release candidate — engineering, developer-readiness and GitHub host-security gates complete; merge/publication pending  
 **Target first stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Public integration contract:** `SQL Contract v1`
@@ -9,11 +9,10 @@
 ## Current release-candidate branch
 
 - Branch: `m2/v1-release-hardening`
-- Draft PR: `#8 — M2: Prepare SadrScales Integration v1.0.0 release`
+- PR: `#8 — M2: Prepare SadrScales Integration v1.0.0 release`
 - Base: `main`
-- Final audited PR head: `69de0a8197437d8a8965d580752d4b8c9ebbb854`
 
-`main` remains the last merged public baseline until PR #8 passes the repository-owner host-security review and is merged.
+`main` remains the last merged public baseline until PR #8 is merged. The stable tag is not created before exact post-merge validation.
 
 ## Completed engineering and public-developer readiness
 
@@ -43,13 +42,13 @@
 - Public provider/copyright identity set to **Tozin Sadr and Behzad Erfanian** in `LICENSE`, NuGet metadata, package README, repository README and NOTICE.
 - Package validation fails if either provider identity or the MIT license expression is missing.
 
-## Final audited PR validation
+## Final audited PR validation before security-gate closure docs
 
-Final audited PR head:
+Validated source head:
 
-`69de0a8197437d8a8965d580752d4b8c9ebbb854`
+`044f168ca6c9cfd157befa0c820e0cbd82e309e6`
 
-SDK CI run `32110048714` / run #90: **PASS**
+SDK CI run `32110435350` / run #92: **PASS**
 
 - SDK restore/build/tests: PASS;
 - C# Quick Start restore/build: PASS;
@@ -60,24 +59,38 @@ SDK CI run `32110048714` / run #90: **PASS**
 - disposable SQL Server 2022 integration suite: PASS;
 - real .NET Framework 4.8 package consumer restore/build/runtime: PASS.
 
-Public Repository Guard run `32110048765` / run #153: **PASS**
+Public Repository Guard run `32110435351` / run #157: **PASS**
 
-- `validate-public-boundary`: PASS;
+- public-boundary validation: PASS;
 - required governance/release/security files: PASS;
-- public-sensitive-file boundary: PASS;
+- sensitive-file boundary: PASS;
 - MIT/provider/CODEOWNERS assertions: PASS.
 
-This is the current release-candidate engineering evidence and supersedes the earlier intermediate CI runs.
+The commits after this validated head only close/document the verified host-security gate; the final PR head must still pass the same CI/public-guard checks before merge.
+
+## GitHub host-security gate — complete
+
+Repository-owner verification on 2026-08-18 confirmed:
+
+- Secret Scanning: enabled;
+- Push Protection: enabled;
+- Dependabot vulnerability alerts: enabled;
+- Dependabot security updates: enabled and not paused;
+- Private Vulnerability Reporting: enabled;
+- CodeQL default setup: configured for C#, default query suite, `remote_and_local` threat model.
+
+`main` branch protection is intentionally configured **after** PR #8 merges so the exact post-merge status-check identities can be required without creating a self-lockout in the current single-maintainer repository.
 
 ## Stable-release gates still open
 
-1. **GitHub repository host security** — verify/enable secret scanning, push protection, Dependabot security alerts/updates, private vulnerability reporting and protection of `main` as appropriate for a public single-maintainer repository.
-2. **PR #8 merge** after the host-security review.
+1. **Final PR #8 CI/public-guard pass on the exact final head.**
+2. **PR #8 merge** into `main`.
 3. **Post-merge `main` validation** on the exact merged source.
-4. **Tag `v1.0.0`** on the exact validated `main` commit.
-5. **Protected Release verification** — SDK/SQL/net48/tag/Guide/release-bundle jobs must pass.
-6. **Draft GitHub Release inspection** — verify package, symbols, Binaries ZIP, Developer Kit ZIP, Guide, manifest and SHA-256 checksums before publication.
-7. **Publish GitHub Release** only after the Draft assets are verified.
+4. **Configure `main` branch protection** using the validated checks; no external reviewer requirement while the repository has one maintainer.
+5. **Tag `v1.0.0`** on the exact validated `main` commit.
+6. **Protected Release verification** — SDK/SQL/net48/tag/Guide/release-bundle jobs must pass.
+7. **Draft GitHub Release inspection** — verify package, symbols, Binaries ZIP, Developer Kit ZIP, Guide, manifest and SHA-256 checksums before publication.
+8. **Publish GitHub Release** only after the Draft assets are verified.
 
 ## Distribution model for v1.0.0
 
@@ -93,7 +106,7 @@ Python/Node.js/Java/PHP wrappers, REST/Webhook Gateway, no-code connectors and a
 
 ## Exact next step
 
-Close and record the GitHub host-security gate, then move PR #8 to ready, merge it, validate exact `main`, tag `v1.0.0`, verify the protected Draft Release and publish it.
+Wait for the final PR #8 CI/public-guard run after this documentation closure, mark the PR ready, merge it, validate exact `main`, configure branch protection, tag `v1.0.0`, verify the protected Draft Release and publish it.
 
 ## Handoff rule
 
