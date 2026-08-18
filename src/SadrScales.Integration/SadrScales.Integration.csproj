@@ -6,19 +6,25 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <AssemblyName>SadrScales.Integration</AssemblyName>
     <RootNamespace>SadrScales.Integration</RootNamespace>
+
     <PackageId>SadrScales.Integration</PackageId>
-    <Version>0.1.0-alpha.1</Version>
+    <Version>1.0.0</Version>
     <Authors>Tozin Sadr</Authors>
-    <Description>Public SQL Contract v1 integration client for Sadr Scales.</Description>
+    <Title>Sadr Scales Integration SDK</Title>
+    <Description>Official C# SDK for the public Sadr Scales SQL Contract v1.</Description>
     <PackageProjectUrl>https://github.com/BehzadErfanian/SadrScales-Integration</PackageProjectUrl>
     <RepositoryUrl>https://github.com/BehzadErfanian/SadrScales-Integration.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>sadr scales pos erp sql integration</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageTags>sadr scales pos erp accounting sql integration</PackageTags>
     <PackageReadmeFile>PACKAGE_README.md</PackageReadmeFile>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnablePackageValidation>true</EnablePackageValidation>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
