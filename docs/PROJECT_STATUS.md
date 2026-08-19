@@ -30,6 +30,7 @@ Chat history is not the project source of truth.
 - Item AutoSend resend is requested through `LastSendItem = 0`.
 - HotKey AutoSend resend is requested through `LastSendKey = 0` where the current model/runtime supports automatic HotKey transfer.
 - Resetting `LastSendItem` / `LastSendKey` is not an immediate device command; it marks the next eligible AutoSend cycle to resend.
+- A successful Resend request means the DB trigger state was reset; it does not claim that the physical scale has already received the data.
 - Runtime-only capabilities are planned for a typed Sadr Integration Service; the previously proposed SQL Command Queue direction is removed.
 
 These confirmed decisions are recorded in `docs/DECISIONS.md` as D-024 through D-028.
@@ -68,6 +69,8 @@ RequestHotKeyResend(scaleId)
 ```
 
 These are documented SQL operations and will also have simple SDK methods. The current Runtime processes them on a later eligible AutoSend cycle; the scale must be enabled, connected and configured for automatic sending. HotKey AutoSend remains model/capability dependent.
+
+The SDK result for these methods reports whether the resend request was recorded successfully. Physical transfer completion is a separate concern that requires Runtime/Service visibility.
 
 ## Future Service boundary
 
