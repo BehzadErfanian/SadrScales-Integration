@@ -1,7 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SadrScales.Integration.Assignments;
 using SadrScales.Integration.Contract;
+using SadrScales.Integration.HotKeys;
 using SadrScales.Integration.Invoices;
 using SadrScales.Integration.Internal;
 using SadrScales.Integration.Items;
@@ -50,6 +52,9 @@ namespace SadrScales.Integration
             Sales = new SadrSalesClient(connectionFactory, options);
             Invoices = new SadrInvoiceClient(connectionFactory, options);
             Scales = new SadrScaleClient(connectionFactory, options);
+            ScaleAssignments = new SadrScaleAssignmentClient(connectionFactory, options);
+            ScaleMappings = new SadrScaleMappingClient(connectionFactory, options);
+            HotKeys = new SadrHotKeyClient(connectionFactory, options);
         }
 
         #endregion
@@ -85,6 +90,21 @@ namespace SadrScales.Integration
         /// Gets registered-scale metadata, coarse SQL status and AutoSend resend-request operations.
         /// </summary>
         public SadrScaleClient Scales { get; }
+
+        /// <summary>
+        /// Gets canonical multi-group assignment operations for registered scales.
+        /// </summary>
+        public SadrScaleAssignmentClient ScaleAssignments { get; }
+
+        /// <summary>
+        /// Gets per-scale PLU/item-code and optional HotKey-position mapping operations.
+        /// </summary>
+        public SadrScaleMappingClient ScaleMappings { get; }
+
+        /// <summary>
+        /// Gets user-managed item-group HotKey template operations.
+        /// </summary>
+        public SadrHotKeyClient HotKeys { get; }
 
         #endregion
 
