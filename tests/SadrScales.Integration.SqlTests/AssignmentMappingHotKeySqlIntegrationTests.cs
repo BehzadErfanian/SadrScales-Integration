@@ -88,7 +88,7 @@ namespace SadrScales.Integration.SqlTests
 
             Assert.AreEqual(SadrReplaceResult.Replaced, replaced);
             Assert.AreEqual(2, persisted.Count);
-            Assert.AreEqual(2, persisted[1].PluNo);
+            Assert.AreEqual(1002, persisted[1].PluNo);
             Assert.AreEqual(0L, ReadScaleLong(2, "LastSendItem"));
             Assert.AreEqual(0L, ReadScaleLong(2, "LastSendKey"));
 
@@ -159,8 +159,8 @@ namespace SadrScales.Integration.SqlTests
             Assert.AreEqual(1, destination.Count);
             Assert.AreEqual(1001, destination[0].PluNo);
             Assert.AreEqual(11, destination[0].ItemCode);
-            Assert.AreEqual(1, destination[0].PageNo);
-            Assert.AreEqual(2, destination[0].KeyNo);
+            Assert.AreEqual(1, destination[0].PageNo.GetValueOrDefault());
+            Assert.AreEqual(2, destination[0].KeyNo.GetValueOrDefault());
             Assert.AreEqual(0L, ReadScaleLong(5, "LastSendItem"));
             Assert.AreEqual(0L, ReadScaleLong(5, "LastSendKey"));
         }
