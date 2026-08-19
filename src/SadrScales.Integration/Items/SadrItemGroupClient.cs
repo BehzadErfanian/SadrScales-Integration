@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,10 +9,12 @@ using SadrScales.Integration.Internal;
 namespace SadrScales.Integration.Items
 {
     /// <summary>
-    /// Basic Contract v1 operations for item groups.
+    /// Public item-group catalog operations.
     /// </summary>
     public sealed class SadrItemGroupClient
     {
+        #region SQL
+
         private const string UpsertSql = @"
 IF NOT EXISTS (
     SELECT 1
@@ -37,14 +40,95 @@ BEGIN
     SELECT CASE WHEN @Rows = 0 THEN 0 ELSE 2 END;
 END;";
 
+        #endregion
+
+        #region Dependencies
+
         private readonly SqlConnectionFactory _connectionFactory;
         private readonly SadrScalesClientOptions _options;
+
+        #endregion
+
+        #region Construction
 
         internal SadrItemGroupClient(SqlConnectionFactory connectionFactory, SadrScalesClientOptions options)
         {
             _connectionFactory = connectionFactory;
             _options = options;
         }
+
+        #endregion
+
+        #region Read API
+
+        /// <summary>
+        /// Reads all item groups ordered by ItemClassCode.
+        /// </summary>
+        public Task<IReadOnlyList<SadrItemGroup>> GetAllAsync(
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return _connectionFactory.ExecuteReadAsync<IReadOnlyList<SadrItemGroup>>(
+                async (connection, token) =>
+                {
+                    var result = new List<SadrItemGroup>();
+                    const string sql = @"
+SELECT ItemClassCode, ItemClassName, Descriptions
+FROM dbo.SADR_ItemClass
+ORDER BY ItemClassCode ASC;";
+
+                    using (var command = new SqlCommand(sql, connection))
+                    {
+                        command.CommandTimeout = _options.CommandTimeoutSeconds;
+                        using (var reader = await command.ExecuteReaderAsync(token).ConfigureAwait(false))
+                        {
+                            while (await reader.ReadAsync(token).ConfigureAwait(false))
+                            {
+                                result.Add(Map(reader));
+                            }
+                        }
+                    }
+
+                    return result;
+                },
+                cancellationToken);
+        }
+
+        /// <summary>
+        /// Reads one item group by ItemClassCode, or returns null when it does not exist.
+        /// </summary>
+        public Task<SadrItemGroup?> GetAsync(
+            string itemClassCode,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            ValidateCode(itemClassCode);
+
+            return _connectionFactory.ExecuteReadAsync<SadrItemGroup?>(
+                async (connection, token) =>
+                {
+                    const string sql = @"
+SELECT ItemClassCode, ItemClassName, Descriptions
+FROM dbo.SADR_ItemClass
+WHERE ItemClassCode = @Code;";
+
+                    using (var command = new SqlCommand(sql, connection))
+                    {
+                        command.CommandTimeout = _options.CommandTimeoutSeconds;
+                        command.Parameters.Add("@Code", SqlDbType.VarChar, 50).Value = itemClassCode;
+
+                        using (var reader = await command.ExecuteReaderAsync(token).ConfigureAwait(false))
+                        {
+                            return await reader.ReadAsync(token).ConfigureAwait(false)
+                                ? Map(reader)
+                                : null;
+                        }
+                    }
+                },
+                cancellationToken);
+        }
+
+        #endregion
+
+        #region Write API
 
         /// <summary>
         /// Inserts or semantically updates an item group.
@@ -78,6 +162,24 @@ END;";
             }
         }
 
+        #endregion
+
+        #region Mapping
+
+        private static SadrItemGroup Map(SqlDataReader reader)
+        {
+            return new SadrItemGroup
+            {
+                ItemClassCode = reader.GetString(0),
+                ItemClassName = reader.IsDBNull(1) ? null : reader.GetString(1),
+                Descriptions = reader.IsDBNull(2) ? null : reader.GetString(2)
+            };
+        }
+
+        #endregion
+
+        #region Validation
+
         private static void Validate(SadrItemGroup group)
         {
             if (group == null)
@@ -85,14 +187,19 @@ END;";
                 throw new ArgumentNullException(nameof(group));
             }
 
-            if (string.IsNullOrWhiteSpace(group.ItemClassCode))
-            {
-                throw new ArgumentException("ItemClassCode is required.", nameof(group));
-            }
-
-            ValidateLength(group.ItemClassCode, 50, nameof(group.ItemClassCode));
+            ValidateCode(group.ItemClassCode);
             ValidateLength(group.ItemClassName, 100, nameof(group.ItemClassName));
             ValidateLength(group.Descriptions, 150, nameof(group.Descriptions));
+        }
+
+        private static void ValidateCode(string itemClassCode)
+        {
+            if (string.IsNullOrWhiteSpace(itemClassCode))
+            {
+                throw new ArgumentException("ItemClassCode is required.", nameof(itemClassCode));
+            }
+
+            ValidateLength(itemClassCode, 50, nameof(itemClassCode));
         }
 
         private static void ValidateLength(string? value, int maximumLength, string name)
@@ -114,5 +221,7 @@ END;";
                 // Preserve the original operation exception.
             }
         }
+
+        #endregion
     }
 }
