@@ -53,6 +53,13 @@ Sadr Scales 5.3 features must not delay this baseline.
 - Per-scale item mapping and group HotKey templates are separate concepts and separate public clients.
 - Public group HotKey APIs manage only positive-PLU user rows; zero/negative internal/system rows remain private and are preserved.
 - Replace-style configuration operations are atomic. An `Unchanged` operation does not create a new resend request.
+- `Sales.ReadAfterAsync` remains the ID-ascending destination-owned synchronization feed.
+- `Sales.QueryAsync` is a separate newest-first search/report surface and never advances or replaces the destination feed cursor.
+- Sales Query and Reports share one filter contract: inclusive Start, exclusive End, exact Identify, PLU, Scale ID/DeviceNo and FID.
+- Sales summary counts invoices by distinct `(DeviceNo, FID)`; raw row count and invoice count are intentionally different concepts.
+- Unit codes 0/1/3 contribute to sales weight and Unit 2 contributes to sales quantity, matching Sadr Scales 5.2.1.
+- Common period helpers preserve Today, Saturday-based CurrentWeek and Persian-calendar CurrentMonth semantics.
+- Public reports are typed Daily / Scale / Item results; Item report is capped at 5000 rows as in 5.2.1.
 - A per-scale typed Command Mailbox is planned for **Sadr Scales 5.3**, not for the immediate 5.2.1 Vendor-Ready release.
 - Service/REST can later become another transport over the same Command Domain.
 
@@ -75,7 +82,7 @@ Sales Feed
 Sales Query / Summary
 Structured Invoice lookup
 Invoice ACK
-Reports
+Daily / Scale / Item Reports
 ```
 
 ## Completed implementation slices
@@ -116,14 +123,13 @@ Completed and merged on PR #17:
 - logically deleted rows remain individually readable for recovery/inspection;
 - Price History read by PLU and recent-list read, newest first;
 - Price History remains read-only; no new automatic PriceLog rule is invented;
-- `SadrItemClient` split into partial write vs read/delete/history responsibilities;
 - Raw SQL catalog recipe, Persian/English docs and Catalog Sample pages;
 - disposable SQL Server tests and .NET Framework 4.8 public-surface coverage;
 - Item update Sample preserves non-edited PLU fields before upsert.
 
 ### Slice 4 — Scale Assignments + Mapping + HotKeys
 
-Implemented on PR #18 and pending final exact-head CI/merge:
+Completed and merged on PR #18. Main baseline after merge: `fba134b8c1a19c9f51365fb246db2cc1f9492f1c`.
 
 - `client.ScaleAssignments.GetGroupsAsync(scaleId)`;
 - atomic `ReplaceGroupsAsync` with `NotFound / Unchanged / Replaced`;
@@ -137,35 +143,48 @@ Implemented on PR #18 and pending final exact-head CI/merge:
 - public HotKey API hides and preserves zero/negative internal/system rows;
 - real group HotKey changes reset HotKey AutoSend state only for scales assigned to that group;
 - unchanged configuration does not create a new resend request;
-- guarded Raw SQL reference with writes disabled by default;
-- Persian and English configuration guides;
-- .NET Framework 4.8 public-surface coverage;
-- WinForms Developer Sample configuration area with separate Assignments, Mapping and HotKeys flows;
-- disposable SQL Server tests cover transaction/recovery semantics and system-row preservation.
-
-The next additive package version remains frozen as `1.1.0`. Historical `v1.0.0` remains immutable.
-
-## Next implementation slices
+- guarded Raw SQL reference, Persian/English configuration guides and WinForms configuration flows;
+- disposable SQL Server, WinForms Build and .NET Framework 4.8 coverage all passed before merge.
 
 ### Slice 5 — Sales Query + Reports
 
-Target:
+Implemented on PR #19 and pending final exact-head CI/merge:
 
-- filtered/paged sales query;
-- summary totals;
-- daily, scale and item reports;
-- Sample + Raw SQL + SQL tests + docs.
+- existing `client.Sales.ReadAfterAsync(...)` remains unchanged as the destination-owned incremental feed;
+- `client.Sales.QueryAsync(filter)` provides newest-first filtered/paged search without touching that cursor;
+- optional filters: inclusive Start, exclusive End, exact Identify, PLU, Scale ID/DeviceNo and FID;
+- page size follows 5.2.1 normalization of 50..2000;
+- complete-filter `RecordCount / InvoiceCount / TotalPrice / TotalWeight / TotalQuantity` summary;
+- distinct invoice identity is `(DeviceNo, FID)`;
+- weight uses Unit 0/1/3 and quantity uses Unit 2;
+- `SadrSalesPeriod` exposes Today, Saturday-based CurrentWeek and Persian CurrentMonth boundaries;
+- typed `client.Reports.GetDailyAsync`, `GetByScaleAsync` and `GetByItemAsync`;
+- Item report remains capped at 5000 rows;
+- Query and all Reports use the same filter builder and are read-only;
+- SQL integration tests verify ordering, filters, summary arithmetic, invoice counting, unit semantics and all three report shapes;
+- Raw SQL `07-sales-query-reports.sql` is read-only and documents Feed-vs-Query separation;
+- Persian and English Sales/Reports guides added;
+- .NET Framework 4.8 public-surface coverage added;
+- WinForms Developer Sample includes a read-only Sales/Reports area with filters, Today/Week/Persian-Month presets, Query and three report views.
+
+The next additive package version remains frozen as `1.1.0`. Historical `v1.0.0` remains immutable.
+
+## Remaining implementation slice
 
 ### Slice 6 — Demo Data + Vendor Acceptance + RC
 
 Target:
 
-- seeded/reproducible Demo Data;
-- production-database guard;
-- complete executable Sample flow;
-- external-developer-style end-to-end acceptance test;
-- documentation cleanup;
-- `1.1.0` RC freeze.
+- deterministic seeded Demo Data, including reproducible `Seed` support;
+- safe generation of Stores / Groups / Items / Scales / Assignments / HotKeys and related sample relationships;
+- explicit production/customer-database guard before Demo generation/reset;
+- Demo reset flow;
+- results visible in the executable Developer Sample;
+- external-developer-style end-to-end acceptance test starting from the public package/repository surface;
+- Getting Started / Capabilities / Recipes / Reference cleanup so maintainers' material does not dominate the vendor path;
+- final compatibility review;
+- `1.1.0` RC freeze;
+- after RC, only bug/security/compatibility fixes before vendor outreach.
 
 ## Out of immediate scope
 
