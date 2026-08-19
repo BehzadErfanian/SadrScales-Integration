@@ -16,5 +16,6 @@
 
   <ItemGroup>
     <None Include="VendorFixture.sql" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="VendorContractRequirements.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
