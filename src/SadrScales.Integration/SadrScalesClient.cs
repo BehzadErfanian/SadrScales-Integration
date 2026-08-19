@@ -6,6 +6,7 @@ using SadrScales.Integration.Invoices;
 using SadrScales.Integration.Internal;
 using SadrScales.Integration.Items;
 using SadrScales.Integration.Sales;
+using SadrScales.Integration.Scales;
 
 namespace SadrScales.Integration
 {
@@ -46,6 +47,7 @@ namespace SadrScales.Integration
             Items = new SadrItemClient(connectionFactory, options);
             Sales = new SadrSalesClient(connectionFactory, options);
             Invoices = new SadrInvoiceClient(connectionFactory, options);
+            Scales = new SadrScaleClient(connectionFactory, options);
         }
 
         #endregion
@@ -71,6 +73,11 @@ namespace SadrScales.Integration
         /// Gets structured-invoice lookup and explicit acknowledgement operations.
         /// </summary>
         public SadrInvoiceClient Invoices { get; }
+
+        /// <summary>
+        /// Gets registered-scale metadata, coarse SQL status and AutoSend resend-request operations.
+        /// </summary>
+        public SadrScaleClient Scales { get; }
 
         #endregion
 
