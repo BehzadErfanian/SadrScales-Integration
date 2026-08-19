@@ -11,7 +11,7 @@
     <RootNamespace>SadrScales.Integration</RootNamespace>
 
     <PackageId>SadrScales.Integration</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>Tozin Sadr; Behzad Erfanian</Authors>
     <Copyright>Copyright © 2026 Tozin Sadr and Behzad Erfanian</Copyright>
     <Title>Sadr Scales Integration SDK</Title>

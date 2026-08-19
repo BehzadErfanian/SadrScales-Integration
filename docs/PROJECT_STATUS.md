@@ -1,8 +1,9 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-19  
-**Phase:** Phase 2 — Contract scope frozen for Vendor-Ready 5.2.1 implementation planning  
+**Phase:** Vendor-Ready 5.2.1 implementation  
 **Current stable release:** `v1.0.0`  
+**Next Vendor-Ready package version:** `1.1.0`  
 **Supported published Sadr Scales baseline:** `5.2.1`  
 **Current published integration contract:** `SQL Contract v1`
 
@@ -22,7 +23,7 @@ Chat history is not the project source of truth.
 
 The next software-vendor outreach must happen only after a **Vendor-Ready Stable Baseline** is complete.
 
-The owner does not want external software companies to be asked repeatedly to review and update their integrations. Therefore the current objective is:
+The current objective is:
 
 ```text
 Complete 5.2.1 SQL Integration
@@ -50,7 +51,6 @@ Sadr Scales 5.3 features must not delay this baseline.
 - Item AutoSend resend request uses `LastSendItem = 0`.
 - HotKey AutoSend resend request uses `LastSendKey = 0` where supported.
 - Resend request success means the DB resend state was recorded; it does not mean the physical scale already received the data.
-- The earlier Service-only runtime-command direction is superseded.
 - A per-scale typed Command Mailbox is planned for **Sadr Scales 5.3**, not for the immediate 5.2.1 Vendor-Ready release.
 - Service/REST can later become another transport over the same Command Domain.
 
@@ -58,7 +58,7 @@ These decisions are recorded in `docs/DECISIONS.md` through D-030.
 
 ## Vendor-Ready 5.2.1 SQL scope
 
-The implementation target now covers:
+The implementation target covers:
 
 ```text
 Connection/schema validation
@@ -79,6 +79,41 @@ Structured Invoice lookup
 Invoice ACK
 Reports
 ```
+
+## Completed implementation slices
+
+### Slice 1 — Structured Invoice + ACK
+
+Implemented and covered by disposable SQL Server integration tests:
+
+- `client.Invoices.GetByBarcodeAsync(totalBarcode)`;
+- `client.Invoices.GetAsync(scaleId, fid)`;
+- `client.Invoices.AcknowledgeAsync(totalBarcode)`;
+- `client.Invoices.AcknowledgeAsync(scaleId, fid)`;
+- `FoundUnread / AlreadyRead / NotFound` lookup semantics;
+- `Acknowledged / AlreadyAcknowledged / NotFound` ACK semantics;
+- full invoice data remains available after ACK;
+- Raw SQL recipe for non-C# consumers;
+- Persian and English invoice documentation;
+- WinForms Developer Sample invoice screen;
+- .NET Framework 4.8 package-consumer coverage.
+
+The next additive package version is frozen as `1.1.0`. Historical `v1.0.0` remains immutable.
+
+## Next implementation slice
+
+### Slice 2 — Scales + Status + Resend
+
+Target scope:
+
+- read registered scales from SQL;
+- read coarse `Online / Offline / Unknown` status from `SADR_Scale.Status`;
+- expose static scale metadata needed by external software;
+- `RequestItemResend(scaleId)` through `LastSendItem = 0`;
+- `RequestHotKeyResend(scaleId)` through `LastSendKey = 0` where supported;
+- Raw SQL examples;
+- disposable SQL Server tests;
+- add the Scale page to the same WinForms Developer Sample.
 
 ## Out of immediate scope
 
@@ -101,10 +136,10 @@ Before the next software-vendor letter/outreach:
 1. complete the final SQL Contract for the 5.2.1 capabilities above;
 2. implement all corresponding SDK APIs;
 3. keep Raw SQL examples for non-C# consumers;
-4. add real SQL integration tests for Structured Invoice + ACK;
+4. keep real SQL integration tests for Structured Invoice + ACK;
 5. test Scale status, Group/Mapping/HotKey and Resend semantics;
 6. implement Sales Query/Summary and Reports coverage;
-7. provide a runnable WinForms Developer Sample;
+7. complete the runnable WinForms Developer Sample;
 8. provide seeded/reproducible Demo Data with Production-DB guard;
 9. keep a short Getting Started path plus a complete reference guide;
 10. keep `.NET Framework 4.8` consumer validation and SQL Server CI green;
@@ -113,7 +148,7 @@ Before the next software-vendor letter/outreach:
 
 ## Sadr Scales 5.3 follow-up
 
-A per-scale Command Mailbox is now a planned 5.3 capability.
+A per-scale Command Mailbox is a planned 5.3 capability.
 
 High-level semantics:
 
@@ -128,20 +163,6 @@ ResultCode / ResultMessage
 
 The Runtime performs validation, licensing, connection/busy checks, model capability and actual protocol work. Device protocol details remain private.
 
-Examples planned for 5.3 include immediate SendItems with options such as ClearExisting, RetrieveItems, HotKey commands, RetrieveSales and supported setting operations.
-
-Exact schema and command code values are not part of the current 5.2.1 Integration release and will be frozen during 5.3 design.
-
-## Exact next step
-
-1. finish Phase 2 PR #14 and merge it after required CI passes;
-2. convert the Vendor-Ready capability matrix into small implementation slices;
-3. implement current 5.2.1 SQL/SDK capabilities first;
-4. complete Sample + Demo Data;
-5. run Vendor Acceptance Test;
-6. freeze and publish the Vendor-Ready release;
-7. only then prepare/send the software-vendor outreach letter.
-
 ## Stable release identity
 
 - Git tag: `v1.0.0`
@@ -152,17 +173,6 @@ Exact schema and command code values are not part of the current 5.2.1 Integrati
 - Providers/copyright identity: **Tozin Sadr and Behzad Erfanian**
 
 The stable tag is immutable and must never be moved or reused.
-
-## Stable v1.0.0 validation evidence
-
-Required checks on the stable source:
-
-- `build-test-pack`: PASS
-- `sql-integration-test`: PASS
-- `net48-package-consumer`: PASS
-- `validate-public-boundary`: PASS
-
-The published `v1.0.0` Basic SQL Contract remains valid and unchanged while the next Vendor-Ready contract is developed additively.
 
 ## Security boundary
 

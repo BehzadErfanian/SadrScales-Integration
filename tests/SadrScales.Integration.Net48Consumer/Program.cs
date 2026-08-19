@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using SadrScales.Integration;
+using SadrScales.Integration.Invoices;
 using SadrScales.Integration.Items;
 using SadrScales.Integration.Sales;
 
@@ -9,6 +10,8 @@ namespace SadrScales.Integration.Net48Consumer
 {
     internal static class Program
     {
+        #region Entry Point
+
         private static int Main()
         {
             try
@@ -29,6 +32,7 @@ namespace SadrScales.Integration.Net48Consumer
                 Assert(client.ItemGroups != null, "ItemGroups API was not created.");
                 Assert(client.Items != null, "Items API was not created.");
                 Assert(client.Sales != null, "Sales API was not created.");
+                Assert(client.Invoices != null, "Invoices API was not created.");
 
                 var group = new SadrItemGroup
                 {
@@ -47,6 +51,12 @@ namespace SadrScales.Integration.Net48Consumer
                 Assert(group.ItemClassCode == "NET48", "Item-group public model failed.");
                 Assert(item.PluNo == 480001, "Item public model failed.");
                 Assert(typeof(SadrSalesBatch).IsPublic, "Sales batch public type is unavailable.");
+
+                string barcode = SadrInvoiceClient.BuildTotalBarcode(12, 3456);
+                Assert(barcode == "25012000003456", "Structured invoice TotalBarcode generation failed.");
+                Assert(typeof(SadrInvoiceLookupResult).IsPublic, "Invoice lookup result public type is unavailable.");
+                Assert(typeof(SadrInvoice).IsPublic, "Structured invoice public type is unavailable.");
+                Assert(typeof(SadrInvoiceItem).IsPublic, "Structured invoice item public type is unavailable.");
 
                 // The SDK package depends on Microsoft.Data.SqlClient. Loading the referenced assembly proves
                 // that the restored net48 application has a compatible provider asset/dependency graph.
@@ -80,6 +90,10 @@ namespace SadrScales.Integration.Net48Consumer
             }
         }
 
+        #endregion
+
+        #region Test Helper
+
         private static void Assert(bool condition, string message)
         {
             if (!condition)
@@ -87,5 +101,7 @@ namespace SadrScales.Integration.Net48Consumer
                 throw new InvalidOperationException(message);
             }
         }
+
+        #endregion
     }
 }
