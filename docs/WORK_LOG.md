@@ -1,5 +1,17 @@
 # Work Log
 
+## 2026-08-20 — Vendor Integration Lab priority and cross-project alignment
+- Reconfirmed the canonical Integration Platform master plan already defines separate roles for the Developer Sample App, Internal Scale Simulator, Public Scale Emulator, POS Simulator/Integration Lab and External Developer Acceptance.
+- Accepted an execution-priority change: finish the already-advanced vendor integration/testing chain before deeper Sadr Scales 5.3 Service implementation.
+- Current sequence is now: verify/finalize `1.1.0` publication evidence -> complete private internal simulator behavior -> freeze approved public behavior -> build safe Public Scale Emulator -> complete POS/Retail one-PC Lab -> first serious external vendor acceptance -> feed future requirements into Sadr Scales 5.3.
+- Kept the `1.1.0` public contract/naming freeze intact; Lab/Emulator work must not casually expand the frozen SQL contract.
+- Reaffirmed truth hierarchy for device behavior: physical device/capture -> protocol documentation -> production -> private internal simulator.
+- Reaffirmed that Public Scale Emulator is a separate vendor product and must not expose proprietary protocol source, packet/capture material, reverse-engineering notes or internal protocol-debug surfaces.
+- Reaffirmed Developer Sample vs POS Simulator separation: Sample is educational/copy-paste public source; POS Simulator models destination transaction, restart, duplicate, cursor and recovery behavior.
+- Defined the target one-PC Lab topology: `Developer Sample / POS Simulator -> Integration SDK/SQL -> SadrScales test environment -> Public Scale Emulator`.
+- Reaffirmed the Integration Domain should evolve additively beyond SQL when Sadr Scales 5.3 provides managed commands/Service/REST/realtime/Webhook capabilities, without creating competing business models per transport.
+- Updated project status and backlog on branch `docs/vendor-integration-lab-priority`; these changes are documentation/planning only and do not alter the frozen 1.1 public API/contract.
+
 ## 2026-08-16 — M0 / M1
 - Public foundation/security/governance created.
 - Contract v1 frozen against effective Sadr Scales 5.2.1 schema.
