@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-19  
-**Phase:** Phase 2 — Contract & Domain Design under owner review  
+**Phase:** Phase 2 — Contract & Domain Design under final owner review  
 **Current stable release:** `v1.0.0`  
 **Supported published Sadr Scales baseline:** `5.2.1`  
 **Current published integration contract:** `SQL Contract v1`
@@ -13,45 +13,98 @@ Read in this order:
 1. `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`
 2. `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`
 3. `.github/maintainers/INTEGRATION_CONTRACT_DOMAIN_DESIGN_FA.md`
-4. this file
+4. `docs/DECISIONS.md`
+5. this file
 
-The Master Plan remains the source of truth for product direction. Phase 1 is complete and merged. Phase 2 now defines the transport-independent domain and exact SQL/runtime boundaries before implementation begins.
+Chat history is not the project source of truth.
 
-## Phase 2 decisions already confirmed by owner
+## Phase 2 owner-confirmed decisions
 
 - SQL is the current third-party integration transport for Sadr Scales 5.2.1.
-- `SADR_Scale.Status` is the supported SQL source for coarse Online/Offline status because Sadr Scales persists these transitions.
+- `SADR_Scale.Status` is the supported SQL source for coarse Online/Offline status.
 - Structured Invoice lookup is supported by TotalBarcode and by ScaleID + FID.
 - Invoice lookup never auto-ACKs.
-- Explicit ACK occurs only after destination persistence/commit succeeds.
-- Invoice-level ACK sets `SADR_Total.LableStatus = 1`.
-- Re-reading an ACKed invoice still returns the full invoice and reports `AlreadyRead`; this is a warning, not a block.
-- Repeated ACK is idempotent.
+- Explicit ACK happens only after the destination persistence/commit succeeds.
+- Invoice-level ACK sets `SADR_Total.LableStatus = 1` and repeated ACK is idempotent.
+- Re-reading an ACKed invoice still returns the complete invoice and reports `AlreadyRead`; this warning does not block recovery/re-import.
+- Item AutoSend resend is requested through `LastSendItem = 0`.
+- HotKey AutoSend resend is requested through `LastSendKey = 0` where the current model/runtime supports automatic HotKey transfer.
+- Resetting `LastSendItem` / `LastSendKey` is not an immediate device command; it marks the next eligible AutoSend cycle to resend.
+- Runtime-only capabilities are planned for a typed Sadr Integration Service; the previously proposed SQL Command Queue direction is removed.
 
-## Phase 2 boundaries now proposed for final owner review
+These confirmed decisions are recorded in `docs/DECISIONS.md` as D-024 through D-028.
 
-- Store identity uses `StoreCode`.
-- `SADR_ScaleItemClass` is the canonical multi-group source.
-- Scale group replacement is a controlled SQL transaction and resets item-send state.
-- Scale item mapping is a controlled SQL transaction with duplicate/layout validation and send-state reset.
-- Group HotKey template and per-scale item mapping are separate concepts.
-- HotKey writes remain SQL data operations, but replace/delete semantics must reset affected send state when row deletion would otherwise be invisible.
-- Raw Add/Update/Delete of `SADR_Scale` is not a supported public lifecycle API even though 5.2.1 discovers new DB rows periodically; internal lifecycle also performs validation, license checks, registry synchronization and connection/cleanup work.
-- Direction proposed for vNext: a Managed SQL Command Channel lets third parties remain SQL-only while Sadr Scales itself executes scale lifecycle and device commands.
-- Public device commands remain typed; raw protocol passthrough is forbidden.
-- firmware/file/label operations remain outside the default public surface pending separate security/API review.
+## Current SQL vNext direction
 
-## Current exact next step
+The SQL surface being designed covers:
 
-Owner review of the remaining unchecked Phase 2 gates in `.github/maintainers/INTEGRATION_CONTRACT_DOMAIN_DESIGN_FA.md`.
+```text
+Connection/schema validation
+Store read/upsert
+Item Group read/upsert
+Item/PLU read/upsert/soft-delete
+Price history read
+Static Scale read
+Scale Online/Offline status read
+Scale group assignment
+Scale item mapping
+HotKey templates
+Request Item Resend
+Request HotKey Resend where supported
+Sales feed/query/summary
+Structured Invoice lookup
+Invoice ACK
+Reports
+```
 
-After acceptance:
+### AutoSend resend semantics
 
-1. record accepted decisions in `docs/DECISIONS.md`;
-2. mark Phase 2 complete;
-3. merge the Phase 2 PR after all required CI gates pass;
+```text
+RequestItemResend(scaleId)
+→ SADR_Scale.LastSendItem = 0
+
+RequestHotKeyResend(scaleId)
+→ SADR_Scale.LastSendKey = 0
+```
+
+These are documented SQL operations and will also have simple SDK methods. The current Runtime processes them on a later eligible AutoSend cycle; the scale must be enabled, connected and configured for automatic sending. HotKey AutoSend remains model/capability dependent.
+
+## Future Service boundary
+
+The following capabilities are not forced into SQL:
+
+```text
+Safe Add/Update/Delete Scale lifecycle
+Immediate Send/Get Items
+Immediate Send/Get HotKeys
+Get Sales directly from the device
+Send/Get Specification
+Set Date/Time
+Salesman/Text/Print/Barcode/Paper operations where supported
+Richer Runtime status/progress/activity/error information
+```
+
+They will be provided later through a typed Sadr Integration Service that keeps protocol details private and reuses Sadr Scales Runtime validation, licensing, registry, connection and model-capability logic.
+
+The exact Service transport (local API / future REST, etc.) is intentionally deferred to implementation design.
+
+## Remaining Phase 2 review gates
+
+- Store/Scale relation;
+- multi-group semantics;
+- Mapping write semantics;
+- HotKey write semantics;
+- Scale lifecycle service boundary details;
+- final device-command family list;
+- firmware/file/label public exclusion pending separate review.
+
+After final acceptance:
+
+1. mark Phase 2 complete;
+2. ensure every accepted decision is in `docs/DECISIONS.md`;
+3. merge PR #14 only after all required CI gates pass;
 4. begin implementation planning in small, testable slices;
-5. do not add large SDK clients or change Sadr Scales runtime before the implementation plan is accepted.
+5. do not modify Sadr Scales runtime or create large SDK clients before the implementation plan is accepted.
 
 ## Stable release identity
 
@@ -79,7 +132,7 @@ The published `v1.0.0` Basic SQL Contract remains valid and unchanged while the 
 
 ## Security boundary
 
-The public repository and future public Integration surface must not expose:
+The public repository and future Integration surface must not expose:
 
 - proprietary device protocols or raw packet formats;
 - captures/PCAPs or reverse-engineering material;
