@@ -2,117 +2,139 @@
 
 # شروع سریع — Sadr Scales Integration
 
-این کوتاه‌ترین مسیر پشتیبانی‌شده برای **Sadr Scales 5.2.1 / SQL Contract v1 / SadrScales.Integration 1.x** است.
+این کوتاه‌ترین مسیر پشتیبانی‌شده برای شرکت‌های نرم‌افزاری است که با **Sadr Scales 5.2.1** یکپارچه می‌شوند.
 
-## ۱. معماری
+> نسخه عمومی پایدار فعلی `v1.0.0` است. خط افزوده‌ی Vendor-Ready `1.1.0` پیش از نامه‌ی بعدی به شرکت‌های نرم‌افزاری در حال Freeze و تست نهایی است.
+
+## ۱. مرز ارتباط را درست ببینید
 
 ```text
 POS / ERP / Accounting
         ↓
-SadrScales.Integration / SQL Contract v1
+SadrScales.Integration یا SQL مستندشده
         ↓
-Sadr Scales Runtime
+دیتابیس / Runtime نرم‌افزار Sadr Scales
         ↓
 ترازوهای پشتیبانی‌شده
 ```
 
-نرم‌افزار شما با Sadr Scales یکپارچه می‌شود. مدیریت Session، Retry، Registry، تفاوت مدل‌ها و ارتباط مستقیم با ترازو بر عهده Sadr Scales باقی می‌ماند.
+نرم‌افزار شما پروتکل مستقیم PLUS، LSG یا Aclas را پیاده‌سازی نمی‌کند. مالک ارتباط مستقیم با ترازو همچنان Sadr Scales است.
 
 ## ۲. پیش‌نیازها
 
-- Sadr Scales 5.2.1 یا نسخه جدیدتری که صریحاً با SQL Contract v1 سازگار اعلام شده باشد.
+- Sadr Scales `5.2.1` یا نسخه جدیدتری که صریحاً سازگار اعلام شده باشد.
 - دسترسی به SQL Server همان نصب Sadr Scales.
-- برای SDK زبان C#: .NET Framework 4.8 یا Runtime جدید .NET که `netstandard2.0` را مصرف کند.
+- برای C#: .NET Framework 4.8 یا .NET جدید با توان مصرف `netstandard2.0`.
 
-ابتدا Sadr Scales را یک‌بار اجرا کنید تا بررسی/به‌روزرسانی Schema خود برنامه کامل شود.
+ابتدا Sadr Scales را یک‌بار اجرا کنید تا بررسی و به‌روزرسانی Schema خود برنامه کامل شود.
 
-## ۳. اول Contract را کنترل کنید
-
-در C#:
+## ۳. قبل از هر کاری Contract را کنترل کنید
 
 ```csharp
 var client = new SadrScalesClient(connectionString);
 await client.ValidateAsync();
 ```
 
-یا Validator فقط‌خواندنی SQL را اجرا کنید:
-
-[`samples/SQL/00-validate-contract.sql`](../../samples/SQL/00-validate-contract.sql)
+برای زبان‌های غیر C# می‌توانید [`00-validate-contract.sql`](../../samples/SQL/00-validate-contract.sql) را اجرا کنید.
 
 اگر Schema سازگار نیست، Integration را با دورزدن Validation ادامه ندهید.
 
-## ۴. Quick Start اجرایی C# را تست کنید
+## ۴. ببینید چه قابلیت‌هایی در اختیار شماست
 
-نمونه‌ای که در CI Build می‌شود اینجاست:
+صفحه [قابلیت‌های Vendor-Ready](capabilities.md) را ببینید.
 
-[`samples/csharp/SadrScales.Integration.QuickStart`](../../samples/csharp/SadrScales.Integration.QuickStart/README.md)
+سطح تأییدشده فعلی 5.2.1 شامل این موارد است:
 
-این برنامه Connection String را فقط از `SADR_SCALES_CONNECTION_STRING` می‌خواند، Contract v1 را بررسی می‌کند و به‌صورت پیش‌فرض فقط یک خواندن فروش انجام می‌دهد.
+- شعبه، گروه کالا و کالا/PLU؛
+- ترازوهای ثبت‌شده و وضعیت Online/Offline؛
+- تخصیص گروه، Mapping اختصاصی و HotKey گروه؛
+- درخواست ارسال مجدد خودکار کالا و HotKey؛
+- Feed افزایشی فروش؛
+- Query فروش و گزارش‌های تایپ‌شده؛
+- دریافت فاکتور ساختاریافته و ACK صریح.
+
+## ۵. برنامه نمونه اجرایی را اجرا کنید
+
+مرجع اصلی اجرایی اینجاست:
+
+[`samples/csharp/SadrScales.Integration.SampleApp`](../../samples/csharp/SadrScales.Integration.SampleApp/README.md)
+
+این برنامه جریان‌های اصلی نسخه Vendor-Ready و Demo Data محافظت‌شده را به‌صورت قابل مشاهده نشان می‌دهد.
+
+Connection String را بدون قرار دادن رمز داخل Source تنظیم کنید:
 
 ```powershell
 $env:SADR_SCALES_CONNECTION_STRING = "Server=...;Database=...;..."
-dotnet run --project samples/csharp/SadrScales.Integration.QuickStart
+dotnet run --project samples/csharp/SadrScales.Integration.SampleApp
 ```
 
-Connection String واقعی را داخل Source Code قرار ندهید.
+Quick Start کوچک‌تر و فقط‌خواندنی هم در [`samples/csharp/SadrScales.Integration.QuickStart`](../../samples/csharp/SadrScales.Integration.QuickStart/README.md) باقی مانده است.
 
-## ۵. استفاده از Package نسخه Release
+## ۶. مسیر Package در C#
 
-پس از دانلود فایل NuGet از GitHub Release در یک پوشه محلی:
+پس از دانلود Package نسخه Release در یک پوشه محلی:
 
 ```bash
-dotnet add package SadrScales.Integration --version 1.0.0 --source <download-folder>
+dotnet add package SadrScales.Integration --version <release-version> --source <download-folder>
 ```
 
-سپس:
+شروع معمول:
 
 ```csharp
 var client = new SadrScalesClient(connectionString);
-
 await client.ValidateAsync();
+
+await client.Stores.UpsertAsync(store);
 await client.ItemGroups.UpsertAsync(group);
 await client.Items.UpsertAsync(item);
-
-SadrSalesBatch batch = await client.Sales.ReadAfterAsync(lastProcessedId, 100);
 ```
 
-## ۶. کالا و PLU
+## ۷. قانون مهم فاکتور
 
-- گروه مرجع را قبل از کالا بسازید.
-- `PluNo` باید یکتا و غیرصفر باشد.
-- `PluNo` شناسه عمومی Contract v1 است؛ از `ID`/`IDitem` به‌عنوان شناسه Integration استفاده نکنید.
-- `TimeStamp/rowversion` را ننویسید.
-- `UpsertAsync` در صورت یکسان بودن داده‌های معنایی Update بی‌دلیل انجام نمی‌دهد.
-- `UpsertBatchAsync` در هر فراخوانی حداکثر **200 PLU یکتا** را در یک Transaction اتمیک می‌پذیرد. انتقال‌های بزرگ‌تر باید در نرم‌افزار مقصد صفحه‌بندی شوند.
-- Writeهای Transactional پس از شروع اجرا به‌صورت خودکار Replay نمی‌شوند.
+```text
+دریافت فاکتور
+→ ذخیره در نرم‌افزار مقصد
+→ Commit موفق مقصد
+→ ACK فاکتور در Sadr Scales
+```
 
-نمونه SQL با Rollback پیش‌فرض: [`samples/SQL/01-upsert-item.sql`](../../samples/SQL/01-upsert-item.sql).
+Lookup هیچ‌وقت خودکار ACK نمی‌کند. فاکتور ACK شده همچنان با `AlreadyRead` و همه‌ی جزئیات برمی‌گردد تا بازیابی یا ورود دوباره ممکن باشد.
 
-## ۷. فروش
+## ۸. قانون مهم Sales Feed
 
-SDK فروش‌های پذیرفته‌شده را افزایشی می‌خواند و برای Ack یا Cursor جدول `SADR_Logs` را Update/Delete نمی‌کند.
+`Sales.ReadAfterAsync` برای همگام‌سازی افزایشی است و Cursor را خود نرم‌افزار مقصد نگه می‌دارد.
 
-قواعد نرم‌افزار مقصد:
+1. ردیف‌های بعد از Cursor را بخوانید؛
+2. آن‌ها را در مقصد ذخیره کنید؛
+3. Transaction مقصد را Commit کنید؛
+4. فقط بعد از آن Cursor جدید را ثبت کنید.
 
-- Cursor را در محل پایدار خود نگه دارد؛
-- ابتدا فروش را در مقصد ذخیره کند و بعد Cursor را جلو ببرد؛
-- از `(DeviceNo, FID, SubID)` برای جلوگیری از Duplicate استفاده کند؛
-- فاصله داشتن IDها را طبیعی بداند.
+برای جلوگیری از Duplicate از `(DeviceNo, FID, SubID)` استفاده کنید. `Sales.QueryAsync` برای جست‌وجو و گزارش است و جای Feed/Cursor را نمی‌گیرد.
 
-نمونه SQL: [`samples/SQL/02-read-sales-incremental.sql`](../../samples/SQL/02-read-sales-incremental.sql).
+## ۹. مسیر غیر C# / Raw SQL
 
-## ۸. اگر مشکلی پیش آمد
+نمونه‌های تأییدشده در [`samples/SQL`](../../samples/SQL/README.md) قرار دارند و همان قابلیت‌های SQL فعلی 5.2.1 را بدون نیاز به C# نشان می‌دهند.
 
-ابتدا [راهنمای رفع اشکال](troubleshooting.md) را ببینید.
+روی جدول‌ها و ستون‌های داخلی که در این مسیر مستند نشده‌اند Write تازه اختراع نکنید.
 
-سپس:
+## ۱۰. ایمنی Demo Data
 
-- [SQL Contract v1](sql-contract-v1.md)
-- [طراحی SDK v1](../SDK_DESIGN_V1.md)
-- [سازگاری](../COMPATIBILITY.md)
-- [مرز امنیتی](../SECURITY_BOUNDARY.md)
-- [راهنمای جامع فارسی](../reference/README.md)
+Demo Data از Contract تولیدی SDK جداست. برنامه نمونه فقط وقتی اجازه Generate/Reset می‌دهد که دیتابیس نام واضح غیرتولیدی داشته باشد، Schema لازم موجود باشد، داده تجاری خالی باشد، نام دقیق دیتابیس دوباره تأیید شود و Demo marker معتبر وجود داشته باشد.
 
-پروتکل مستقیم PLUS، LSG، Aclas و سایر مدل‌ها عمداً خارج از سطح عمومی Integration است.
+Demo marker را روی دیتابیس مشتری یا Production فعال نکنید.
+
+## ۱۱. فقط در صورت نیاز سراغ مرجع بروید
+
+- [قابلیت‌ها](capabilities.md)
+- [کاتالوگ](catalog.md)
+- [ترازو، وضعیت و ارسال مجدد](scales-status-resend.md)
+- [تخصیص، Mapping و HotKey](assignments-mapping-hotkeys.md)
+- [فاکتور ساختاریافته و ACK](structured-invoices.md)
+- [جست‌وجوی فروش و گزارش‌ها](sales-query-reports.md)
+- [نمونه‌های Raw SQL](../../samples/SQL/README.md)
+- [رفع اشکال](troubleshooting.md)
+- [Security](../../SECURITY.md)
+
+پروتکل مستقیم ترازو، Packet خام، کلیدهای خصوصی و Runtime Command دلخواه عمداً خارج از این مخزن عمومی هستند.
 
 </div>
