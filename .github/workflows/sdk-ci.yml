@@ -108,6 +108,12 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Restore WinForms Developer Sample
+        run: dotnet restore samples/csharp/SadrScales.Integration.SampleApp/SadrScales.Integration.SampleApp.csproj
+
+      - name: Build WinForms Developer Sample
+        run: dotnet build samples/csharp/SadrScales.Integration.SampleApp/SadrScales.Integration.SampleApp.csproj --configuration Release --no-restore
+
       - name: Pack SDK for consumer test
         run: dotnet pack src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --output artifacts/package
 
