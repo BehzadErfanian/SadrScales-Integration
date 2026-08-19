@@ -7,6 +7,7 @@ using SadrScales.Integration.HotKeys;
 using SadrScales.Integration.Invoices;
 using SadrScales.Integration.Internal;
 using SadrScales.Integration.Items;
+using SadrScales.Integration.Reports;
 using SadrScales.Integration.Sales;
 using SadrScales.Integration.Scales;
 using SadrScales.Integration.Stores;
@@ -50,6 +51,7 @@ namespace SadrScales.Integration
             ItemGroups = new SadrItemGroupClient(connectionFactory, options);
             Items = new SadrItemClient(connectionFactory, options);
             Sales = new SadrSalesClient(connectionFactory, options);
+            Reports = new SadrReportClient(connectionFactory, options);
             Invoices = new SadrInvoiceClient(connectionFactory, options);
             Scales = new SadrScaleClient(connectionFactory, options);
             ScaleAssignments = new SadrScaleAssignmentClient(connectionFactory, options);
@@ -77,9 +79,14 @@ namespace SadrScales.Integration
         public SadrItemClient Items { get; }
 
         /// <summary>
-        /// Gets read-only sales-feed operations for the SQL integration surface.
+        /// Gets read-only incremental feed and filtered/paged sales-query operations.
         /// </summary>
         public SadrSalesClient Sales { get; }
+
+        /// <summary>
+        /// Gets typed Daily, Scale and Item sales-report operations.
+        /// </summary>
+        public SadrReportClient Reports { get; }
 
         /// <summary>
         /// Gets structured-invoice lookup and explicit acknowledgement operations.
