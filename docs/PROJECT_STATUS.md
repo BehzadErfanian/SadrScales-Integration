@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-18  
-**Phase:** `v1.0.0` stable public release — published; next-generation Integration Platform planning accepted  
+**Phase:** Phase 1 — Full Integration Surface Audit completed on branch; maintainer review pending  
 **Current stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Current published integration contract:** `SQL Contract v1`
@@ -12,11 +12,17 @@ The accepted future direction is recorded in:
 
 - `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`
 
-That master plan is the canonical source for the next-generation product goal, completeness-first priorities, repository simplification, full capability audit, transport-independent domain design, coding/comment/region rules, testing strategy, Developer Sample App, seeded/random demo-data generation, internal simulator completion, protected public scale emulator, POS simulator and full single-PC Integration Lab.
+The Phase 1 audit is recorded in:
+
+- `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`
+
+The master plan remains the canonical source for the product goal, completeness-first priorities, repository simplification, transport-independent domain design, coding/comment/region rules, testing strategy, Developer Sample App, seeded/random demo-data generation, internal simulator completion, protected public scale emulator, POS simulator and full single-PC Integration Lab.
+
+The audit maps the externally useful Sadr Scales 5.2.1 surface into Safe Data Contract, Managed Runtime Command and Internal / Do Not Expose categories. It also records the design gaps that must be resolved before a new public Contract/API is implemented.
 
 The existing `v1.0.0` release remains immutable and valid for its published Basic SQL Contract. The next public version number is intentionally undecided until the new Contract/API compatibility design is complete.
 
-**Next exact step:** Phase 1 — Full Integration Surface Audit of final Sadr Scales 5.2.1. No large Public API or repository redesign should begin before that audit is reviewed.
+**Next exact step:** maintainer/owner review of the Phase 1 audit. After acceptance, begin Phase 2 Contract & Domain Design. Do not add large new Public SDK clients before the Phase 2 decisions are accepted.
 
 ## Stable release identity
 
@@ -48,11 +54,11 @@ All Draft Release assets were downloaded directly and verified before publicatio
 
 ## Final validation evidence
 
-### Exact merged `main`
+### Exact stable release source
 
 `a6bccc7c13a8afba29b6860869d2a942b1231803`
 
-### Main CI
+### Main CI for stable release
 
 - SDK CI run `32111583869`: **PASS**
 - Public Repository Guard run `32112295906`: **PASS**
@@ -74,16 +80,6 @@ Jobs:
 - `sql-integration-test`: PASS
 - `net48-package-consumer`: PASS
 - `draft-release`: PASS
-
-The `draft-release` job successfully:
-
-- checked out the tagged source;
-- rebuilt and repacked the SDK;
-- validated the NuGet package;
-- downloaded and SHA-verified the official Integration Guide;
-- built the final release bundle/checksums;
-- uploaded release engineering evidence;
-- created/updated the Draft GitHub Release.
 
 ## Official Integration Guide
 
@@ -113,7 +109,7 @@ Repository-owner verification confirmed before publication:
 - branch deletion disabled;
 - zero required approving reviews while the repository has one maintainer.
 
-## Completed engineering and developer readiness
+## Completed engineering and developer readiness for v1.0.0
 
 - SQL Contract v1 audit/freeze and bilingual contract documentation.
 - C# SDK targeting `netstandard2.0` with `Microsoft.Data.SqlClient 7.0.2`.
@@ -138,26 +134,22 @@ Repository-owner verification confirmed before publication:
 
 GitHub is the developer source of truth. Stable SDK packages, compiled binaries, Developer Kit, official guide and checksums are distributed from the `v1.0.0` GitHub Release rather than committed as binary clutter to `main`.
 
-NuGet.org publication remains a separate post-v1 decision because it requires package-account/ownership/publication-policy administration.
+NuGet.org publication remains a separate decision because it requires package-account/ownership/publication-policy administration.
 
 ## Scope boundary of published v1.0.0
 
 `v1.0.0` does not expose direct device protocols, packet captures, private firmware/vendor data, customer data, private keys or internal Sadr Scales runtime source.
 
-Its Basic SQL Contract is intentionally narrower than the newly accepted long-term Integration Platform goal. That gap will be addressed through the Phase 1 audit and subsequent Contract/Domain design rather than by silently changing the published v1 contract.
+Its Basic SQL Contract is intentionally narrower than the accepted long-term Integration Platform goal. The Phase 1 audit documents that gap explicitly; future work must address it through Contract/Domain design rather than silently changing the published v1 contract.
 
-## Next phase
+## Phase 1 audit result
 
-The stable `v1.0.0` release is closed and frozen.
+The audit confirms that the useful integration surface is substantially broader than the v1 Basic SQL Contract. Important surfaces include stores, scale configuration, live runtime state, scale/group/item assignments, hot keys, structured invoices, aggregate-barcode lookup, sales query/reporting and managed device commands.
 
-Active planning now moves to **Phase 1 — Full Integration Surface Audit** from the canonical master plan. The audit must identify every externally useful capability in final Sadr Scales 5.2.1 and classify it as:
+It also confirms that some operations must not be exposed as raw SQL merely because tables exist. Scale lifecycle and live device operations require Runtime orchestration; internal sync/migration/recovery/protocol state remains private.
 
-- Safe Data Contract;
-- Managed Runtime Command;
-- Internal / Do Not Expose.
-
-The audit is the prerequisite for the next Public API, repository simplification, full samples and Integration Lab work.
+Open design gates are listed in `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md` and must be resolved in Phase 2 before implementation.
 
 ## Handoff rule
 
-A future session begins with `AGENTS.md`, then `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`, then this status file and only the current-state/contract references relevant to the task.
+A future session begins with `AGENTS.md`, then `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`, then `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`, then this status file and only the current-state/contract references relevant to the task.
