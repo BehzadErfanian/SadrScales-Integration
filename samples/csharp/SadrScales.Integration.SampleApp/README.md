@@ -8,7 +8,7 @@ The application intentionally grows one tested capability at a time instead of c
 
 Enter the Sadr Scales SQL connection string at the top of the form, or set `SADR_SCALES_CONNECTION_STRING` before launch.
 
-The current application contains separate **Invoices** and **Scales** tabs that use the same connection.
+The current application contains **Invoices**, **Scales** and **Catalog** areas that use the same connection.
 
 ## Invoices tab
 
@@ -22,31 +22,46 @@ The current application contains separate **Invoices** and **Scales** tabs that 
 
 The sample never auto-ACKs a lookup.
 
-To test ACK manually you must:
-
-1. check **Enable ACK write**;
-2. click **ACK invoice**;
-3. confirm the warning dialog.
-
-In a real POS/ERP integration, ACK must be called only after the destination database transaction has committed successfully.
-
-ACK updates `SADR_Total.LableStatus = 1` and is idempotent.
+To test ACK manually you must enable the ACK write and confirm the warning dialog. In a real POS/ERP integration, ACK must be called only after the destination database transaction has committed successfully.
 
 ## Scales tab
 
-1. Click **Refresh scales** to read the registered Sadr Scales rows.
-2. Inspect Scale ID, IP, port, model, store, `Online / Offline / Unknown` status and AutoSend configuration in the grid.
-3. Selecting a row copies its Scale ID into the resend control.
+Click **Refresh scales** to read registered Scale ID, IP, port, model, store, `Online / Offline / Unknown` status and AutoSend configuration.
 
-### Resend safety
+Resend buttons remain disabled until **Enable resend writes** is selected, and each request requires confirmation.
 
-Resend requests are explicit SQL writes, so the buttons remain disabled until **Enable resend writes** is checked. Each request also requires a confirmation dialog.
+`Requested` means the SQL AutoSend watermark was reset. It does **not** mean the physical scale has already received the items/HotKeys.
 
-- **Request item resend** records an item AutoSend resend request.
-- **Request HotKey resend** records a HotKey AutoSend resend request only for models whose 5.2.1 automatic HotKey path supports it.
-- PLUS reports `UnsupportedModel` for automatic HotKey resend rather than false success.
+## Catalog tab
 
-`Requested` means the SQL AutoSend watermark was reset. It does **not** mean the physical scale has already received the items/HotKeys. Actual transfer occurs during a later eligible AutoSend cycle.
+Catalog has nested **Stores**, **Groups** and **Items** pages plus one shared **Enable catalog writes** guard. Reads remain available while writes are disabled.
+
+### Stores
+
+- Refresh the store list.
+- Select a row to load its fields.
+- Upsert by stable `StoreCode` only after enabling catalog writes.
+
+### Groups
+
+- Refresh item groups.
+- Select/edit `ItemClassCode`, name and description.
+- Upsert only after enabling catalog writes.
+
+### Items
+
+- Refresh active items, or explicitly select **Include deleted**.
+- Select a PLU to inspect/edit Group, Name and Price.
+- Upsert preserves all non-edited fields of an existing PLU by reading the complete item first; it does not overwrite print/barcode/tare/text settings with defaults.
+- **Soft delete** sets `DeleteFlag = 1` after confirmation and never physically removes the row.
+- A deleted PLU can still be inspected/recovered through the SDK.
+- **Price history** is read-only and loads recent history for the selected PLU.
+
+## Write-safety rule
+
+The Sample App is a reference tool, not a production administration console. Every current write family has an explicit guard, and higher-impact operations also require confirmation.
+
+Demo Data in a later Vendor-Ready slice will add a stronger production-database guard before synthetic data generation is allowed.
 
 ## Run
 
@@ -61,4 +76,4 @@ The public sample does not contain customer credentials, direct scale protocols,
 
 ## Planned growth
 
-Future Vendor-Ready slices will add Stores, Groups, Items, Assignments, HotKeys, Sales, Reports and Demo Data to this same application.
+The next slices add Scale Assignments/Mapping/HotKeys, then Sales/Reports, then seeded Demo Data and the final external-developer acceptance flow to this same application.
