@@ -11,7 +11,7 @@ namespace SadrScales.Integration.Items
     /// <summary>
     /// Basic Contract v1 operations for PLU/items.
     /// </summary>
-    public sealed class SadrItemClient
+    public sealed partial class SadrItemClient
     {
         /// <summary>
         /// Maximum number of PLUs accepted by one atomic batch call.

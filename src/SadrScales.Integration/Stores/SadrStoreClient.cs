@@ -6,35 +6,39 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using SadrScales.Integration.Internal;
 
-namespace SadrScales.Integration.Items
+namespace SadrScales.Integration.Stores
 {
     /// <summary>
-    /// Public item-group catalog operations.
+    /// Public Sadr Scales store/branch catalog operations.
     /// </summary>
-    public sealed class SadrItemGroupClient
+    public sealed class SadrStoreClient
     {
         #region SQL
 
         private const string UpsertSql = @"
-IF NOT EXISTS (
+IF NOT EXISTS
+(
     SELECT 1
-    FROM dbo.SADR_ItemClass WITH (UPDLOCK, HOLDLOCK)
-    WHERE ItemClassCode = @Code)
+    FROM dbo.SADR_Store WITH (UPDLOCK, HOLDLOCK)
+    WHERE StoreCode = @StoreCode
+)
 BEGIN
-    INSERT INTO dbo.SADR_ItemClass (ItemClassCode, ItemClassName, Descriptions)
-    VALUES (@Code, @Name, @Descriptions);
+    INSERT INTO dbo.SADR_Store(StoreCode, StoreName, Descriptions)
+    VALUES(@StoreCode, @StoreName, @Descriptions);
     SELECT CAST(1 AS int);
 END
 ELSE
 BEGIN
-    UPDATE dbo.SADR_ItemClass
-    SET ItemClassName = @Name,
+    UPDATE dbo.SADR_Store
+    SET StoreName = @StoreName,
         Descriptions = @Descriptions
-    WHERE ItemClassCode = @Code
-      AND EXISTS (
-          SELECT ItemClassName, Descriptions
+    WHERE StoreCode = @StoreCode
+      AND EXISTS
+      (
+          SELECT StoreName, Descriptions
           EXCEPT
-          SELECT @Name, @Descriptions);
+          SELECT @StoreName, @Descriptions
+      );
 
     DECLARE @Rows int = @@ROWCOUNT;
     SELECT CASE WHEN @Rows = 0 THEN 0 ELSE 2 END;
@@ -51,7 +55,7 @@ END;";
 
         #region Construction
 
-        internal SadrItemGroupClient(SqlConnectionFactory connectionFactory, SadrScalesClientOptions options)
+        internal SadrStoreClient(SqlConnectionFactory connectionFactory, SadrScalesClientOptions options)
         {
             _connectionFactory = connectionFactory;
             _options = options;
@@ -62,19 +66,19 @@ END;";
         #region Read API
 
         /// <summary>
-        /// Reads all item groups ordered by ItemClassCode.
+        /// Reads all stores ordered by their stable StoreCode identity.
         /// </summary>
-        public Task<IReadOnlyList<SadrItemGroup>> GetAllAsync(
+        public Task<IReadOnlyList<SadrStore>> GetAllAsync(
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _connectionFactory.ExecuteReadAsync<IReadOnlyList<SadrItemGroup>>(
+            return _connectionFactory.ExecuteReadAsync<IReadOnlyList<SadrStore>>(
                 async (connection, token) =>
                 {
-                    var result = new List<SadrItemGroup>();
+                    var result = new List<SadrStore>();
                     const string sql = @"
-SELECT ItemClassCode, ItemClassName, Descriptions
-FROM dbo.SADR_ItemClass
-ORDER BY ItemClassCode ASC;";
+SELECT StoreCode, StoreName, Descriptions
+FROM dbo.SADR_Store
+ORDER BY StoreCode ASC;";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
@@ -94,32 +98,35 @@ ORDER BY ItemClassCode ASC;";
         }
 
         /// <summary>
-        /// Reads one item group by ItemClassCode, or returns null when it does not exist.
+        /// Reads one store by StoreCode, or returns null when it does not exist.
         /// </summary>
-        public Task<SadrItemGroup?> GetAsync(
-            string itemClassCode,
+        public Task<SadrStore?> GetAsync(
+            string storeCode,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            ValidateCode(itemClassCode);
+            ValidateStoreCode(storeCode);
 
-            return _connectionFactory.ExecuteReadAsync<SadrItemGroup?>(
+            return _connectionFactory.ExecuteReadAsync<SadrStore?>(
                 async (connection, token) =>
                 {
                     const string sql = @"
-SELECT ItemClassCode, ItemClassName, Descriptions
-FROM dbo.SADR_ItemClass
-WHERE ItemClassCode = @Code;";
+SELECT StoreCode, StoreName, Descriptions
+FROM dbo.SADR_Store
+WHERE StoreCode = @StoreCode;";
 
                     using (var command = new SqlCommand(sql, connection))
                     {
                         command.CommandTimeout = _options.CommandTimeoutSeconds;
-                        command.Parameters.Add("@Code", SqlDbType.VarChar, 50).Value = itemClassCode;
+                        command.Parameters.Add("@StoreCode", SqlDbType.VarChar, 50).Value = storeCode;
 
                         using (var reader = await command.ExecuteReaderAsync(token).ConfigureAwait(false))
                         {
-                            return await reader.ReadAsync(token).ConfigureAwait(false)
-                                ? Map(reader)
-                                : null;
+                            if (!await reader.ReadAsync(token).ConfigureAwait(false))
+                            {
+                                return null;
+                            }
+
+                            return Map(reader);
                         }
                     }
                 },
@@ -131,28 +138,28 @@ WHERE ItemClassCode = @Code;";
         #region Write API
 
         /// <summary>
-        /// Inserts or semantically updates an item group.
+        /// Inserts a store or updates it only when its semantic values changed.
         /// </summary>
-        public async Task<SadrWriteResult> UpsertAsync(
-            SadrItemGroup group,
+        public async Task<SadrStoreUpsertResult> UpsertAsync(
+            SadrStore store,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            Validate(group);
+            Validate(store);
 
             using (var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false))
             using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
             using (var command = new SqlCommand(UpsertSql, connection, transaction))
             {
                 command.CommandTimeout = _options.CommandTimeoutSeconds;
-                command.Parameters.Add("@Code", SqlDbType.VarChar, 50).Value = group.ItemClassCode;
-                command.Parameters.Add("@Name", SqlDbType.NVarChar, 100).Value = (object?)group.ItemClassName ?? DBNull.Value;
-                command.Parameters.Add("@Descriptions", SqlDbType.NVarChar, 150).Value = (object?)group.Descriptions ?? DBNull.Value;
+                command.Parameters.Add("@StoreCode", SqlDbType.VarChar, 50).Value = store.StoreCode;
+                command.Parameters.Add("@StoreName", SqlDbType.NVarChar, 100).Value = (object?)store.StoreName ?? DBNull.Value;
+                command.Parameters.Add("@Descriptions", SqlDbType.NVarChar, 150).Value = (object?)store.Descriptions ?? DBNull.Value;
 
                 try
                 {
                     var scalar = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
                     transaction.Commit();
-                    return new SadrWriteResult((SadrWriteOperation)Convert.ToInt32(scalar));
+                    return (SadrStoreUpsertResult)Convert.ToInt32(scalar);
                 }
                 catch
                 {
@@ -166,12 +173,12 @@ WHERE ItemClassCode = @Code;";
 
         #region Mapping
 
-        private static SadrItemGroup Map(SqlDataReader reader)
+        private static SadrStore Map(SqlDataReader reader)
         {
-            return new SadrItemGroup
+            return new SadrStore
             {
-                ItemClassCode = reader.GetString(0),
-                ItemClassName = reader.IsDBNull(1) ? null : reader.GetString(1),
+                StoreCode = reader.GetString(0),
+                StoreName = reader.IsDBNull(1) ? null : reader.GetString(1),
                 Descriptions = reader.IsDBNull(2) ? null : reader.GetString(2)
             };
         }
@@ -180,33 +187,33 @@ WHERE ItemClassCode = @Code;";
 
         #region Validation
 
-        private static void Validate(SadrItemGroup group)
+        private static void Validate(SadrStore store)
         {
-            if (group == null)
+            if (store == null)
             {
-                throw new ArgumentNullException(nameof(group));
+                throw new ArgumentNullException(nameof(store));
             }
 
-            ValidateCode(group.ItemClassCode);
-            ValidateLength(group.ItemClassName, 100, nameof(group.ItemClassName));
-            ValidateLength(group.Descriptions, 150, nameof(group.Descriptions));
+            ValidateStoreCode(store.StoreCode);
+            ValidateLength(store.StoreName, 100, nameof(store.StoreName));
+            ValidateLength(store.Descriptions, 150, nameof(store.Descriptions));
         }
 
-        private static void ValidateCode(string itemClassCode)
+        private static void ValidateStoreCode(string storeCode)
         {
-            if (string.IsNullOrWhiteSpace(itemClassCode))
+            if (string.IsNullOrWhiteSpace(storeCode))
             {
-                throw new ArgumentException("ItemClassCode is required.", nameof(itemClassCode));
+                throw new ArgumentException("StoreCode is required.", nameof(storeCode));
             }
 
-            ValidateLength(itemClassCode, 50, nameof(itemClassCode));
+            ValidateLength(storeCode, 50, nameof(storeCode));
         }
 
         private static void ValidateLength(string? value, int maximumLength, string name)
         {
             if (value != null && value.Length > maximumLength)
             {
-                throw new ArgumentException(name + " exceeds the SQL Contract v1 maximum length of " + maximumLength + ".", name);
+                throw new ArgumentException(name + " exceeds the supported maximum length of " + maximumLength + ".", name);
             }
         }
 

@@ -6,6 +6,7 @@ using SadrScales.Integration.Invoices;
 using SadrScales.Integration.Items;
 using SadrScales.Integration.Sales;
 using SadrScales.Integration.Scales;
+using SadrScales.Integration.Stores;
 
 namespace SadrScales.Integration.Net48Consumer
 {
@@ -30,11 +31,18 @@ namespace SadrScales.Integration.Net48Consumer
                 Assert(options.TransientRetryBaseDelayMilliseconds == 100, "Retry delay option did not round-trip.");
 
                 var client = new SadrScalesClient(options);
+                Assert(client.Stores != null, "Stores API was not created.");
                 Assert(client.ItemGroups != null, "ItemGroups API was not created.");
                 Assert(client.Items != null, "Items API was not created.");
                 Assert(client.Sales != null, "Sales API was not created.");
                 Assert(client.Invoices != null, "Invoices API was not created.");
                 Assert(client.Scales != null, "Scales API was not created.");
+
+                var store = new SadrStore
+                {
+                    StoreCode = "NET48",
+                    StoreName = "Compatibility Store"
+                };
 
                 var group = new SadrItemGroup
                 {
@@ -50,8 +58,12 @@ namespace SadrScales.Integration.Net48Consumer
                     UnitPrice = 1000
                 };
 
+                Assert(store.StoreCode == "NET48", "Store public model failed.");
                 Assert(group.ItemClassCode == "NET48", "Item-group public model failed.");
                 Assert(item.PluNo == 480001, "Item public model failed.");
+                Assert(typeof(SadrStoreUpsertResult).IsPublic, "Store upsert result public enum is unavailable.");
+                Assert(typeof(SadrItemSoftDeleteResult).IsPublic, "Item soft-delete result public enum is unavailable.");
+                Assert(typeof(SadrPriceHistoryEntry).IsPublic, "Price-history public model is unavailable.");
                 Assert(typeof(SadrSalesBatch).IsPublic, "Sales batch public type is unavailable.");
 
                 string barcode = SadrInvoiceClient.BuildTotalBarcode(12, 3456);

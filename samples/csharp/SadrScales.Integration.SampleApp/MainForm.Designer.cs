@@ -10,6 +10,7 @@ namespace SadrScales.Integration.SampleApp
         private System.Windows.Forms.TabControl tabMain;
         private System.Windows.Forms.TabPage tabInvoices;
         private System.Windows.Forms.TabPage tabScales;
+        private System.Windows.Forms.TabPage tabCatalogPage;
         private System.Windows.Forms.Label lblBarcode;
         private System.Windows.Forms.TextBox txtBarcode;
         private System.Windows.Forms.Button btnLookup;
@@ -18,7 +19,7 @@ namespace SadrScales.Integration.SampleApp
         private System.Windows.Forms.Label lblInvoiceStatus;
         private System.Windows.Forms.SplitContainer splitInvoice;
         private System.Windows.Forms.DataGridView dgvInvoice;
-        private System.Windows.Forms.DataGridView dgvItems;
+        private System.Windows.Forms.DataGridView dgvInvoiceItems;
         private System.Windows.Forms.Label lblInvoiceHeader;
         private System.Windows.Forms.Label lblInvoiceItems;
         private System.Windows.Forms.Button btnRefreshScales;
@@ -29,6 +30,51 @@ namespace SadrScales.Integration.SampleApp
         private System.Windows.Forms.Button btnRequestHotKeyResend;
         private System.Windows.Forms.Label lblScaleStatus;
         private System.Windows.Forms.DataGridView dgvScales;
+        private System.Windows.Forms.CheckBox chkEnableCatalogWrites;
+        private System.Windows.Forms.Label lblCatalogWriteWarning;
+        private System.Windows.Forms.TabControl tabCatalog;
+        private System.Windows.Forms.TabPage tabStores;
+        private System.Windows.Forms.TabPage tabGroups;
+        private System.Windows.Forms.TabPage tabItems;
+        private System.Windows.Forms.Button btnRefreshStores;
+        private System.Windows.Forms.Label lblStoreCode;
+        private System.Windows.Forms.TextBox txtStoreCode;
+        private System.Windows.Forms.Label lblStoreName;
+        private System.Windows.Forms.TextBox txtStoreName;
+        private System.Windows.Forms.Label lblStoreDescription;
+        private System.Windows.Forms.TextBox txtStoreDescription;
+        private System.Windows.Forms.Button btnUpsertStore;
+        private System.Windows.Forms.Label lblStoreStatus;
+        private System.Windows.Forms.DataGridView dgvStores;
+        private System.Windows.Forms.Button btnRefreshGroups;
+        private System.Windows.Forms.Label lblGroupCode;
+        private System.Windows.Forms.TextBox txtGroupCode;
+        private System.Windows.Forms.Label lblGroupName;
+        private System.Windows.Forms.TextBox txtGroupName;
+        private System.Windows.Forms.Label lblGroupDescription;
+        private System.Windows.Forms.TextBox txtGroupDescription;
+        private System.Windows.Forms.Button btnUpsertGroup;
+        private System.Windows.Forms.Label lblGroupStatus;
+        private System.Windows.Forms.DataGridView dgvGroups;
+        private System.Windows.Forms.Button btnRefreshCatalogItems;
+        private System.Windows.Forms.CheckBox chkIncludeDeletedItems;
+        private System.Windows.Forms.Label lblItemPlu;
+        private System.Windows.Forms.NumericUpDown nudItemPlu;
+        private System.Windows.Forms.Label lblItemGroup;
+        private System.Windows.Forms.TextBox txtItemGroup;
+        private System.Windows.Forms.Label lblItemName;
+        private System.Windows.Forms.TextBox txtItemName;
+        private System.Windows.Forms.Label lblItemPrice;
+        private System.Windows.Forms.NumericUpDown nudItemPrice;
+        private System.Windows.Forms.Button btnUpsertItem;
+        private System.Windows.Forms.Button btnSoftDeleteItem;
+        private System.Windows.Forms.Button btnLoadPriceHistory;
+        private System.Windows.Forms.Label lblItemStatus;
+        private System.Windows.Forms.SplitContainer splitCatalogItems;
+        private System.Windows.Forms.DataGridView dgvCatalogItems;
+        private System.Windows.Forms.DataGridView dgvPriceHistory;
+        private System.Windows.Forms.Label lblCatalogItems;
+        private System.Windows.Forms.Label lblPriceHistory;
 
         #region Windows Form Designer generated code
 
@@ -38,7 +84,6 @@ namespace SadrScales.Integration.SampleApp
             {
                 components.Dispose();
             }
-
             base.Dispose(disposing);
         }
 
@@ -51,7 +96,7 @@ namespace SadrScales.Integration.SampleApp
             this.splitInvoice = new System.Windows.Forms.SplitContainer();
             this.dgvInvoice = new System.Windows.Forms.DataGridView();
             this.lblInvoiceHeader = new System.Windows.Forms.Label();
-            this.dgvItems = new System.Windows.Forms.DataGridView();
+            this.dgvInvoiceItems = new System.Windows.Forms.DataGridView();
             this.lblInvoiceItems = new System.Windows.Forms.Label();
             this.lblInvoiceStatus = new System.Windows.Forms.Label();
             this.btnAck = new System.Windows.Forms.Button();
@@ -68,6 +113,52 @@ namespace SadrScales.Integration.SampleApp
             this.nudScaleId = new System.Windows.Forms.NumericUpDown();
             this.lblScaleId = new System.Windows.Forms.Label();
             this.btnRefreshScales = new System.Windows.Forms.Button();
+            this.tabCatalogPage = new System.Windows.Forms.TabPage();
+            this.tabCatalog = new System.Windows.Forms.TabControl();
+            this.tabStores = new System.Windows.Forms.TabPage();
+            this.dgvStores = new System.Windows.Forms.DataGridView();
+            this.lblStoreStatus = new System.Windows.Forms.Label();
+            this.btnUpsertStore = new System.Windows.Forms.Button();
+            this.txtStoreDescription = new System.Windows.Forms.TextBox();
+            this.lblStoreDescription = new System.Windows.Forms.Label();
+            this.txtStoreName = new System.Windows.Forms.TextBox();
+            this.lblStoreName = new System.Windows.Forms.Label();
+            this.txtStoreCode = new System.Windows.Forms.TextBox();
+            this.lblStoreCode = new System.Windows.Forms.Label();
+            this.btnRefreshStores = new System.Windows.Forms.Button();
+            this.tabGroups = new System.Windows.Forms.TabPage();
+            this.dgvGroups = new System.Windows.Forms.DataGridView();
+            this.lblGroupStatus = new System.Windows.Forms.Label();
+            this.btnUpsertGroup = new System.Windows.Forms.Button();
+            this.txtGroupDescription = new System.Windows.Forms.TextBox();
+            this.lblGroupDescription = new System.Windows.Forms.Label();
+            this.txtGroupName = new System.Windows.Forms.TextBox();
+            this.lblGroupName = new System.Windows.Forms.Label();
+            this.txtGroupCode = new System.Windows.Forms.TextBox();
+            this.lblGroupCode = new System.Windows.Forms.Label();
+            this.btnRefreshGroups = new System.Windows.Forms.Button();
+            this.tabItems = new System.Windows.Forms.TabPage();
+            this.splitCatalogItems = new System.Windows.Forms.SplitContainer();
+            this.dgvCatalogItems = new System.Windows.Forms.DataGridView();
+            this.lblCatalogItems = new System.Windows.Forms.Label();
+            this.dgvPriceHistory = new System.Windows.Forms.DataGridView();
+            this.lblPriceHistory = new System.Windows.Forms.Label();
+            this.lblItemStatus = new System.Windows.Forms.Label();
+            this.btnLoadPriceHistory = new System.Windows.Forms.Button();
+            this.btnSoftDeleteItem = new System.Windows.Forms.Button();
+            this.btnUpsertItem = new System.Windows.Forms.Button();
+            this.nudItemPrice = new System.Windows.Forms.NumericUpDown();
+            this.lblItemPrice = new System.Windows.Forms.Label();
+            this.txtItemName = new System.Windows.Forms.TextBox();
+            this.lblItemName = new System.Windows.Forms.Label();
+            this.txtItemGroup = new System.Windows.Forms.TextBox();
+            this.lblItemGroup = new System.Windows.Forms.Label();
+            this.nudItemPlu = new System.Windows.Forms.NumericUpDown();
+            this.lblItemPlu = new System.Windows.Forms.Label();
+            this.chkIncludeDeletedItems = new System.Windows.Forms.CheckBox();
+            this.btnRefreshCatalogItems = new System.Windows.Forms.Button();
+            this.lblCatalogWriteWarning = new System.Windows.Forms.Label();
+            this.chkEnableCatalogWrites = new System.Windows.Forms.CheckBox();
             this.tabMain.SuspendLayout();
             this.tabInvoices.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitInvoice)).BeginInit();
@@ -75,42 +166,46 @@ namespace SadrScales.Integration.SampleApp
             this.splitInvoice.Panel2.SuspendLayout();
             this.splitInvoice.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvInvoice)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvItems)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvInvoiceItems)).BeginInit();
             this.tabScales.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvScales)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudScaleId)).BeginInit();
+            this.tabCatalogPage.SuspendLayout();
+            this.tabCatalog.SuspendLayout();
+            this.tabStores.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvStores)).BeginInit();
+            this.tabGroups.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvGroups)).BeginInit();
+            this.tabItems.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitCatalogItems)).BeginInit();
+            this.splitCatalogItems.Panel1.SuspendLayout();
+            this.splitCatalogItems.Panel2.SuspendLayout();
+            this.splitCatalogItems.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvCatalogItems)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPriceHistory)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudItemPrice)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudItemPlu)).BeginInit();
             this.SuspendLayout();
-            // 
-            // lblConnectionString
-            // 
+            // Common connection
             this.lblConnectionString.AutoSize = true;
             this.lblConnectionString.Location = new System.Drawing.Point(12, 15);
             this.lblConnectionString.Name = "lblConnectionString";
             this.lblConnectionString.Size = new System.Drawing.Size(96, 13);
-            this.lblConnectionString.TabIndex = 0;
             this.lblConnectionString.Text = "SQL connection:";
-            // 
-            // txtConnectionString
-            // 
             this.txtConnectionString.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
             this.txtConnectionString.Location = new System.Drawing.Point(114, 12);
             this.txtConnectionString.Name = "txtConnectionString";
             this.txtConnectionString.Size = new System.Drawing.Size(1054, 20);
-            this.txtConnectionString.TabIndex = 1;
-            // 
-            // tabMain
-            // 
+            // Main tabs
             this.tabMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
             this.tabMain.Controls.Add(this.tabInvoices);
             this.tabMain.Controls.Add(this.tabScales);
+            this.tabMain.Controls.Add(this.tabCatalogPage);
             this.tabMain.Location = new System.Drawing.Point(12, 43);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
             this.tabMain.Size = new System.Drawing.Size(1156, 645);
-            this.tabMain.TabIndex = 2;
-            // 
-            // tabInvoices
-            // 
+            // Invoice tab
             this.tabInvoices.Controls.Add(this.splitInvoice);
             this.tabInvoices.Controls.Add(this.lblInvoiceStatus);
             this.tabInvoices.Controls.Add(this.btnAck);
@@ -122,141 +217,52 @@ namespace SadrScales.Integration.SampleApp
             this.tabInvoices.Name = "tabInvoices";
             this.tabInvoices.Padding = new System.Windows.Forms.Padding(8);
             this.tabInvoices.Size = new System.Drawing.Size(1148, 619);
-            this.tabInvoices.TabIndex = 0;
             this.tabInvoices.Text = "Invoices";
             this.tabInvoices.UseVisualStyleBackColor = true;
-            // 
-            // lblBarcode
-            // 
             this.lblBarcode.AutoSize = true;
             this.lblBarcode.Location = new System.Drawing.Point(11, 17);
-            this.lblBarcode.Name = "lblBarcode";
-            this.lblBarcode.Size = new System.Drawing.Size(74, 13);
-            this.lblBarcode.TabIndex = 0;
             this.lblBarcode.Text = "TotalBarcode:";
-            // 
-            // txtBarcode
-            // 
             this.txtBarcode.Location = new System.Drawing.Point(99, 14);
             this.txtBarcode.MaxLength = 14;
-            this.txtBarcode.Name = "txtBarcode";
             this.txtBarcode.Size = new System.Drawing.Size(190, 20);
-            this.txtBarcode.TabIndex = 1;
-            // 
-            // btnLookup
-            // 
             this.btnLookup.Location = new System.Drawing.Point(300, 12);
-            this.btnLookup.Name = "btnLookup";
             this.btnLookup.Size = new System.Drawing.Size(105, 25);
-            this.btnLookup.TabIndex = 2;
             this.btnLookup.Text = "Lookup invoice";
             this.btnLookup.UseVisualStyleBackColor = true;
             this.btnLookup.Click += new System.EventHandler(this.btnLookup_Click);
-            // 
-            // chkEnableWrites
-            // 
             this.chkEnableWrites.AutoSize = true;
             this.chkEnableWrites.Location = new System.Drawing.Point(425, 17);
-            this.chkEnableWrites.Name = "chkEnableWrites";
-            this.chkEnableWrites.Size = new System.Drawing.Size(119, 17);
-            this.chkEnableWrites.TabIndex = 3;
             this.chkEnableWrites.Text = "Enable ACK write";
-            this.chkEnableWrites.UseVisualStyleBackColor = true;
             this.chkEnableWrites.CheckedChanged += new System.EventHandler(this.chkEnableWrites_CheckedChanged);
-            // 
-            // btnAck
-            // 
             this.btnAck.Enabled = false;
             this.btnAck.Location = new System.Drawing.Point(555, 12);
-            this.btnAck.Name = "btnAck";
             this.btnAck.Size = new System.Drawing.Size(105, 25);
-            this.btnAck.TabIndex = 4;
             this.btnAck.Text = "ACK invoice";
             this.btnAck.UseVisualStyleBackColor = true;
             this.btnAck.Click += new System.EventHandler(this.btnAck_Click);
-            // 
-            // lblInvoiceStatus
-            // 
             this.lblInvoiceStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
             this.lblInvoiceStatus.AutoEllipsis = true;
             this.lblInvoiceStatus.Location = new System.Drawing.Point(676, 17);
-            this.lblInvoiceStatus.Name = "lblInvoiceStatus";
             this.lblInvoiceStatus.Size = new System.Drawing.Size(457, 17);
-            this.lblInvoiceStatus.TabIndex = 5;
             this.lblInvoiceStatus.Text = "Ready";
-            // 
-            // splitInvoice
-            // 
             this.splitInvoice.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
             this.splitInvoice.Location = new System.Drawing.Point(11, 48);
-            this.splitInvoice.Name = "splitInvoice";
             this.splitInvoice.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitInvoice.Panel1
-            // 
-            this.splitInvoice.Panel1.Controls.Add(this.dgvInvoice);
-            this.splitInvoice.Panel1.Controls.Add(this.lblInvoiceHeader);
-            // 
-            // splitInvoice.Panel2
-            // 
-            this.splitInvoice.Panel2.Controls.Add(this.dgvItems);
-            this.splitInvoice.Panel2.Controls.Add(this.lblInvoiceItems);
             this.splitInvoice.Size = new System.Drawing.Size(1122, 558);
             this.splitInvoice.SplitterDistance = 180;
-            this.splitInvoice.TabIndex = 6;
-            // 
-            // dgvInvoice
-            // 
-            this.dgvInvoice.AllowUserToAddRows = false;
-            this.dgvInvoice.AllowUserToDeleteRows = false;
-            this.dgvInvoice.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvInvoice.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.dgvInvoice.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvInvoice.Location = new System.Drawing.Point(0, 24);
-            this.dgvInvoice.MultiSelect = false;
-            this.dgvInvoice.Name = "dgvInvoice";
-            this.dgvInvoice.ReadOnly = true;
-            this.dgvInvoice.RowHeadersVisible = false;
-            this.dgvInvoice.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvInvoice.Size = new System.Drawing.Size(1122, 156);
-            this.dgvInvoice.TabIndex = 1;
-            // 
-            // lblInvoiceHeader
-            // 
+            this.splitInvoice.Panel1.Controls.Add(this.dgvInvoice);
+            this.splitInvoice.Panel1.Controls.Add(this.lblInvoiceHeader);
+            this.splitInvoice.Panel2.Controls.Add(this.dgvInvoiceItems);
+            this.splitInvoice.Panel2.Controls.Add(this.lblInvoiceItems);
             this.lblInvoiceHeader.AutoSize = true;
             this.lblInvoiceHeader.Location = new System.Drawing.Point(0, 5);
-            this.lblInvoiceHeader.Name = "lblInvoiceHeader";
-            this.lblInvoiceHeader.Size = new System.Drawing.Size(78, 13);
-            this.lblInvoiceHeader.TabIndex = 0;
             this.lblInvoiceHeader.Text = "Invoice header";
-            // 
-            // dgvItems
-            // 
-            this.dgvItems.AllowUserToAddRows = false;
-            this.dgvItems.AllowUserToDeleteRows = false;
-            this.dgvItems.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvItems.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.dgvItems.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvItems.Location = new System.Drawing.Point(0, 24);
-            this.dgvItems.MultiSelect = false;
-            this.dgvItems.Name = "dgvItems";
-            this.dgvItems.ReadOnly = true;
-            this.dgvItems.RowHeadersVisible = false;
-            this.dgvItems.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvItems.Size = new System.Drawing.Size(1122, 350);
-            this.dgvItems.TabIndex = 1;
-            // 
-            // lblInvoiceItems
-            // 
             this.lblInvoiceItems.AutoSize = true;
             this.lblInvoiceItems.Location = new System.Drawing.Point(0, 5);
-            this.lblInvoiceItems.Name = "lblInvoiceItems";
-            this.lblInvoiceItems.Size = new System.Drawing.Size(69, 13);
-            this.lblInvoiceItems.TabIndex = 0;
             this.lblInvoiceItems.Text = "Invoice items";
-            // 
-            // tabScales
-            // 
+            ConfigureReadOnlyGrid(this.dgvInvoice, new System.Drawing.Point(0, 24), new System.Drawing.Size(1122, 156));
+            ConfigureReadOnlyGrid(this.dgvInvoiceItems, new System.Drawing.Point(0, 24), new System.Drawing.Size(1122, 350));
+            // Scales tab
             this.tabScales.Controls.Add(this.dgvScales);
             this.tabScales.Controls.Add(this.lblScaleStatus);
             this.tabScales.Controls.Add(this.btnRequestHotKeyResend);
@@ -266,104 +272,244 @@ namespace SadrScales.Integration.SampleApp
             this.tabScales.Controls.Add(this.lblScaleId);
             this.tabScales.Controls.Add(this.btnRefreshScales);
             this.tabScales.Location = new System.Drawing.Point(4, 22);
-            this.tabScales.Name = "tabScales";
             this.tabScales.Padding = new System.Windows.Forms.Padding(8);
             this.tabScales.Size = new System.Drawing.Size(1148, 619);
-            this.tabScales.TabIndex = 1;
             this.tabScales.Text = "Scales";
             this.tabScales.UseVisualStyleBackColor = true;
-            // 
-            // btnRefreshScales
-            // 
             this.btnRefreshScales.Location = new System.Drawing.Point(11, 12);
-            this.btnRefreshScales.Name = "btnRefreshScales";
             this.btnRefreshScales.Size = new System.Drawing.Size(110, 25);
-            this.btnRefreshScales.TabIndex = 0;
             this.btnRefreshScales.Text = "Refresh scales";
-            this.btnRefreshScales.UseVisualStyleBackColor = true;
             this.btnRefreshScales.Click += new System.EventHandler(this.btnRefreshScales_Click);
-            // 
-            // lblScaleId
-            // 
             this.lblScaleId.AutoSize = true;
             this.lblScaleId.Location = new System.Drawing.Point(140, 18);
-            this.lblScaleId.Name = "lblScaleId";
-            this.lblScaleId.Size = new System.Drawing.Size(49, 13);
-            this.lblScaleId.TabIndex = 1;
             this.lblScaleId.Text = "Scale ID:";
-            // 
-            // nudScaleId
-            // 
             this.nudScaleId.Location = new System.Drawing.Point(195, 15);
-            this.nudScaleId.Maximum = new decimal(new int[] { 99, 0, 0, 0 });
-            this.nudScaleId.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            this.nudScaleId.Name = "nudScaleId";
+            this.nudScaleId.Minimum = 1;
+            this.nudScaleId.Maximum = 99;
+            this.nudScaleId.Value = 1;
             this.nudScaleId.Size = new System.Drawing.Size(55, 20);
-            this.nudScaleId.TabIndex = 2;
-            this.nudScaleId.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // chkEnableScaleWrites
-            // 
             this.chkEnableScaleWrites.AutoSize = true;
             this.chkEnableScaleWrites.Location = new System.Drawing.Point(270, 17);
-            this.chkEnableScaleWrites.Name = "chkEnableScaleWrites";
-            this.chkEnableScaleWrites.Size = new System.Drawing.Size(127, 17);
-            this.chkEnableScaleWrites.TabIndex = 3;
             this.chkEnableScaleWrites.Text = "Enable resend writes";
-            this.chkEnableScaleWrites.UseVisualStyleBackColor = true;
             this.chkEnableScaleWrites.CheckedChanged += new System.EventHandler(this.chkEnableScaleWrites_CheckedChanged);
-            // 
-            // btnRequestItemResend
-            // 
             this.btnRequestItemResend.Enabled = false;
             this.btnRequestItemResend.Location = new System.Drawing.Point(410, 12);
-            this.btnRequestItemResend.Name = "btnRequestItemResend";
             this.btnRequestItemResend.Size = new System.Drawing.Size(135, 25);
-            this.btnRequestItemResend.TabIndex = 4;
             this.btnRequestItemResend.Text = "Request item resend";
-            this.btnRequestItemResend.UseVisualStyleBackColor = true;
             this.btnRequestItemResend.Click += new System.EventHandler(this.btnRequestItemResend_Click);
-            // 
-            // btnRequestHotKeyResend
-            // 
             this.btnRequestHotKeyResend.Enabled = false;
             this.btnRequestHotKeyResend.Location = new System.Drawing.Point(552, 12);
-            this.btnRequestHotKeyResend.Name = "btnRequestHotKeyResend";
             this.btnRequestHotKeyResend.Size = new System.Drawing.Size(145, 25);
-            this.btnRequestHotKeyResend.TabIndex = 5;
             this.btnRequestHotKeyResend.Text = "Request HotKey resend";
-            this.btnRequestHotKeyResend.UseVisualStyleBackColor = true;
             this.btnRequestHotKeyResend.Click += new System.EventHandler(this.btnRequestHotKeyResend_Click);
-            // 
-            // lblScaleStatus
-            // 
             this.lblScaleStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblScaleStatus.AutoEllipsis = true;
             this.lblScaleStatus.Location = new System.Drawing.Point(715, 17);
-            this.lblScaleStatus.Name = "lblScaleStatus";
             this.lblScaleStatus.Size = new System.Drawing.Size(418, 30);
-            this.lblScaleStatus.TabIndex = 6;
-            this.lblScaleStatus.Text = "Ready. Resend writes only request a later eligible AutoSend cycle.";
-            // 
-            // dgvScales
-            // 
-            this.dgvScales.AllowUserToAddRows = false;
-            this.dgvScales.AllowUserToDeleteRows = false;
-            this.dgvScales.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvScales.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.dgvScales.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvScales.Location = new System.Drawing.Point(11, 55);
-            this.dgvScales.MultiSelect = false;
-            this.dgvScales.Name = "dgvScales";
-            this.dgvScales.ReadOnly = true;
-            this.dgvScales.RowHeadersVisible = false;
-            this.dgvScales.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvScales.Size = new System.Drawing.Size(1122, 551);
-            this.dgvScales.TabIndex = 7;
+            this.lblScaleStatus.Text = "Ready. Resend writes request a later eligible AutoSend cycle.";
+            ConfigureReadOnlyGrid(this.dgvScales, new System.Drawing.Point(11, 55), new System.Drawing.Size(1122, 551));
             this.dgvScales.SelectionChanged += new System.EventHandler(this.dgvScales_SelectionChanged);
-            // 
-            // MainForm
-            // 
+            // Catalog page and guard
+            this.tabCatalogPage.Controls.Add(this.tabCatalog);
+            this.tabCatalogPage.Controls.Add(this.lblCatalogWriteWarning);
+            this.tabCatalogPage.Controls.Add(this.chkEnableCatalogWrites);
+            this.tabCatalogPage.Location = new System.Drawing.Point(4, 22);
+            this.tabCatalogPage.Padding = new System.Windows.Forms.Padding(8);
+            this.tabCatalogPage.Size = new System.Drawing.Size(1148, 619);
+            this.tabCatalogPage.Text = "Catalog";
+            this.tabCatalogPage.UseVisualStyleBackColor = true;
+            this.chkEnableCatalogWrites.AutoSize = true;
+            this.chkEnableCatalogWrites.Location = new System.Drawing.Point(12, 15);
+            this.chkEnableCatalogWrites.Text = "Enable catalog writes";
+            this.chkEnableCatalogWrites.CheckedChanged += new System.EventHandler(this.chkEnableCatalogWrites_CheckedChanged);
+            this.lblCatalogWriteWarning.AutoSize = true;
+            this.lblCatalogWriteWarning.Location = new System.Drawing.Point(170, 16);
+            this.lblCatalogWriteWarning.Text = "Writes are disabled by default. Item update preserves unedited fields; delete is logical, not physical.";
+            this.tabCatalog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabCatalog.Controls.Add(this.tabStores);
+            this.tabCatalog.Controls.Add(this.tabGroups);
+            this.tabCatalog.Controls.Add(this.tabItems);
+            this.tabCatalog.Location = new System.Drawing.Point(11, 42);
+            this.tabCatalog.Size = new System.Drawing.Size(1126, 565);
+            // Stores
+            this.tabStores.Controls.Add(this.dgvStores);
+            this.tabStores.Controls.Add(this.lblStoreStatus);
+            this.tabStores.Controls.Add(this.btnUpsertStore);
+            this.tabStores.Controls.Add(this.txtStoreDescription);
+            this.tabStores.Controls.Add(this.lblStoreDescription);
+            this.tabStores.Controls.Add(this.txtStoreName);
+            this.tabStores.Controls.Add(this.lblStoreName);
+            this.tabStores.Controls.Add(this.txtStoreCode);
+            this.tabStores.Controls.Add(this.lblStoreCode);
+            this.tabStores.Controls.Add(this.btnRefreshStores);
+            this.tabStores.Text = "Stores";
+            this.tabStores.UseVisualStyleBackColor = true;
+            this.btnRefreshStores.Location = new System.Drawing.Point(10, 10);
+            this.btnRefreshStores.Size = new System.Drawing.Size(100, 25);
+            this.btnRefreshStores.Text = "Refresh stores";
+            this.btnRefreshStores.Click += new System.EventHandler(this.btnRefreshStores_Click);
+            this.lblStoreCode.AutoSize = true;
+            this.lblStoreCode.Location = new System.Drawing.Point(125, 16);
+            this.lblStoreCode.Text = "Code:";
+            this.txtStoreCode.Location = new System.Drawing.Point(165, 13);
+            this.txtStoreCode.MaxLength = 50;
+            this.txtStoreCode.Size = new System.Drawing.Size(95, 20);
+            this.lblStoreName.AutoSize = true;
+            this.lblStoreName.Location = new System.Drawing.Point(275, 16);
+            this.lblStoreName.Text = "Name:";
+            this.txtStoreName.Location = new System.Drawing.Point(320, 13);
+            this.txtStoreName.MaxLength = 100;
+            this.txtStoreName.Size = new System.Drawing.Size(170, 20);
+            this.lblStoreDescription.AutoSize = true;
+            this.lblStoreDescription.Location = new System.Drawing.Point(505, 16);
+            this.lblStoreDescription.Text = "Description:";
+            this.txtStoreDescription.Location = new System.Drawing.Point(575, 13);
+            this.txtStoreDescription.MaxLength = 150;
+            this.txtStoreDescription.Size = new System.Drawing.Size(220, 20);
+            this.btnUpsertStore.Enabled = false;
+            this.btnUpsertStore.Location = new System.Drawing.Point(810, 10);
+            this.btnUpsertStore.Size = new System.Drawing.Size(95, 25);
+            this.btnUpsertStore.Text = "Upsert store";
+            this.btnUpsertStore.Click += new System.EventHandler(this.btnUpsertStore_Click);
+            this.lblStoreStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblStoreStatus.Location = new System.Drawing.Point(920, 16);
+            this.lblStoreStatus.Size = new System.Drawing.Size(185, 30);
+            this.lblStoreStatus.Text = "Ready";
+            ConfigureReadOnlyGrid(this.dgvStores, new System.Drawing.Point(10, 48), new System.Drawing.Size(1095, 480));
+            this.dgvStores.SelectionChanged += new System.EventHandler(this.dgvStores_SelectionChanged);
+            // Groups
+            this.tabGroups.Controls.Add(this.dgvGroups);
+            this.tabGroups.Controls.Add(this.lblGroupStatus);
+            this.tabGroups.Controls.Add(this.btnUpsertGroup);
+            this.tabGroups.Controls.Add(this.txtGroupDescription);
+            this.tabGroups.Controls.Add(this.lblGroupDescription);
+            this.tabGroups.Controls.Add(this.txtGroupName);
+            this.tabGroups.Controls.Add(this.lblGroupName);
+            this.tabGroups.Controls.Add(this.txtGroupCode);
+            this.tabGroups.Controls.Add(this.lblGroupCode);
+            this.tabGroups.Controls.Add(this.btnRefreshGroups);
+            this.tabGroups.Text = "Groups";
+            this.tabGroups.UseVisualStyleBackColor = true;
+            this.btnRefreshGroups.Location = new System.Drawing.Point(10, 10);
+            this.btnRefreshGroups.Size = new System.Drawing.Size(100, 25);
+            this.btnRefreshGroups.Text = "Refresh groups";
+            this.btnRefreshGroups.Click += new System.EventHandler(this.btnRefreshGroups_Click);
+            this.lblGroupCode.AutoSize = true;
+            this.lblGroupCode.Location = new System.Drawing.Point(125, 16);
+            this.lblGroupCode.Text = "Code:";
+            this.txtGroupCode.Location = new System.Drawing.Point(165, 13);
+            this.txtGroupCode.MaxLength = 50;
+            this.txtGroupCode.Size = new System.Drawing.Size(95, 20);
+            this.lblGroupName.AutoSize = true;
+            this.lblGroupName.Location = new System.Drawing.Point(275, 16);
+            this.lblGroupName.Text = "Name:";
+            this.txtGroupName.Location = new System.Drawing.Point(320, 13);
+            this.txtGroupName.MaxLength = 100;
+            this.txtGroupName.Size = new System.Drawing.Size(170, 20);
+            this.lblGroupDescription.AutoSize = true;
+            this.lblGroupDescription.Location = new System.Drawing.Point(505, 16);
+            this.lblGroupDescription.Text = "Description:";
+            this.txtGroupDescription.Location = new System.Drawing.Point(575, 13);
+            this.txtGroupDescription.MaxLength = 150;
+            this.txtGroupDescription.Size = new System.Drawing.Size(220, 20);
+            this.btnUpsertGroup.Enabled = false;
+            this.btnUpsertGroup.Location = new System.Drawing.Point(810, 10);
+            this.btnUpsertGroup.Size = new System.Drawing.Size(95, 25);
+            this.btnUpsertGroup.Text = "Upsert group";
+            this.btnUpsertGroup.Click += new System.EventHandler(this.btnUpsertGroup_Click);
+            this.lblGroupStatus.Location = new System.Drawing.Point(920, 16);
+            this.lblGroupStatus.Size = new System.Drawing.Size(185, 30);
+            this.lblGroupStatus.Text = "Ready";
+            ConfigureReadOnlyGrid(this.dgvGroups, new System.Drawing.Point(10, 48), new System.Drawing.Size(1095, 480));
+            this.dgvGroups.SelectionChanged += new System.EventHandler(this.dgvGroups_SelectionChanged);
+            // Items
+            this.tabItems.Controls.Add(this.splitCatalogItems);
+            this.tabItems.Controls.Add(this.lblItemStatus);
+            this.tabItems.Controls.Add(this.btnLoadPriceHistory);
+            this.tabItems.Controls.Add(this.btnSoftDeleteItem);
+            this.tabItems.Controls.Add(this.btnUpsertItem);
+            this.tabItems.Controls.Add(this.nudItemPrice);
+            this.tabItems.Controls.Add(this.lblItemPrice);
+            this.tabItems.Controls.Add(this.txtItemName);
+            this.tabItems.Controls.Add(this.lblItemName);
+            this.tabItems.Controls.Add(this.txtItemGroup);
+            this.tabItems.Controls.Add(this.lblItemGroup);
+            this.tabItems.Controls.Add(this.nudItemPlu);
+            this.tabItems.Controls.Add(this.lblItemPlu);
+            this.tabItems.Controls.Add(this.chkIncludeDeletedItems);
+            this.tabItems.Controls.Add(this.btnRefreshCatalogItems);
+            this.tabItems.Text = "Items";
+            this.tabItems.UseVisualStyleBackColor = true;
+            this.btnRefreshCatalogItems.Location = new System.Drawing.Point(10, 10);
+            this.btnRefreshCatalogItems.Size = new System.Drawing.Size(95, 25);
+            this.btnRefreshCatalogItems.Text = "Refresh items";
+            this.btnRefreshCatalogItems.Click += new System.EventHandler(this.btnRefreshCatalogItems_Click);
+            this.chkIncludeDeletedItems.AutoSize = true;
+            this.chkIncludeDeletedItems.Location = new System.Drawing.Point(115, 15);
+            this.chkIncludeDeletedItems.Text = "Include deleted";
+            this.lblItemPlu.AutoSize = true;
+            this.lblItemPlu.Location = new System.Drawing.Point(225, 16);
+            this.lblItemPlu.Text = "PLU:";
+            this.nudItemPlu.Location = new System.Drawing.Point(255, 13);
+            this.nudItemPlu.Minimum = 1;
+            this.nudItemPlu.Maximum = 2147483647;
+            this.nudItemPlu.Value = 1;
+            this.nudItemPlu.Size = new System.Drawing.Size(90, 20);
+            this.lblItemGroup.AutoSize = true;
+            this.lblItemGroup.Location = new System.Drawing.Point(355, 16);
+            this.lblItemGroup.Text = "Group:";
+            this.txtItemGroup.Location = new System.Drawing.Point(400, 13);
+            this.txtItemGroup.MaxLength = 50;
+            this.txtItemGroup.Text = "0";
+            this.txtItemGroup.Size = new System.Drawing.Size(80, 20);
+            this.lblItemName.AutoSize = true;
+            this.lblItemName.Location = new System.Drawing.Point(490, 16);
+            this.lblItemName.Text = "Name:";
+            this.txtItemName.Location = new System.Drawing.Point(535, 13);
+            this.txtItemName.MaxLength = 100;
+            this.txtItemName.Size = new System.Drawing.Size(145, 20);
+            this.lblItemPrice.AutoSize = true;
+            this.lblItemPrice.Location = new System.Drawing.Point(690, 16);
+            this.lblItemPrice.Text = "Price:";
+            this.nudItemPrice.Location = new System.Drawing.Point(730, 13);
+            this.nudItemPrice.Maximum = 2147483647;
+            this.nudItemPrice.Size = new System.Drawing.Size(95, 20);
+            this.btnUpsertItem.Enabled = false;
+            this.btnUpsertItem.Location = new System.Drawing.Point(835, 10);
+            this.btnUpsertItem.Size = new System.Drawing.Size(80, 25);
+            this.btnUpsertItem.Text = "Upsert";
+            this.btnUpsertItem.Click += new System.EventHandler(this.btnUpsertItem_Click);
+            this.btnSoftDeleteItem.Enabled = false;
+            this.btnSoftDeleteItem.Location = new System.Drawing.Point(920, 10);
+            this.btnSoftDeleteItem.Size = new System.Drawing.Size(85, 25);
+            this.btnSoftDeleteItem.Text = "Soft delete";
+            this.btnSoftDeleteItem.Click += new System.EventHandler(this.btnSoftDeleteItem_Click);
+            this.btnLoadPriceHistory.Location = new System.Drawing.Point(1010, 10);
+            this.btnLoadPriceHistory.Size = new System.Drawing.Size(95, 25);
+            this.btnLoadPriceHistory.Text = "Price history";
+            this.btnLoadPriceHistory.Click += new System.EventHandler(this.btnLoadPriceHistory_Click);
+            this.lblItemStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblItemStatus.Location = new System.Drawing.Point(10, 42);
+            this.lblItemStatus.Size = new System.Drawing.Size(1095, 20);
+            this.lblItemStatus.Text = "Ready";
+            this.splitCatalogItems.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitCatalogItems.Location = new System.Drawing.Point(10, 65);
+            this.splitCatalogItems.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.splitCatalogItems.Size = new System.Drawing.Size(1095, 463);
+            this.splitCatalogItems.SplitterDistance = 285;
+            this.splitCatalogItems.Panel1.Controls.Add(this.dgvCatalogItems);
+            this.splitCatalogItems.Panel1.Controls.Add(this.lblCatalogItems);
+            this.splitCatalogItems.Panel2.Controls.Add(this.dgvPriceHistory);
+            this.splitCatalogItems.Panel2.Controls.Add(this.lblPriceHistory);
+            this.lblCatalogItems.AutoSize = true;
+            this.lblCatalogItems.Location = new System.Drawing.Point(0, 4);
+            this.lblCatalogItems.Text = "Catalog items";
+            this.lblPriceHistory.AutoSize = true;
+            this.lblPriceHistory.Location = new System.Drawing.Point(0, 4);
+            this.lblPriceHistory.Text = "Price history (read-only)";
+            ConfigureReadOnlyGrid(this.dgvCatalogItems, new System.Drawing.Point(0, 23), new System.Drawing.Size(1095, 262));
+            this.dgvCatalogItems.SelectionChanged += new System.EventHandler(this.dgvCatalogItems_SelectionChanged);
+            ConfigureReadOnlyGrid(this.dgvPriceHistory, new System.Drawing.Point(0, 23), new System.Drawing.Size(1095, 155));
+            // Form
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1180, 700);
@@ -384,13 +530,49 @@ namespace SadrScales.Integration.SampleApp
             ((System.ComponentModel.ISupportInitialize)(this.splitInvoice)).EndInit();
             this.splitInvoice.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvInvoice)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvItems)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvInvoiceItems)).EndInit();
             this.tabScales.ResumeLayout(false);
             this.tabScales.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvScales)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudScaleId)).EndInit();
+            this.tabCatalogPage.ResumeLayout(false);
+            this.tabCatalogPage.PerformLayout();
+            this.tabCatalog.ResumeLayout(false);
+            this.tabStores.ResumeLayout(false);
+            this.tabStores.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvStores)).EndInit();
+            this.tabGroups.ResumeLayout(false);
+            this.tabGroups.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvGroups)).EndInit();
+            this.tabItems.ResumeLayout(false);
+            this.tabItems.PerformLayout();
+            this.splitCatalogItems.Panel1.ResumeLayout(false);
+            this.splitCatalogItems.Panel1.PerformLayout();
+            this.splitCatalogItems.Panel2.ResumeLayout(false);
+            this.splitCatalogItems.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitCatalogItems)).EndInit();
+            this.splitCatalogItems.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvCatalogItems)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPriceHistory)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudItemPrice)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudItemPlu)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+        }
+
+        private static void ConfigureReadOnlyGrid(System.Windows.Forms.DataGridView grid, System.Drawing.Point location, System.Drawing.Size size)
+        {
+            grid.AllowUserToAddRows = false;
+            grid.AllowUserToDeleteRows = false;
+            grid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
+            grid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            grid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            grid.Location = location;
+            grid.MultiSelect = false;
+            grid.ReadOnly = true;
+            grid.RowHeadersVisible = false;
+            grid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            grid.Size = size;
         }
 
         #endregion

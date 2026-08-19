@@ -80,55 +80,51 @@ Reports
 
 ### Slice 1 — Structured Invoice + ACK
 
-Completed:
+Completed and merged:
 
-- `client.Invoices.GetByBarcodeAsync(totalBarcode)`;
-- `client.Invoices.GetAsync(scaleId, fid)`;
+- structured lookup by TotalBarcode and ScaleID + FID;
 - explicit idempotent ACK;
 - `FoundUnread / AlreadyRead / NotFound`;
 - full invoice remains available after ACK;
-- Raw SQL recipe;
-- Persian and English documentation;
-- WinForms Developer Sample Invoices tab;
-- disposable SQL Server tests;
-- .NET Framework 4.8 package-consumer coverage.
+- Raw SQL recipe, Persian/English docs and Invoices Sample flow;
+- disposable SQL Server and .NET Framework 4.8 package-consumer coverage.
 
 ### Slice 2 — Scales + Status + Resend
 
-Completed on the active Vendor-Ready branch and pending final green CI/merge:
+Completed and merged:
 
-- `client.Scales.GetAllAsync()`;
-- `client.Scales.GetAsync(scaleId)`;
-- `client.Scales.GetStatusAsync(scaleId)`;
+- `client.Scales.GetAllAsync()` / `GetAsync()` / `GetStatusAsync()`;
 - public `Online / Offline / Unknown` status mapping;
-- static scale metadata for third-party software;
-- `RequestItemResendAsync(scaleId)` without exposing `LastSendItem`;
-- `RequestHotKeyResendAsync(scaleId)` without exposing `LastSendKey`;
+- static scale metadata;
+- Item and supported HotKey AutoSend resend requests without exposing internal watermarks;
 - `Requested / NotFound / UnsupportedModel` results;
-- PLUS HotKey resend rejects unsupported automatic behavior instead of reporting false success;
-- Raw SQL recipe with writes disabled by default;
-- Persian and English documentation;
-- WinForms Developer Sample Scales tab with guarded resend writes;
-- disposable SQL Server tests;
-- .NET Framework 4.8 package-consumer coverage.
+- Raw SQL recipe, Persian/English docs and Scales Sample flow;
+- disposable SQL Server and .NET Framework 4.8 coverage.
 
 `Requested` always means the resend state was recorded for a later eligible AutoSend cycle; it is not a physical-device completion result.
+
+### Slice 3 — Stores + Catalog completion
+
+Completed on PR #17 and pending final exact-head CI/merge:
+
+- Store read/upsert with `StoreCode` as stable identity;
+- Item Group read/list plus existing semantic upsert;
+- Item read/list with active-only default and optional include-deleted mode;
+- idempotent `SoftDeleteAsync` using `DeleteFlag = 1`, never physical item deletion;
+- logically deleted rows remain individually readable for recovery/inspection;
+- Price History read by PLU and recent-list read, newest first;
+- Price History remains read-only; no new automatic PriceLog rule is invented;
+- `SadrItemClient` split into partial write vs read/delete/history responsibilities;
+- disposable SQL Server tests for Store, Group, Item, soft-delete and Price History semantics;
+- .NET Framework 4.8 public-surface coverage;
+- Raw SQL catalog recipe with writes disabled by default;
+- Persian and English Catalog documentation;
+- WinForms Developer Sample Catalog area with Stores, Groups and Items pages;
+- catalog writes disabled by default; Item update preserves non-edited fields before upsert.
 
 The next additive package version remains frozen as `1.1.0`. Historical `v1.0.0` remains immutable.
 
 ## Next implementation slices
-
-### Slice 3 — Stores + Catalog completion
-
-Target:
-
-- Store read/upsert;
-- Item Group read/upsert completion;
-- Item/PLU read APIs in addition to the existing write APIs;
-- supported soft-delete semantics;
-- Price History read;
-- Raw SQL examples and disposable SQL tests;
-- Stores/Groups/Items pages in the same WinForms Developer Sample.
 
 ### Slice 4 — Scale Assignments + Mapping + HotKeys
 
@@ -139,7 +135,7 @@ Target:
 - group HotKey templates;
 - validation/replace semantics matching Sadr Scales 5.2.1;
 - resend-state behavior kept internal to SDK implementation;
-- Sample + SQL tests + docs.
+- Sample + Raw SQL + SQL tests + docs.
 
 ### Slice 5 — Sales Query + Reports
 
