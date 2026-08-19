@@ -5,6 +5,7 @@ using SadrScales.Integration;
 using SadrScales.Integration.Invoices;
 using SadrScales.Integration.Items;
 using SadrScales.Integration.Sales;
+using SadrScales.Integration.Scales;
 
 namespace SadrScales.Integration.Net48Consumer
 {
@@ -33,6 +34,7 @@ namespace SadrScales.Integration.Net48Consumer
                 Assert(client.Items != null, "Items API was not created.");
                 Assert(client.Sales != null, "Sales API was not created.");
                 Assert(client.Invoices != null, "Invoices API was not created.");
+                Assert(client.Scales != null, "Scales API was not created.");
 
                 var group = new SadrItemGroup
                 {
@@ -57,6 +59,10 @@ namespace SadrScales.Integration.Net48Consumer
                 Assert(typeof(SadrInvoiceLookupResult).IsPublic, "Invoice lookup result public type is unavailable.");
                 Assert(typeof(SadrInvoice).IsPublic, "Structured invoice public type is unavailable.");
                 Assert(typeof(SadrInvoiceItem).IsPublic, "Structured invoice item public type is unavailable.");
+
+                Assert(typeof(SadrScale).IsPublic, "Scale public model is unavailable.");
+                Assert(typeof(SadrScaleStatus).IsPublic, "Scale status public enum is unavailable.");
+                Assert(typeof(SadrResendRequestResult).IsPublic, "Resend request result public enum is unavailable.");
 
                 // The SDK package depends on Microsoft.Data.SqlClient. Loading the referenced assembly proves
                 // that the restored net48 application has a compatible provider asset/dependency graph.
