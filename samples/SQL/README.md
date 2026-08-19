@@ -15,6 +15,7 @@ These three samples belong to the already-published basic SQL Contract v1 surfac
 4. [`03-structured-invoice-lookup-ack.sql`](03-structured-invoice-lookup-ack.sql) — structured invoice lookup plus optional explicit invoice ACK.
 5. [`04-scale-status-resend.sql`](04-scale-status-resend.sql) — registered-scale/status read plus explicitly enabled Item/HotKey AutoSend resend requests.
 6. [`05-catalog.sql`](05-catalog.sql) — stores, groups, active/all item semantics, logical delete and read-only price history.
+7. [`06-assignments-mapping-hotkeys.sql`](06-assignments-mapping-hotkeys.sql) — scale-group assignments, per-scale item mapping and user-managed group HotKey templates.
 
 The Vendor-Ready samples are additive and are being prepared for `1.1.0`. They do not change the historical `v1.0.0` tag or its frozen Contract v1 behavior.
 
@@ -102,6 +103,24 @@ When writes are explicitly enabled, the sample demonstrates a Store upsert and a
 
 The existing [`01-upsert-item.sql`](01-upsert-item.sql) remains the full Item Group + PLU upsert example. Price History remains read-only in the 1.1.0 Vendor-Ready contract; the Integration SDK does not invent a rule that every external price update must create a PriceLog row.
 
+### `06-assignments-mapping-hotkeys.sql`
+
+Default behavior is read-only because `@ApplyChanges = 0`:
+
+- reads canonical item-group assignments for one scale;
+- reads that scale's item mapping;
+- reads positive-PLU user HotKeys for one group;
+- changes no configuration.
+
+With writes explicitly enabled, the sample demonstrates full transactional replacements. Individual write families have separate flags so a developer cannot accidentally replace all three areas at once.
+
+Important semantics:
+
+- Assignment replacement resets the selected scale's Item AutoSend state.
+- Per-scale mapping replacement validates the scale HotKey layout and resets both Item and HotKey AutoSend state.
+- Group HotKey replacement removes/replaces only positive-PLU user rows. Zero/negative internal/system rows are preserved.
+- A group HotKey change resets HotKey AutoSend state only for scales canonically assigned to that group.
+
 ## Application-code rule
 
 The local T-SQL variables in these files exist only so a developer can safely inspect/run a sample in SSMS. Real application code must use parameterized commands rather than building SQL through string concatenation.
@@ -110,4 +129,4 @@ The local T-SQL variables in these files exist only so a developer can safely in
 
 The public samples do not expose or write direct device protocol packets/opcodes, private keys, customer data or arbitrary Runtime commands.
 
-The sanctioned Vendor-Ready writes are narrowly defined business operations such as invoice ACK, AutoSend resend requests, catalog upserts and logical item delete; internal protocol/runtime state remains private.
+The sanctioned Vendor-Ready writes are narrowly defined business operations such as invoice ACK, AutoSend resend requests, catalog upserts, logical item delete and validated configuration replacement; internal protocol/runtime state remains private.

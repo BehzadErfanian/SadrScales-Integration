@@ -49,10 +49,12 @@ Sadr Scales 5.3 features must not delay this baseline.
 - Item AutoSend resend request uses `LastSendItem = 0`.
 - HotKey AutoSend resend request uses `LastSendKey = 0` where supported.
 - Resend request success means the DB resend state was recorded; it does not mean the physical scale already received the data.
+- Canonical multi-group scale assignment is `SADR_ScaleItemClass`; the public SDK hides that table behind `ScaleAssignments`.
+- Per-scale item mapping and group HotKey templates are separate concepts and separate public clients.
+- Public group HotKey APIs manage only positive-PLU user rows; zero/negative internal/system rows remain private and are preserved.
+- Replace-style configuration operations are atomic. An `Unchanged` operation does not create a new resend request.
 - A per-scale typed Command Mailbox is planned for **Sadr Scales 5.3**, not for the immediate 5.2.1 Vendor-Ready release.
 - Service/REST can later become another transport over the same Command Domain.
-
-These decisions are recorded in `docs/DECISIONS.md` through D-030.
 
 ## Vendor-Ready 5.2.1 SQL scope
 
@@ -105,7 +107,7 @@ Completed and merged:
 
 ### Slice 3 — Stores + Catalog completion
 
-Completed on PR #17 and pending final exact-head CI/merge:
+Completed and merged on PR #17:
 
 - Store read/upsert with `StoreCode` as stable identity;
 - Item Group read/list plus existing semantic upsert;
@@ -115,27 +117,35 @@ Completed on PR #17 and pending final exact-head CI/merge:
 - Price History read by PLU and recent-list read, newest first;
 - Price History remains read-only; no new automatic PriceLog rule is invented;
 - `SadrItemClient` split into partial write vs read/delete/history responsibilities;
-- disposable SQL Server tests for Store, Group, Item, soft-delete and Price History semantics;
+- Raw SQL catalog recipe, Persian/English docs and Catalog Sample pages;
+- disposable SQL Server tests and .NET Framework 4.8 public-surface coverage;
+- Item update Sample preserves non-edited PLU fields before upsert.
+
+### Slice 4 — Scale Assignments + Mapping + HotKeys
+
+Implemented on PR #18 and pending final exact-head CI/merge:
+
+- `client.ScaleAssignments.GetGroupsAsync(scaleId)`;
+- atomic `ReplaceGroupsAsync` with `NotFound / Unchanged / Replaced`;
+- assignment changes reset Item AutoSend state only when the assignment actually changes;
+- `client.ScaleMappings.GetAsync(scaleId)`;
+- atomic `ReplaceAsync` and validated `CopyAsync` for per-scale mapping;
+- mapping validation covers duplicate PLU, duplicate per-scale ItemCode, duplicate HotKey position, Page/Key pairing and persisted scale HotKey layout;
+- incompatible Copy leaves the destination unchanged;
+- real mapping changes reset Item + HotKey AutoSend state;
+- `client.HotKeys.GetGroupAsync()` / `ReplaceGroupAsync()` for user-managed group templates;
+- public HotKey API hides and preserves zero/negative internal/system rows;
+- real group HotKey changes reset HotKey AutoSend state only for scales assigned to that group;
+- unchanged configuration does not create a new resend request;
+- guarded Raw SQL reference with writes disabled by default;
+- Persian and English configuration guides;
 - .NET Framework 4.8 public-surface coverage;
-- Raw SQL catalog recipe with writes disabled by default;
-- Persian and English Catalog documentation;
-- WinForms Developer Sample Catalog area with Stores, Groups and Items pages;
-- catalog writes disabled by default; Item update preserves non-edited fields before upsert.
+- WinForms Developer Sample configuration area with separate Assignments, Mapping and HotKeys flows;
+- disposable SQL Server tests cover transaction/recovery semantics and system-row preservation.
 
 The next additive package version remains frozen as `1.1.0`. Historical `v1.0.0` remains immutable.
 
 ## Next implementation slices
-
-### Slice 4 — Scale Assignments + Mapping + HotKeys
-
-Target:
-
-- canonical multi-group scale assignment;
-- Scale Item Mapping;
-- group HotKey templates;
-- validation/replace semantics matching Sadr Scales 5.2.1;
-- resend-state behavior kept internal to SDK implementation;
-- Sample + Raw SQL + SQL tests + docs.
 
 ### Slice 5 — Sales Query + Reports
 
@@ -144,7 +154,7 @@ Target:
 - filtered/paged sales query;
 - summary totals;
 - daily, scale and item reports;
-- Sample + SQL tests + docs.
+- Sample + Raw SQL + SQL tests + docs.
 
 ### Slice 6 — Demo Data + Vendor Acceptance + RC
 
