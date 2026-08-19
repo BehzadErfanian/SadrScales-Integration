@@ -8,7 +8,7 @@ The application intentionally grows one tested capability at a time instead of c
 
 Enter the Sadr Scales SQL connection string at the top of the form, or set `SADR_SCALES_CONNECTION_STRING` before launch.
 
-The current application contains **Invoices**, **Scales** and **Catalog** areas that use the same connection.
+The current application contains **Invoices**, **Scales**, **Catalog** and **Assignments / Mapping / HotKeys** areas that use the same connection.
 
 ## Invoices tab
 
@@ -57,6 +57,41 @@ Catalog has nested **Stores**, **Groups** and **Items** pages plus one shared **
 - A deleted PLU can still be inspected/recovered through the SDK.
 - **Price history** is read-only and loads recent history for the selected PLU.
 
+## Assignments / Mapping / HotKeys
+
+This area demonstrates three different configuration concepts and deliberately keeps them separate.
+
+### Scale Assignments
+
+- Enter a Scale ID and load its canonical item groups.
+- The desired replacement list is entered as comma-separated group codes.
+- **Replace groups** is a complete atomic replacement, not an incremental add/remove operation.
+- A real change requests Item AutoSend re-evaluation for the scale.
+- Repeating the same assignment returns `Unchanged` and does not create a fresh resend request.
+
+### Scale Mapping
+
+- Load one scale's complete PLU/ItemCode mapping.
+- Edit the staging grid, then use **Replace mapping** to atomically replace the complete map.
+- `PageNo` and `KeyNo` are optional, but when used they must both be populated and fit the target scale's configured HotKey layout.
+- Duplicate PLUs, ItemCodes and HotKey positions are rejected.
+- **Copy mapping** validates the destination layout before replacing it; incompatible copies leave the destination untouched.
+- A real mapping change requests both Item and HotKey AutoSend re-evaluation.
+
+### Group HotKeys
+
+- Enter an item-group code and load the user-managed HotKey template.
+- The grid intentionally shows only positive-PLU user keys.
+- Zero/negative internal/system rows are hidden and preserved during replacement.
+- **Replace HotKeys** atomically replaces the user-managed template for the selected group.
+- A real change requests HotKey AutoSend re-evaluation only for scales canonically assigned to that group.
+
+### Configuration write safety
+
+All Replace/Copy operations remain disabled until **Enable configuration writes** is selected, and each write requires an explicit confirmation.
+
+`Replaced` means the SQL configuration committed successfully. It does **not** mean a physical scale already received the new configuration. Actual transfer is performed later by an eligible Sadr Scales AutoSend cycle.
+
 ## Write-safety rule
 
 The Sample App is a reference tool, not a production administration console. Every current write family has an explicit guard, and higher-impact operations also require confirmation.
@@ -76,4 +111,4 @@ The public sample does not contain customer credentials, direct scale protocols,
 
 ## Planned growth
 
-The next slices add Scale Assignments/Mapping/HotKeys, then Sales/Reports, then seeded Demo Data and the final external-developer acceptance flow to this same application.
+The next slice adds **Sales Query + Reports**. The final Vendor-Ready slice adds seeded Demo Data, a production-database guard, the external-developer acceptance flow and `1.1.0` RC cleanup to this same application.
