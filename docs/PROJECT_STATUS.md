@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
-**Last updated:** 2026-08-18  
-**Phase:** Phase 1 — Full Integration Surface Audit completed on branch; maintainer review pending  
+**Last updated:** 2026-08-19  
+**Phase:** Phase 2 — Contract & Domain Design drafted; owner/maintainer review pending  
 **Current stable release:** `v1.0.0`  
 **Supported Sadr Scales baseline:** `5.2.1`  
 **Current published integration contract:** `SQL Contract v1`
@@ -12,17 +12,36 @@ The accepted future direction is recorded in:
 
 - `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`
 
-The Phase 1 audit is recorded in:
+The completed Phase 1 audit is recorded in:
 
 - `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`
 
+The Phase 2 design under review is recorded in:
+
+- `.github/maintainers/INTEGRATION_CONTRACT_DOMAIN_DESIGN_FA.md`
+
 The master plan remains the canonical source for the product goal, completeness-first priorities, repository simplification, transport-independent domain design, coding/comment/region rules, testing strategy, Developer Sample App, seeded/random demo-data generation, internal simulator completion, protected public scale emulator, POS simulator and full single-PC Integration Lab.
 
-The audit maps the externally useful Sadr Scales 5.2.1 surface into Safe Data Contract, Managed Runtime Command and Internal / Do Not Expose categories. It also records the design gaps that must be resolved before a new public Contract/API is implemented.
+The existing `v1.0.0` release remains immutable and valid for its published Basic SQL Contract. The next public version number is intentionally undecided until the new Contract/API compatibility design is accepted.
 
-The existing `v1.0.0` release remains immutable and valid for its published Basic SQL Contract. The next public version number is intentionally undecided until the new Contract/API compatibility design is complete.
+**Next exact step:** owner/maintainer review of the Phase 2 Contract & Domain Design. Do not implement large new Public SDK clients or Runtime transport code until the Phase 2 decisions are accepted.
 
-**Next exact step:** maintainer/owner review of the Phase 1 audit. After acceptance, begin Phase 2 Contract & Domain Design. Do not add large new Public SDK clients before the Phase 2 decisions are accepted.
+## Current Phase 2 proposal
+
+The design under review establishes these proposed boundaries:
+
+- one transport-independent Integration Domain;
+- Direct SQL limited to a documented Safe Data surface;
+- Scale lifecycle and live status as Managed Runtime operations;
+- `StoreCode` as the Store identity and Scale-to-Store relation;
+- `SADR_ScaleItemClass` as the canonical multi-group assignment source;
+- per-scale item mapping separated from group-level HotKey templates;
+- destination-owned sales cursor retained, with no public invoice Ack in the base vNext contract;
+- typed Runtime commands with no raw protocol passthrough;
+- firmware/file/label transfer excluded from the default public surface pending separate security/API review;
+- additive migration from `v1.0.0` rather than silent mutation of SQL Contract v1.
+
+These are not yet recorded as Accepted decisions in `docs/DECISIONS.md`; acceptance occurs only after owner/maintainer review.
 
 ## Stable release identity
 
@@ -140,16 +159,14 @@ NuGet.org publication remains a separate decision because it requires package-ac
 
 `v1.0.0` does not expose direct device protocols, packet captures, private firmware/vendor data, customer data, private keys or internal Sadr Scales runtime source.
 
-Its Basic SQL Contract is intentionally narrower than the accepted long-term Integration Platform goal. The Phase 1 audit documents that gap explicitly; future work must address it through Contract/Domain design rather than silently changing the published v1 contract.
+Its Basic SQL Contract remains frozen. Phase 2 defines a possible broader future surface without modifying the published v1 contract.
 
-## Phase 1 audit result
+## Phase 1 result
 
-The audit confirms that the useful integration surface is substantially broader than the v1 Basic SQL Contract. Important surfaces include stores, scale configuration, live runtime state, scale/group/item assignments, hot keys, structured invoices, aggregate-barcode lookup, sales query/reporting and managed device commands.
+Phase 1 established the full externally useful surface of Sadr Scales 5.2.1 and classified it into Safe Data Contract, Managed Runtime Command and Internal / Do Not Expose categories.
 
-It also confirms that some operations must not be exposed as raw SQL merely because tables exist. Scale lifecycle and live device operations require Runtime orchestration; internal sync/migration/recovery/protocol state remains private.
-
-Open design gates are listed in `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md` and must be resolved in Phase 2 before implementation.
+The audit also identified the main design gaps resolved provisionally in the Phase 2 proposal: Store identity, multi-group semantics, mapping vs HotKey, invoice acknowledgement, live status source and the Runtime command boundary.
 
 ## Handoff rule
 
-A future session begins with `AGENTS.md`, then `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`, then `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`, then this status file and only the current-state/contract references relevant to the task.
+A future session begins with `AGENTS.md`, then `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`, then `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`, then `.github/maintainers/INTEGRATION_CONTRACT_DOMAIN_DESIGN_FA.md`, then this status file and only the current-state/contract references relevant to the task.
