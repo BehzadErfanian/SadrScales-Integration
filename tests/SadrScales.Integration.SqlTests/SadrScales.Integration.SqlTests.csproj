@@ -15,5 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/SadrScales.Integration/SadrScales.Integration.csproj" />
+    <ProjectReference Include="../../samples/csharp/SadrScales.Integration.DemoLab/SadrScales.Integration.DemoLab.csproj" />
   </ItemGroup>
 </Project>
