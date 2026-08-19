@@ -23,8 +23,6 @@ Chat history is not the project source of truth.
 
 The next software-vendor outreach must happen only after a **Vendor-Ready Stable Baseline** is complete.
 
-The current objective is:
-
 ```text
 Complete 5.2.1 SQL Integration
         ↓
@@ -39,7 +37,7 @@ One serious vendor outreach / letter
 
 Sadr Scales 5.3 features must not delay this baseline.
 
-## Owner-confirmed Phase 2 decisions
+## Frozen integration decisions
 
 - SQL remains the current third-party integration transport for Sadr Scales 5.2.1.
 - `SADR_Scale.Status` is the supported SQL source for coarse Online/Offline state.
@@ -57,8 +55,6 @@ Sadr Scales 5.3 features must not delay this baseline.
 These decisions are recorded in `docs/DECISIONS.md` through D-030.
 
 ## Vendor-Ready 5.2.1 SQL scope
-
-The implementation target covers:
 
 ```text
 Connection/schema validation
@@ -84,36 +80,86 @@ Reports
 
 ### Slice 1 — Structured Invoice + ACK
 
-Implemented and covered by disposable SQL Server integration tests:
+Completed:
 
 - `client.Invoices.GetByBarcodeAsync(totalBarcode)`;
 - `client.Invoices.GetAsync(scaleId, fid)`;
-- `client.Invoices.AcknowledgeAsync(totalBarcode)`;
-- `client.Invoices.AcknowledgeAsync(scaleId, fid)`;
-- `FoundUnread / AlreadyRead / NotFound` lookup semantics;
-- `Acknowledged / AlreadyAcknowledged / NotFound` ACK semantics;
-- full invoice data remains available after ACK;
-- Raw SQL recipe for non-C# consumers;
-- Persian and English invoice documentation;
-- WinForms Developer Sample invoice screen;
+- explicit idempotent ACK;
+- `FoundUnread / AlreadyRead / NotFound`;
+- full invoice remains available after ACK;
+- Raw SQL recipe;
+- Persian and English documentation;
+- WinForms Developer Sample Invoices tab;
+- disposable SQL Server tests;
 - .NET Framework 4.8 package-consumer coverage.
-
-The next additive package version is frozen as `1.1.0`. Historical `v1.0.0` remains immutable.
-
-## Next implementation slice
 
 ### Slice 2 — Scales + Status + Resend
 
-Target scope:
+Completed on the active Vendor-Ready branch and pending final green CI/merge:
 
-- read registered scales from SQL;
-- read coarse `Online / Offline / Unknown` status from `SADR_Scale.Status`;
-- expose static scale metadata needed by external software;
-- `RequestItemResend(scaleId)` through `LastSendItem = 0`;
-- `RequestHotKeyResend(scaleId)` through `LastSendKey = 0` where supported;
-- Raw SQL examples;
+- `client.Scales.GetAllAsync()`;
+- `client.Scales.GetAsync(scaleId)`;
+- `client.Scales.GetStatusAsync(scaleId)`;
+- public `Online / Offline / Unknown` status mapping;
+- static scale metadata for third-party software;
+- `RequestItemResendAsync(scaleId)` without exposing `LastSendItem`;
+- `RequestHotKeyResendAsync(scaleId)` without exposing `LastSendKey`;
+- `Requested / NotFound / UnsupportedModel` results;
+- PLUS HotKey resend rejects unsupported automatic behavior instead of reporting false success;
+- Raw SQL recipe with writes disabled by default;
+- Persian and English documentation;
+- WinForms Developer Sample Scales tab with guarded resend writes;
 - disposable SQL Server tests;
-- add the Scale page to the same WinForms Developer Sample.
+- .NET Framework 4.8 package-consumer coverage.
+
+`Requested` always means the resend state was recorded for a later eligible AutoSend cycle; it is not a physical-device completion result.
+
+The next additive package version remains frozen as `1.1.0`. Historical `v1.0.0` remains immutable.
+
+## Next implementation slices
+
+### Slice 3 — Stores + Catalog completion
+
+Target:
+
+- Store read/upsert;
+- Item Group read/upsert completion;
+- Item/PLU read APIs in addition to the existing write APIs;
+- supported soft-delete semantics;
+- Price History read;
+- Raw SQL examples and disposable SQL tests;
+- Stores/Groups/Items pages in the same WinForms Developer Sample.
+
+### Slice 4 — Scale Assignments + Mapping + HotKeys
+
+Target:
+
+- canonical multi-group scale assignment;
+- Scale Item Mapping;
+- group HotKey templates;
+- validation/replace semantics matching Sadr Scales 5.2.1;
+- resend-state behavior kept internal to SDK implementation;
+- Sample + SQL tests + docs.
+
+### Slice 5 — Sales Query + Reports
+
+Target:
+
+- filtered/paged sales query;
+- summary totals;
+- daily, scale and item reports;
+- Sample + SQL tests + docs.
+
+### Slice 6 — Demo Data + Vendor Acceptance + RC
+
+Target:
+
+- seeded/reproducible Demo Data;
+- production-database guard;
+- complete executable Sample flow;
+- external-developer-style end-to-end acceptance test;
+- documentation cleanup;
+- `1.1.0` RC freeze.
 
 ## Out of immediate scope
 
@@ -133,35 +179,20 @@ Firmware/File/Label public operations
 
 Before the next software-vendor letter/outreach:
 
-1. complete the final SQL Contract for the 5.2.1 capabilities above;
+1. complete the final SQL Contract for the approved 5.2.1 capabilities;
 2. implement all corresponding SDK APIs;
 3. keep Raw SQL examples for non-C# consumers;
-4. keep real SQL integration tests for Structured Invoice + ACK;
-5. test Scale status, Group/Mapping/HotKey and Resend semantics;
-6. implement Sales Query/Summary and Reports coverage;
-7. complete the runnable WinForms Developer Sample;
-8. provide seeded/reproducible Demo Data with Production-DB guard;
-9. keep a short Getting Started path plus a complete reference guide;
-10. keep `.NET Framework 4.8` consumer validation and SQL Server CI green;
-11. run an external-developer-style end-to-end acceptance test;
-12. freeze naming/contract after RC except for bug/security/compatibility fixes.
+4. keep real SQL integration tests for all sanctioned writes and important read semantics;
+5. complete the runnable WinForms Developer Sample;
+6. provide seeded/reproducible Demo Data with Production-DB guard;
+7. keep a short Getting Started path plus a complete reference guide;
+8. keep `.NET Framework 4.8` consumer validation and SQL Server CI green;
+9. run an external-developer-style end-to-end acceptance test;
+10. freeze naming/contract after RC except for bug/security/compatibility fixes.
 
 ## Sadr Scales 5.3 follow-up
 
-A per-scale Command Mailbox is a planned 5.3 capability.
-
-High-level semantics:
-
-```text
-one stable mailbox/row per Scale
-one active command per Scale
-RequestId
-Typed CommandCode / flags
-Idle / Pending / Running / Succeeded / Failed / Rejected
-ResultCode / ResultMessage
-```
-
-The Runtime performs validation, licensing, connection/busy checks, model capability and actual protocol work. Device protocol details remain private.
+A per-scale Command Mailbox is a planned 5.3 capability. Runtime remains responsible for validation, licensing, connection/busy state, model capability and actual protocol execution. Raw device protocol details remain private.
 
 ## Stable release identity
 
