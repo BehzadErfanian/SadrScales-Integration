@@ -12,5 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../src/SadrScales.Integration/SadrScales.Integration.csproj" />
+    <ProjectReference Include="../SadrScales.Integration.DemoLab/SadrScales.Integration.DemoLab.csproj" />
   </ItemGroup>
 </Project>

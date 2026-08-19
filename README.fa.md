@@ -5,197 +5,149 @@
 [![SDK CI](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/sdk-ci.yml/badge.svg)](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/sdk-ci.yml)
 [![Public Repository Guard](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/public-repo-guard.yml/badge.svg)](https://github.com/BehzadErfanian/SadrScales-Integration/actions/workflows/public-repo-guard.yml)
 
-**مخزن عمومی رسمی قرارداد SQL، ابزار توسعه C# و نمونه‌های اتصال نرم‌افزارهای فروشگاهی، ERP و حسابداری به Sadr Scales.**
+**مخزن عمومی رسمی اتصال نرم‌افزارهای فروشگاهی، ERP و حسابداری به Sadr Scales.**
 
-**ارائه و نگهداری توسط Tozin Sadr و Behzad Erfanian.**
+ارائه و نگهداری توسط **Tozin Sadr و Behzad Erfanian**.
 
-[English](README.md) · [نسخه پایدار v1.0.0](https://github.com/BehzadErfanian/SadrScales-Integration/releases/tag/v1.0.0) · [شروع سریع](docs/fa/getting-started.md) · [رفع اشکال](docs/fa/troubleshooting.md) · [چک‌لیست آمادگی بهره‌برداری](docs/PRODUCTION_READINESS_CHECKLIST.md) · [قرارداد SQL v1](docs/fa/sql-contract-v1.md) · [سازگاری](docs/COMPATIBILITY.md) · [پشتیبانی](SUPPORT.md) · [امنیت](SECURITY.md)
-
----
+[English](README.md) · [شروع سریع](docs/fa/getting-started.md) · [قابلیت‌ها](docs/fa/capabilities.md) · [نمونه‌های SQL](samples/SQL/README.md) · [برنامه نمونه](samples/csharp/SadrScales.Integration.SampleApp/README.md) · [پشتیبانی](SUPPORT.md) · [امنیت](SECURITY.md)
 
 ## وضعیت
 
-**نسخه عمومی پایدار: `v1.0.0`.**
+- نسخه عمومی پایدار: **`v1.0.0`**
+- نسخه افزوده‌ی Vendor-Ready بعدی: **`1.1.0`**
+- مبنای Sadr Scales: **`5.2.1`**
+- Target SDK: `netstandard2.0`
+- مصرف Package تأییدشده: .NET Framework 4.8 و .NET جدید
+- مجوز: MIT
 
-مبنای پشتیبانی نسخه 1:
+نسخه `v1.0.0` ثابت و تغییرناپذیر است. خط `1.1.0` فقط پس از تکمیل سطح Vendor-Ready 5.2.1، برنامه نمونه، محافظ Demo Data و تست Vendor Acceptance از روی Package Freeze می‌شود.
 
-| بخش | مبنا |
-|---|---|
-| Sadr Scales | `5.2.1` یا نسخه جدیدتری که صریحاً با SQL Contract v1 سازگار اعلام شده باشد |
-| قرارداد عمومی بانک | **SQL Contract v1** |
-| SDK زبان C# | `SadrScales.Integration 1.0.0` |
-| Target SDK | `netstandard2.0` |
-| SQL Provider | `Microsoft.Data.SqlClient 7.0.2` |
-| .NET Framework | مصرف واقعی Package روی `net48` در CI |
-| تست SQL | SQL Server 2022 با Schema و داده ساختگی Contract v1 |
-| مجوز | MIT |
+## از اینجا شروع کنید
 
-نسخه `v1.0.0` از Commit دقیق `a6bccc7c13a8afba29b6860869d2a942b1231803` و پس از CI محافظت‌شده، Branch Protection، کنترل بسته Release و اعتبارسنجی SHA-256 منتشر شده است.
+```text
+۱. شروع سریع را بخوانید
+۲. Contract بانک را Validate کنید
+۳. صفحه قابلیت‌ها را ببینید
+۴. برنامه نمونه را اجرا کنید
+۵. اگر C# ندارید از نمونه‌های Raw SQL استفاده کنید
+۶. فقط در صورت نیاز سراغ سندهای مرجع بروید
+```
 
-## چرا از این مسیر یکپارچه‌سازی کنیم؟
-
-نرم‌افزار شما با **Sadr Scales** یکپارچه می‌شود، نه با پروتکل اختصاصی مستقیم هر مدل ترازو.
+## معماری
 
 ```text
 POS / ERP / Accounting
         ↓
-SadrScales.Integration / SQL Contract v1
+SadrScales.Integration یا SQL مستندشده
         ↓
-Sadr Scales Runtime
+دیتابیس / Runtime نرم‌افزار Sadr Scales
         ↓
 PLUS / LSG / Aclas / ترازوهای پشتیبانی‌شده
 ```
 
-مدیریت Session، Retry/Reconnect، Registry، تفاوت مدل‌ها و ارتباط مستقیم با دستگاه بر عهده Runtime خود Sadr Scales باقی می‌ماند.
+نرم‌افزار شما با **Sadr Scales** یکپارچه می‌شود، نه با پروتکل اختصاصی مستقیم هر ترازو. ارتباط مستقیم، Retry/Reconnect و تفاوت مدل‌ها در اختیار Sadr Scales باقی می‌ماند.
 
-## مسیر پنج‌دقیقه‌ای C#
-
-### ۱. ابتدا Contract بانک را کنترل کنید
+## شروع پنج‌دقیقه‌ای C#
 
 ```csharp
 var client = new SadrScalesClient(connectionString);
 await client.ValidateAsync();
-```
 
-اگر Schema سازگار نیست، Integration را با دورزدن Validation ادامه ندهید.
-
-### ۲. گروه و کالا/PLU را ثبت یا به‌روزرسانی کنید
-
-```csharp
+await client.Stores.UpsertAsync(store);
 await client.ItemGroups.UpsertAsync(group);
 await client.Items.UpsertAsync(item);
 ```
 
-برای انتقال گروهی محدود:
-
-```csharp
-SadrItemBatchWriteResult result = await client.Items.UpsertBatchAsync(items);
-```
-
-هر Batch حداکثر **۲۰۰ PLU یکتا** دارد، پیش از SQL کامل بررسی می‌شود و در یک Transaction اتمیک Commit می‌شود. انتقال بزرگ‌تر باید توسط نرم‌افزار شما صفحه‌بندی شود.
-
-### ۳. فروش پذیرفته‌شده را افزایشی بخوانید
+برای همگام‌سازی پیوسته فروش:
 
 ```csharp
 SadrSalesBatch batch = await client.Sales.ReadAfterAsync(lastProcessedId, 100);
 ```
 
-نرم‌افزار مقصد مالک State پایدار خودش است:
+ابتدا داده را در مقصد ذخیره و Commit کنید و فقط بعد از آن `batch.LastReadId` را به‌عنوان Cursor جدید نگه دارید.
 
-1. فروش را در بانک خودش ثبت کند؛
-2. ثبت مقصد را Commit کند؛
-3. بعد `batch.LastReadId` را به‌عنوان Cursor بعدی ذخیره کند.
+## قابلیت‌های Vendor-Ready 1.1
 
-برای جلوگیری از تکرار، کلید پیشنهادی `(DeviceNo, FID, SubID)` است. فاصله داشتن `ID`های فروش طبیعی است.
+سطح تأییدشده Sadr Scales 5.2.1 شامل این موارد است:
 
-## Quick Start اجرایی
+- شعبه‌ها؛
+- گروه‌های کالا و کالا/PLU؛
+- خواندن تاریخچه قیمت؛
+- ترازوهای ثبت‌شده و وضعیت `Online / Offline / Unknown`؛
+- تخصیص گروه‌های کالا به ترازو؛
+- Mapping اختصاصی هر ترازو؛
+- HotKeyهای گروه؛
+- درخواست ارسال مجدد خودکار کالا/HotKey؛
+- Sales Feed افزایشی؛
+- Sales Query و Summary؛
+- دریافت فاکتور با TotalBarcode یا ScaleID + FID؛
+- ACK صریح و Idempotent؛
+- گزارش روزانه، بر اساس ترازو و بر اساس کالا.
 
-نمونه C# واقعی که در CI Build می‌شود و به‌صورت پیش‌فرض فقط خواندنی است:
+نقشه کامل در [صفحه قابلیت‌ها](docs/fa/capabilities.md) است.
 
-[`samples/csharp/SadrScales.Integration.QuickStart`](samples/csharp/SadrScales.Integration.QuickStart/README.md)
+## قانون مهم فاکتور
 
-Connection String فقط از `SADR_SCALES_CONNECTION_STRING` خوانده می‌شود:
+```text
+دریافت فاکتور
+→ ذخیره در مقصد
+→ Commit موفق مقصد
+→ ACK در Sadr Scales
+```
+
+Lookup هیچ‌وقت خودکار ACK نمی‌کند. فاکتور ACK شده همچنان کامل با `AlreadyRead` برمی‌گردد تا بازیابی و ورود دوباره ممکن باشد.
+
+## برنامه نمونه اجرایی
+
+مرجع اصلی:
+
+[`samples/csharp/SadrScales.Integration.SampleApp`](samples/csharp/SadrScales.Integration.SampleApp/README.md)
+
+این برنامه Invoices، Scales، Catalog، Assignments/Mapping/HotKeys، Sales/Reports و Demo Data محافظت‌شده را نشان می‌دهد.
 
 ```powershell
 $env:SADR_SCALES_CONNECTION_STRING = "Server=...;Database=...;..."
-dotnet run --project samples/csharp/SadrScales.Integration.QuickStart
+dotnet run --project samples/csharp/SadrScales.Integration.SampleApp
 ```
 
-Connection String واقعی را داخل Source Code قرار ندهید.
+Credential واقعی را داخل Source قرار ندهید.
 
-## نصب Package
+## مسیر غیر C# / Raw SQL
 
-فایل‌های SDK پایدار از [GitHub Release نسخه v1.0.0](https://github.com/BehzadErfanian/SadrScales-Integration/releases/tag/v1.0.0) منتشر می‌شوند.
+استفاده از C# اجباری نیست. نمونه‌های مستقل از زبان در [`samples/SQL`](samples/SQL/README.md) قرار دارند.
 
-پس از دانلود `SadrScales.Integration.1.0.0.nupkg` در یک پوشه محلی:
+برای قابلیت‌هایی که مستند نشده‌اند، Write تازه روی جدول‌ها یا ستون‌های داخلی اختراع نکنید.
 
-```bash
-dotnet add package SadrScales.Integration --version 1.0.0 --source <download-folder>
-```
+## ایمنی Demo Data
 
-نسخه پایدار همچنین شامل Symbol Package، DLL و XML Documentation، بسته Developer Kit، راهنمای رسمی فارسی، Release Manifest، SHA-256 و Release Notes است.
+DemoLab جزو API تولیدی SDK نیست. Generate/Reset فقط روی دیتابیس واضح غیرتولیدی، با Schema سازگار، داده تجاری خالی، تأیید دوباره نام دقیق دیتابیس و Demo marker معتبر مجاز است.
 
-## مسیر Raw SQL
+Demo marker را روی دیتابیس مشتری یا Production فعال نکنید.
 
-برای Integration استفاده از C# اجباری نیست. نمونه‌های مستقل از زبان در [`samples/SQL`](samples/SQL/README.md) وجود دارند:
+## Gate کیفیت Release
 
-- کنترل Schema؛
-- Upsert امن گروه و PLU با Rollback پیش‌فرض؛
-- خواندن افزایشی و فقط‌خواندنی فروش.
+نسخه Vendor-Ready باید این موارد را سبز داشته باشد:
 
-این مسیر برای Java، Python، Node.js، PHP و سایر زبان‌ها نیز مبنای اولیه است تا Wrapper اختصاصی آن زبان ساخته شود.
+- Build/Test/Pack SDK؛
+- SQL Server Integration Tests؛
+- Build برنامه WinForms Sample؛
+- مصرف واقعی Package روی .NET Framework 4.8؛
+- Vendor Acceptance از روی Package و بدون ProjectReference؛
+- Public Repository Guard؛
+- Release Bundle smoke test.
 
-## SQL Contract v1
+بعد از Freeze نسخه `1.1.0 RC` فقط اصلاح Bug، Security و Compatibility مجاز است تا نامه به شرکت‌های نرم‌افزاری ارسال شود.
 
-سطح عمومی پایه عمداً کوچک نگه داشته شده است:
+## مرز امنیتی
 
-- `dbo.SADR_ItemClass` — گروه کالا؛ SELECT / INSERT / UPDATE؛
-- `dbo.SADR_Item` — کالا/PLU؛ SELECT / INSERT / UPDATE؛ شناسه عمومی `PluNo` است؛
-- `dbo.SADR_Logs` — فروش پذیرفته‌شده؛ فقط **SELECT**.
+این مخزن عمداً پروتکل مستقیم ترازو، Packet خام، Capture شبکه، کلید خصوصی، داده واقعی مشتری، Firmware خصوصی و Runtime Command دلخواه را منتشر نمی‌کند.
 
-قواعد مهم:
+Command Mailbox تایپ‌شده برای هر ترازو در **Sadr Scales 5.3** برنامه‌ریزی شده و جزو انتشار فعلی 5.2.1 نیست.
 
-- `rowversion` را ننویسید؛
-- از `ID`/`IDitem` قدیمی به‌عنوان هویت عمومی PLU استفاده نکنید؛
-- برای Ack یا Cursor جدول `SADR_Logs` را Update/Delete نکنید؛
-- Cursor پایدار و Idempotency متعلق به نرم‌افزار مقصد است.
+## مجوز
 
-Registry، Mapping، جزئیات داخلی فاکتور ساخت‌یافته و Runtime State تا زمانی که Contract عمومی جداگانه‌ای تصویب نشود، سطح کنترل‌شده باقی می‌مانند.
-
-## رفتار Retry و اطمینان‌پذیری
-
-SDK فقط در مرزهایی که Replay امن است Retry خودکار دارد:
-
-- بازکردن Connection پیش از شروع Command؛
-- اجرای کامل و فقط‌خواندنی Contract Validation؛
-- اجرای کامل و فقط‌خواندنی Sales Read.
-
-Writeهای Transactional گروه و کالا پس از شروع اجرا **به‌صورت خودکار Replay نمی‌شوند**؛ چون با گم‌شدن پاسخ ممکن است وضعیت Commit مبهم شود.
-
-## تحویل برای بهره‌برداری واقعی
-
-پیش از فعال‌کردن اتصال در محیط مشتری، [چک‌لیست آمادگی بهره‌برداری](docs/PRODUCTION_READINESS_CHECKLIST.md) را کامل کنید. این چک‌لیست کنترل نسخه و Contract، امنیت دسترسی بانک، قواعد کالا، Cursor و جلوگیری از ثبت تکراری فروش، تست Restart/Rollback و تحویل عملیاتی را پوشش می‌دهد.
-
-## سازگاری و پایداری API
-
-نسخه `1.0.0` اولین خط پایدار API است. نسخه‌های `1.x` از Semantic Versioning پیروی می‌کنند و نسخه SQL Contract جداگانه مدیریت می‌شود.
-
-جزئیات در [سیاست سازگاری API](docs/API_COMPATIBILITY.md) ثبت شده است.
-
-## سندهای اصلی
-
-- [شروع سریع](docs/fa/getting-started.md)
-- [راهنمای رفع اشکال](docs/fa/troubleshooting.md)
-- [چک‌لیست آمادگی بهره‌برداری](docs/PRODUCTION_READINESS_CHECKLIST.md)
-- [SQL Contract v1](docs/fa/sql-contract-v1.md)
-- [سیاست سازگاری API](docs/API_COMPATIBILITY.md)
-- [طراحی SDK v1](docs/SDK_DESIGN_V1.md)
-- [سازگاری نسخه‌ها](docs/COMPATIBILITY.md)
-- [مرز امنیتی](docs/SECURITY_BOUNDARY.md)
-- [هویت راهنمای رسمی فارسی](docs/reference/README.md)
-- [سیاست پشتیبانی](SUPPORT.md)
-- [راهنمای مشارکت](CONTRIBUTING.md)
-
-## پشتیبانی و امنیت
-
-برای ایرادهای قابل بازتولید SDK یا Contract که اطلاعات حساس ندارند از GitHub Issues استفاده کنید. پیش از انتشار اطلاعات مربوط به مشتری، [SUPPORT.md](SUPPORT.md) را بخوانید.
-
-گزارش‌های امنیتی باید طبق [SECURITY.md](SECURITY.md) ارسال شوند و نباید در Issue عمومی عادی منتشر شوند.
-
-پروتکل مستقیم دستگاه، Capture شبکه، کلید خصوصی، Credential، اطلاعات مشتری، Firmware/Vendor material و Source یا زیرساخت داخلی Sadr Scales اجازه ورود به این Repository عمومی را ندارند.
-
-## کیفیت Release و حفاظت Repository
-
-نسخه پایدار با Public Repository Guard، Build/Test SDK، Quick Start اجرایی، کنترل NuGet Package و Source Link، SQL Server 2022، مصرف واقعی .NET Framework 4.8، Protected Tag Release، SHA-256 راهنمای رسمی و کنترل کامل Release Manifest/Assetها اعتبارسنجی شده است.
-
-Secret Scanning، Push Protection، Dependabot alerts/security updates، Private Vulnerability Reporting و CodeQL برای C# فعال هستند. شاخه `main` با Checkهای الزامی، Conversation Resolution و Admin Enforcement محافظت می‌شود و Force Push و حذف Branch غیرفعال هستند.
-
-## مجوز و ارائه‌دهندگان
-
-SDK عمومی `SadrScales-Integration` و محتوای عمومی مشمول فایل [LICENSE](LICENSE) با مجوز **MIT** منتشر می‌شوند.
+MIT License. فایل‌های [LICENSE](LICENSE) و [NOTICE.md](NOTICE.md) را ببینید.
 
 **Copyright (c) 2026 Tozin Sadr and Behzad Erfanian.**
-
-این مجوز شامل Source خصوصی Sadr Scales، پروتکل‌های اختصاصی ترازو، Firmware، کلیدهای خصوصی، اطلاعات مشتری یا سایر موارد خارج از این Repository نمی‌شود. برای مرزبندی کامل [NOTICE.md](NOTICE.md) را ببینید.
 
 </div>

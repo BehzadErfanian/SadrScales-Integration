@@ -126,3 +126,49 @@ jobs:
       - name: Run .NET Framework 4.8 package compatibility smoke test
         shell: pwsh
         run: '& "tests\SadrScales.Integration.Net48Consumer\bin\Release\net48\SadrScales.Integration.Net48Consumer.exe"'
+
+  vendor-acceptance:
+    runs-on: ubuntu-latest
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: SadrCi_Test_2026!
+        ports:
+          - 1433:1433
+
+    env:
+      SADR_VENDOR_ACCEPTANCE_SQL: Server=localhost,1433;Database=master;User ID=sa;Password=SadrCi_Test_2026!;Encrypt=False;TrustServerCertificate=True
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Pack SDK exactly as the vendor receives it
+        run: dotnet pack src/SadrScales.Integration/SadrScales.Integration.csproj --configuration Release --output artifacts/vendor-package
+
+      - name: Restore package-only Vendor Acceptance app
+        run: dotnet restore tests/SadrScales.Integration.VendorAcceptance/SadrScales.Integration.VendorAcceptance.csproj --configfile tests/SadrScales.Integration.VendorAcceptance/NuGet.CI.config
+
+      - name: Build package-only Vendor Acceptance app
+        run: dotnet build tests/SadrScales.Integration.VendorAcceptance/SadrScales.Integration.VendorAcceptance.csproj --configuration Release --no-restore
+
+      - name: Wait for SQL Server TCP endpoint
+        shell: bash
+        run: |
+          for i in {1..30}; do
+            if (echo > /dev/tcp/127.0.0.1/1433) >/dev/null 2>&1; then exit 0; fi
+            sleep 2
+          done
+          echo 'SQL Server did not become reachable.' >&2
+          exit 1
+
+      - name: Run external-developer Vendor Acceptance flow
+        run: dotnet tests/SadrScales.Integration.VendorAcceptance/bin/Release/net8.0/SadrScales.Integration.VendorAcceptance.dll
