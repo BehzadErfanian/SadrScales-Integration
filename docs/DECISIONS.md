@@ -137,7 +137,17 @@ If an invoice has already been ACKed (`LableStatus = 1`), a later lookup still r
 **Status:** Accepted
 Sadr Scales 5.2.1 already uses `SADR_Scale.LastSendItem` and `SADR_Scale.LastSendKey` as AutoSend watermarks. The public vNext SQL contract therefore supports `RequestItemResend(scaleId)` by setting `LastSendItem = 0`, and `RequestHotKeyResend(scaleId)` by setting `LastSendKey = 0` where the current model/runtime supports automatic HotKey transfer. These operations are resend requests, not immediate device commands: the next eligible AutoSend cycle performs the transfer when the scale is enabled, connected and configured for automatic sending. SDK methods hide the watermark detail; the Raw SQL path remains documented for non-C# consumers.
 
-## D-028 — Runtime-only capabilities move to a Service, not a SQL command queue
+## D-028 — Service-only runtime command direction
+**Date:** 2026-08-19  
+**Status:** Superseded by D-029
+The earlier Phase 2 direction proposed keeping all runtime-only operations outside SQL and exposing them later only through a typed Sadr Integration Service. This direction is superseded because the owner later accepted a per-scale SQL Command Mailbox for Sadr Scales 5.3. The Service remains a future transport, but is no longer the only planned runtime-command entry point.
+
+## D-029 — Command Mailbox belongs to Sadr Scales 5.3, not the current Vendor-Ready baseline
 **Date:** 2026-08-19  
 **Status:** Accepted
-SQL is extended only for behavior that Sadr Scales 5.2.1 can safely and predictably expose through its database. Scale lifecycle orchestration, immediate Send/Get commands, direct device sales retrieval, settings and richer Runtime state are not modeled as a new SQL command queue. They will be exposed later through a typed Sadr Integration Service that reuses Sadr Scales validation, licensing, registry, connection and model-capability logic while keeping device protocols private. The exact local/REST transport of that Service is a later implementation decision and must not change the public Domain semantics.
+A typed per-scale Command Mailbox is a planned Sadr Scales 5.3 capability. Each scale has a stable command slot/mailbox, one active command at a time, a RequestId, typed command code/flags, execution state and result. Sadr Scales executes the command through its real Runtime validation, licensing, registry, connection and model-capability logic. Raw protocol packets/opcodes are never exposed. The exact schema and command codes are frozen during 5.3 design, not during the current 5.2.1 Integration work.
+
+## D-030 — Vendor-Ready 5.2.1 Integration is completed before the next software-vendor outreach
+**Date:** 2026-08-19  
+**Status:** Accepted
+The immediate priority is to complete and stabilize every integration capability already supportable against Sadr Scales 5.2.1 through SQL, SDK, documentation and executable samples. The software-vendor outreach/letter is sent only after this Vendor-Ready Baseline passes its end-to-end release gate. The goal is one serious integration update cycle for external software companies rather than repeated requests caused by an unstable or incomplete public contract. Sadr Scales 5.3 Command Mailbox, Service/API, public scale emulator and other later capabilities must not delay this current Vendor-Ready release and must be additive/compatible with it.
