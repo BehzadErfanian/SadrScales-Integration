@@ -9,9 +9,9 @@ using SadrScales.Integration.Internal;
 namespace SadrScales.Integration.Sales
 {
     /// <summary>
-    /// Read-only basic Contract v1 sales-feed operations.
+    /// Read-only sales feed and additive Vendor-Ready query operations.
     /// </summary>
-    public sealed class SadrSalesClient
+    public sealed partial class SadrSalesClient
     {
         private const string ReadSql = @"
 SELECT TOP (@BatchSize)
@@ -38,6 +38,7 @@ ORDER BY ID ASC;";
         /// Recognized transient connection/read failures are retried within the configured bounded policy.
         /// </summary>
         /// <remarks>
+        /// This is the synchronization/feed API. It remains ID-ascending and separate from newest-first user queries.
         /// The caller must persist destination data first and persist <see cref="SadrSalesBatch.LastReadId"/>
         /// only after the destination transaction succeeds.
         /// </remarks>
