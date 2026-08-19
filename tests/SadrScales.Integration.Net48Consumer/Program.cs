@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using SadrScales.Integration;
+using SadrScales.Integration.Assignments;
+using SadrScales.Integration.HotKeys;
 using SadrScales.Integration.Invoices;
 using SadrScales.Integration.Items;
 using SadrScales.Integration.Sales;
@@ -37,6 +39,9 @@ namespace SadrScales.Integration.Net48Consumer
                 Assert(client.Sales != null, "Sales API was not created.");
                 Assert(client.Invoices != null, "Invoices API was not created.");
                 Assert(client.Scales != null, "Scales API was not created.");
+                Assert(client.ScaleAssignments != null, "ScaleAssignments API was not created.");
+                Assert(client.ScaleMappings != null, "ScaleMappings API was not created.");
+                Assert(client.HotKeys != null, "HotKeys API was not created.");
 
                 var store = new SadrStore
                 {
@@ -58,12 +63,33 @@ namespace SadrScales.Integration.Net48Consumer
                     UnitPrice = 1000
                 };
 
+                var mapping = new SadrScaleItemMap
+                {
+                    ScaleId = 48,
+                    PluNo = item.PluNo,
+                    ItemCode = 1,
+                    PageNo = 0,
+                    KeyNo = 1
+                };
+
+                var hotKey = new SadrHotKey
+                {
+                    PageNo = 0,
+                    KeyNo = 1,
+                    PluNo = item.PluNo
+                };
+
                 Assert(store.StoreCode == "NET48", "Store public model failed.");
                 Assert(group.ItemClassCode == "NET48", "Item-group public model failed.");
                 Assert(item.PluNo == 480001, "Item public model failed.");
+                Assert(mapping.ItemCode == 1, "Scale mapping public model failed.");
+                Assert(hotKey.PluNo == item.PluNo, "HotKey public model failed.");
                 Assert(typeof(SadrStoreUpsertResult).IsPublic, "Store upsert result public enum is unavailable.");
                 Assert(typeof(SadrItemSoftDeleteResult).IsPublic, "Item soft-delete result public enum is unavailable.");
                 Assert(typeof(SadrPriceHistoryEntry).IsPublic, "Price-history public model is unavailable.");
+                Assert(typeof(SadrReplaceResult).IsPublic, "Replace result public enum is unavailable.");
+                Assert(typeof(SadrScaleItemMap).IsPublic, "Scale mapping public model is unavailable.");
+                Assert(typeof(SadrHotKey).IsPublic, "HotKey public model is unavailable.");
                 Assert(typeof(SadrSalesBatch).IsPublic, "Sales batch public type is unavailable.");
 
                 string barcode = SadrInvoiceClient.BuildTotalBarcode(12, 3456);
