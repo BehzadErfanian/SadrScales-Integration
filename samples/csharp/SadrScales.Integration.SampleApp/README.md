@@ -8,9 +8,9 @@ The application intentionally grows one tested capability at a time instead of c
 
 Enter the Sadr Scales SQL connection string at the top of the form, or set `SADR_SCALES_CONNECTION_STRING` before launch.
 
-The current application contains **Invoices**, **Scales**, **Catalog** and **Assignments / Mapping / HotKeys** areas that use the same connection.
+The current application contains **Invoices**, **Scales**, **Catalog**, **Assignments / Mapping / HotKeys** and **Sales / Reports** areas that use the same connection.
 
-## Invoices tab
+## Invoices
 
 1. Enter a 14-digit structured `TotalBarcode`.
 2. Click **Lookup invoice**.
@@ -18,85 +18,100 @@ The current application contains **Invoices**, **Scales**, **Catalog** and **Ass
 4. `FoundUnread` means the invoice has not yet been explicitly ACKed.
 5. `AlreadyRead` still displays the complete invoice so recovery/re-import remains possible.
 
-### ACK safety
+ACK is never automatic. The manual sample requires the ACK write guard and confirmation. A real destination must Save/Commit first and ACK only afterward.
 
-The sample never auto-ACKs a lookup.
+## Scales
 
-To test ACK manually you must enable the ACK write and confirm the warning dialog. In a real POS/ERP integration, ACK must be called only after the destination database transaction has committed successfully.
+**Refresh scales** reads registered Scale ID, IP, port, model, store, `Online / Offline / Unknown` status and AutoSend configuration.
 
-## Scales tab
+Resend buttons require the write guard and confirmation. `Requested` means the SQL AutoSend state was reset; it does not mean the physical scale already received the data.
 
-Click **Refresh scales** to read registered Scale ID, IP, port, model, store, `Online / Offline / Unknown` status and AutoSend configuration.
+## Catalog
 
-Resend buttons remain disabled until **Enable resend writes** is selected, and each request requires confirmation.
+Catalog contains **Stores**, **Groups** and **Items** pages plus one shared write guard.
 
-`Requested` means the SQL AutoSend watermark was reset. It does **not** mean the physical scale has already received the items/HotKeys.
-
-## Catalog tab
-
-Catalog has nested **Stores**, **Groups** and **Items** pages plus one shared **Enable catalog writes** guard. Reads remain available while writes are disabled.
-
-### Stores
-
-- Refresh the store list.
-- Select a row to load its fields.
-- Upsert by stable `StoreCode` only after enabling catalog writes.
-
-### Groups
-
-- Refresh item groups.
-- Select/edit `ItemClassCode`, name and description.
-- Upsert only after enabling catalog writes.
-
-### Items
-
-- Refresh active items, or explicitly select **Include deleted**.
-- Select a PLU to inspect/edit Group, Name and Price.
-- Upsert preserves all non-edited fields of an existing PLU by reading the complete item first; it does not overwrite print/barcode/tare/text settings with defaults.
-- **Soft delete** sets `DeleteFlag = 1` after confirmation and never physically removes the row.
-- A deleted PLU can still be inspected/recovered through the SDK.
-- **Price history** is read-only and loads recent history for the selected PLU.
+- Store identity is `StoreCode`.
+- Groups support read/upsert.
+- Items support active/all views, read/upsert and logical delete.
+- Item edit reads the complete existing PLU before changing selected fields, so print/barcode/tare/text settings are not overwritten with defaults.
+- Soft delete sets `DeleteFlag = 1`; it never physically removes the row.
+- Price History is read-only.
 
 ## Assignments / Mapping / HotKeys
 
-This area demonstrates three different configuration concepts and deliberately keeps them separate.
+This area demonstrates three deliberately separate configuration concepts.
 
 ### Scale Assignments
 
-- Enter a Scale ID and load its canonical item groups.
-- The desired replacement list is entered as comma-separated group codes.
-- **Replace groups** is a complete atomic replacement, not an incremental add/remove operation.
-- A real change requests Item AutoSend re-evaluation for the scale.
+- Load canonical item groups for one Scale ID.
+- Enter the complete desired replacement as comma-separated group codes.
+- A real change requests Item AutoSend re-evaluation.
 - Repeating the same assignment returns `Unchanged` and does not create a fresh resend request.
 
 ### Scale Mapping
 
 - Load one scale's complete PLU/ItemCode mapping.
-- Edit the staging grid, then use **Replace mapping** to atomically replace the complete map.
-- `PageNo` and `KeyNo` are optional, but when used they must both be populated and fit the target scale's configured HotKey layout.
+- Edit the staging grid and atomically replace the full map.
+- Optional `PageNo` + `KeyNo` must be supplied together and fit the scale HotKey layout.
 - Duplicate PLUs, ItemCodes and HotKey positions are rejected.
-- **Copy mapping** validates the destination layout before replacing it; incompatible copies leave the destination untouched.
-- A real mapping change requests both Item and HotKey AutoSend re-evaluation.
+- Copy validates the destination before replacement; an incompatible destination remains unchanged.
+- A real change requests Item + HotKey AutoSend re-evaluation.
 
 ### Group HotKeys
 
-- Enter an item-group code and load the user-managed HotKey template.
-- The grid intentionally shows only positive-PLU user keys.
-- Zero/negative internal/system rows are hidden and preserved during replacement.
-- **Replace HotKeys** atomically replaces the user-managed template for the selected group.
-- A real change requests HotKey AutoSend re-evaluation only for scales canonically assigned to that group.
+- Load the user-managed template for an item group.
+- Only positive-PLU user keys are shown.
+- Zero/negative internal/system rows are hidden and preserved.
+- A real replacement requests HotKey AutoSend re-evaluation only for scales assigned to that group.
 
-### Configuration write safety
+All Replace/Copy operations require **Enable configuration writes** plus confirmation.
 
-All Replace/Copy operations remain disabled until **Enable configuration writes** is selected, and each write requires an explicit confirmation.
+## Sales / Reports
 
-`Replaced` means the SQL configuration committed successfully. It does **not** mean a physical scale already received the new configuration. Actual transfer is performed later by an eligible Sadr Scales AutoSend cycle.
+This page is entirely read-only and demonstrates the difference between search/reporting and the destination-owned incremental feed.
+
+### Filters
+
+Optional filters include:
+
+- inclusive Start and exclusive End date/time;
+- exact Identify;
+- Scale ID;
+- PLU;
+- FID;
+- Query page number and page size.
+
+The **Today**, **This week** and **Persian month** buttons demonstrate Sadr Scales 5.2.1 period semantics. The week starts on Saturday and Current Month follows the Persian calendar.
+
+### Query page
+
+**Query page** calls `client.Sales.QueryAsync(filter)` and shows newest rows first.
+
+The Summary line displays totals for the complete filter, not only the visible page:
+
+```text
+RecordCount | InvoiceCount | TotalPrice | TotalWeight | TotalQuantity
+```
+
+`InvoiceCount` uses distinct `(DeviceNo, FID)`. Unit codes 0/1/3 contribute to weight; Unit 2 contributes to quantity.
+
+This Query page does **not** change or replace the cursor used by `Sales.ReadAfterAsync`.
+
+### Reports
+
+The same filter can run:
+
+- **Daily report**;
+- **By scale**;
+- **By item**.
+
+The item report is capped at 5000 aggregate rows, matching 5.2.1. Report results are typed SDK models, not public `DataTable` contracts.
 
 ## Write-safety rule
 
 The Sample App is a reference tool, not a production administration console. Every current write family has an explicit guard, and higher-impact operations also require confirmation.
 
-Demo Data in a later Vendor-Ready slice will add a stronger production-database guard before synthetic data generation is allowed.
+The final Demo Data slice will add a stronger production-database guard before synthetic data generation is allowed.
 
 ## Run
 
@@ -111,4 +126,4 @@ The public sample does not contain customer credentials, direct scale protocols,
 
 ## Planned growth
 
-The next slice adds **Sales Query + Reports**. The final Vendor-Ready slice adds seeded Demo Data, a production-database guard, the external-developer acceptance flow and `1.1.0` RC cleanup to this same application.
+The remaining Vendor-Ready slice adds **seeded Demo Data + production-database guard + external-developer acceptance + 1.1.0 RC cleanup** to this same application/repository.

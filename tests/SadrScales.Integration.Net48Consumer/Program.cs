@@ -6,6 +6,7 @@ using SadrScales.Integration.Assignments;
 using SadrScales.Integration.HotKeys;
 using SadrScales.Integration.Invoices;
 using SadrScales.Integration.Items;
+using SadrScales.Integration.Reports;
 using SadrScales.Integration.Sales;
 using SadrScales.Integration.Scales;
 using SadrScales.Integration.Stores;
@@ -37,6 +38,7 @@ namespace SadrScales.Integration.Net48Consumer
                 Assert(client.ItemGroups != null, "ItemGroups API was not created.");
                 Assert(client.Items != null, "Items API was not created.");
                 Assert(client.Sales != null, "Sales API was not created.");
+                Assert(client.Reports != null, "Reports API was not created.");
                 Assert(client.Invoices != null, "Invoices API was not created.");
                 Assert(client.Scales != null, "Scales API was not created.");
                 Assert(client.ScaleAssignments != null, "ScaleAssignments API was not created.");
@@ -79,11 +81,20 @@ namespace SadrScales.Integration.Net48Consumer
                     PluNo = item.PluNo
                 };
 
+                var salesFilter = new SadrSalesQueryFilter
+                {
+                    ScaleId = 48,
+                    Plu = item.PluNo,
+                    PageNumber = 1,
+                    PageSize = 200
+                };
+
                 Assert(store.StoreCode == "NET48", "Store public model failed.");
                 Assert(group.ItemClassCode == "NET48", "Item-group public model failed.");
                 Assert(item.PluNo == 480001, "Item public model failed.");
                 Assert(mapping.ItemCode == 1, "Scale mapping public model failed.");
                 Assert(hotKey.PluNo == item.PluNo, "HotKey public model failed.");
+                Assert(salesFilter.ScaleId == 48, "Sales query filter public model failed.");
                 Assert(typeof(SadrStoreUpsertResult).IsPublic, "Store upsert result public enum is unavailable.");
                 Assert(typeof(SadrItemSoftDeleteResult).IsPublic, "Item soft-delete result public enum is unavailable.");
                 Assert(typeof(SadrPriceHistoryEntry).IsPublic, "Price-history public model is unavailable.");
@@ -91,6 +102,18 @@ namespace SadrScales.Integration.Net48Consumer
                 Assert(typeof(SadrScaleItemMap).IsPublic, "Scale mapping public model is unavailable.");
                 Assert(typeof(SadrHotKey).IsPublic, "HotKey public model is unavailable.");
                 Assert(typeof(SadrSalesBatch).IsPublic, "Sales batch public type is unavailable.");
+                Assert(typeof(SadrSalesQueryFilter).IsPublic, "Sales query filter is unavailable.");
+                Assert(typeof(SadrSalesPage).IsPublic, "Sales page result is unavailable.");
+                Assert(typeof(SadrSalesSummary).IsPublic, "Sales summary is unavailable.");
+                Assert(typeof(SadrDailySalesReportRow).IsPublic, "Daily report row is unavailable.");
+                Assert(typeof(SadrScaleSalesReportRow).IsPublic, "Scale report row is unavailable.");
+                Assert(typeof(SadrItemSalesReportRow).IsPublic, "Item report row is unavailable.");
+
+                SadrSalesDateRange week = SadrSalesPeriod.GetRange(
+                    SadrSalesPeriodPreset.CurrentWeek,
+                    new DateTime(2026, 8, 19));
+                Assert(week.StartDateInclusive.DayOfWeek == DayOfWeek.Saturday,
+                    "Saturday-based CurrentWeek period failed.");
 
                 string barcode = SadrInvoiceClient.BuildTotalBarcode(12, 3456);
                 Assert(barcode == "25012000003456", "Structured invoice TotalBarcode generation failed.");

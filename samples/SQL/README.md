@@ -16,6 +16,7 @@ These three samples belong to the already-published basic SQL Contract v1 surfac
 5. [`04-scale-status-resend.sql`](04-scale-status-resend.sql) — registered-scale/status read plus explicitly enabled Item/HotKey AutoSend resend requests.
 6. [`05-catalog.sql`](05-catalog.sql) — stores, groups, active/all item semantics, logical delete and read-only price history.
 7. [`06-assignments-mapping-hotkeys.sql`](06-assignments-mapping-hotkeys.sql) — scale-group assignments, per-scale item mapping and user-managed group HotKey templates.
+8. [`07-sales-query-reports.sql`](07-sales-query-reports.sql) — read-only filtered sales query, summary and Daily/Scale/Item reports.
 
 The Vendor-Ready samples are additive and are being prepared for `1.1.0`. They do not change the historical `v1.0.0` tag or its frozen Contract v1 behavior.
 
@@ -120,6 +121,24 @@ Important semantics:
 - Per-scale mapping replacement validates the scale HotKey layout and resets both Item and HotKey AutoSend state.
 - Group HotKey replacement removes/replaces only positive-PLU user rows. Zero/negative internal/system rows are preserved.
 - A group HotKey change resets HotKey AutoSend state only for scales canonically assigned to that group.
+
+### `07-sales-query-reports.sql`
+
+This sample is always read-only.
+
+It demonstrates:
+
+- optional inclusive start / exclusive end dates;
+- exact Identify, PLU, Scale/DeviceNo and FID filters;
+- newest-first Query pagination (`DateTime DESC, ID DESC`);
+- complete-filter Summary independent of the current page;
+- distinct invoice counting by `(DeviceNo, FID)`;
+- weight totals for Unit 0/1/3 and quantity totals for Unit 2;
+- Daily report;
+- Scale report;
+- Item report capped at 5000 rows.
+
+This query/report path is different from [`02-read-sales-incremental.sql`](02-read-sales-incremental.sql). The incremental sample is for destination-owned synchronization cursors; `07` is for search/reporting and never advances or replaces that cursor.
 
 ## Application-code rule
 
