@@ -1,41 +1,38 @@
 # طراحی Contract و Domain مستقل از Transport — Phase 2
 
-**وضعیت:** پیش‌نویس Phase 2 برای بازبینی مالک/نگهدارنده  
+**وضعیت:** پیش‌نویس نهایی برای بازبینی مالک/نگهدارنده  
 **تاریخ:** 2026-08-19  
-**Sadr Scales baseline:** `5.2.1`  
+**Sadr Scales baseline بررسی‌شده:** `5.2.1`  
 **Sadr Scales source commit:** `1048749f52faba35e69464b64983e772c1c857e3`  
 **Integration baseline:** `7690e2a622201cc9b5f0f112c6d6099d44c4233e`  
 **Phase 1 audit:** `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`
 
 ---
 
-## 1. هدف Phase 2
+## 1. هدف
 
-هدف این فاز تعریف Contract عمومی ساده، کامل و قابل توسعه برای شرکت‌های ثالث است؛ بدون اینکه مصرف‌کننده مجبور شود ساختار داخلی Sadr Scales یا پروتکل ترازوها را بداند.
+هدف این فاز تعریف یک Contract عمومی **کامل، ساده، قابل یادگیری و قابل توسعه** برای شرکت‌های ثالث است؛ به شکلی که مصرف‌کننده مجبور نباشد ساختار داخلی Sadr Scales یا پروتکل ترازوها را بداند.
 
-این سند چهار چیز را مشخص می‌کند:
+این سند طراحی است و هنوز پیاده‌سازی جدید ایجاد نمی‌کند.
 
-1. Domain عمومی Integration؛
-2. Public API سطح بالا؛
-3. SQL Contract قابل استفاده با Sadr Scales 5.2.1؛
-4. مرز عملیات‌هایی که برای اجرا روی خود ترازو به یک کانال مدیریت‌شده در Sadr Scales نیاز دارند.
-
-این سند پیاده‌سازی نیست و `v1.0.0` و `SQL Contract v1` منتشرشده را تغییر نمی‌دهد.
+`v1.0.0` و `SQL Contract v1` منتشرشده تغییر نمی‌کنند و Tag آن‌ها ثابت می‌ماند.
 
 ---
 
-## 2. اصل کلیدی: Domain با Transport یکی نیست
+## 2. اصل اصلی: Domain از Transport جدا است
 
-مفهوم‌های عمومی ثابت می‌مانند:
+مفهوم‌های عمومی Integration عبارت‌اند از:
 
 ```text
+Connection
 Store / Branch
 Scale
 Scale Status
 Item Group
 Item / PLU
-Scale Assignment
-Hot Key
+Scale Group Assignment
+Scale Item Assignment
+HotKey Template
 Sales Feed
 Structured Invoice
 Invoice Acknowledgement
@@ -43,42 +40,44 @@ Reports
 Device Commands
 ```
 
-اما روش دسترسی می‌تواند تغییر کند:
+روش دسترسی می‌تواند در طول زمان تغییر کند:
 
 ```text
 Integration Domain
         │
-        ├── SQL               ← روش اصلی قابل استفاده با 5.2.1
+        ├── SQL                    ← روش فعلی و اصلی
+        ├── Managed SQL Command    ← مسیر پیشنهادی برای عملیات Runtime
         ├── Future Local API
         ├── Future REST/API
         ├── Future XML
         └── Future Webhook / other
 ```
 
-برنامه‌نویس نباید با تغییر Transport مجبور شود معنی `Scale`, `Item` یا `Invoice` را دوباره یاد بگیرد.
+تغییر Transport نباید معنی `Scale`, `Item`, `Invoice` یا `SendItems` را عوض کند.
 
 ---
 
-## 3. منظور از Runtime چیست؟
+## 3. Runtime دقیقاً چیست؟
 
-در این اسناد، **Runtime** یعنی خود پردازش در حال اجرای Sadr Scales و اجزای داخلی آن که مسئول این کارها هستند:
+در این پروژه Runtime یعنی خود پردازش در حال اجرای Sadr Scales که مسئول این موارد است:
 
 ```text
 Scale connections
 Registry
 Heartbeat
-Queues
-Send/Get operations
 Reconnect
+Queues
 In-flight operations
-Device capability checks
+Send/Get operations
+Model capability checks
+License-gated scale lifecycle
 ```
 
-### نکته مهم برای 5.2.1
+### وضعیت در 5.2.1
 
-Runtime در نسخه 5.2.1 **API عمومی برای نرم‌افزار ثالث نیست**.
+Sadr Scales 5.2.1 API عمومی Runtime برای شرکت ثالث ندارد.
 
-پس شرکت ثالث در Integration فعلی:
+پس نرم‌افزار ثالث فعلاً از SQL استفاده می‌کند:
 
 ```text
 Third-party software
@@ -86,33 +85,80 @@ Third-party software
        SQL
         ↓
 Sadr Scales Database
+        ↑
+Sadr Scales Runtime
+        ↕
+      Scale
 ```
 
-کار می‌کند.
-
-اگر در آینده Local Service یا REST Gateway اضافه شود، آن کانال می‌تواند عملیات فعال Runtime را به شکل مدیریت‌شده در اختیار Integration قرار دهد.
+این محدودیت نباید باعث شود عملیات Runtime را با UPDATE/DELETE ناقص روی جدول‌های داخلی تقلید کنیم.
 
 ---
 
-## 4. Public API سطح بالا
+## 4. سه نوع عملیات عمومی
 
-API باید بر اساس مفهوم تجاری باشد:
+### 4.1 Data SQL
 
-```csharp
-sadr.Connection
-sadr.Stores
-sadr.ItemGroups
-sadr.Items
-sadr.Scales
-sadr.ScaleAssignments
-sadr.HotKeys
-sadr.Sales
-sadr.Invoices
-sadr.Reports
-sadr.Commands
+عملیاتی که مستقیماً روی Contract داده قابل انجام‌اند:
+
+```text
+Connection/schema validation
+Store read/upsert
+Item Group read/upsert
+Item read/upsert/soft-delete
+Price history read
+Static Scale read
+Scale Online/Offline status read
+Scale group assignment
+Scale item assignment
+HotKey template
+Sales feed/query/summary
+Structured Invoice lookup
+Invoice ACK
+Reports
 ```
 
-نام جدول‌هایی مثل `SADR_Total`, `SADR_ScaleItemClass` یا `SADR_KeyAssignment` جزئیات Storage هستند و برای استفاده عادی نباید لازم باشند.
+### 4.2 Managed SQL Command
+
+عملیاتی که باید توسط خود Sadr Scales اجرا شوند:
+
+```text
+Add Scale
+Update Scale runtime-sensitive fields
+Delete Scale
+Enable/Disable Scale when runtime lifecycle is affected
+Send Items
+Get Items
+Send HotKeys
+Get HotKeys
+Get Sales from device
+Send/Get Specification
+Set Date/Time
+Salesmen operations
+Text operations
+Print Format
+Barcode Format
+Paper Type
+```
+
+برای این عملیات، جهت معماری vNext یک **SQL Command Channel رسمی** تعریف می‌شود تا شرکت ثالث همچنان فقط به SQL نیاز داشته باشد ولی منطق Runtime دور زده نشود.
+
+### 4.3 Internal / Do Not Expose
+
+```text
+Raw device packets
+Protocol opcodes
+PCAP/captures
+Protocol implementation
+Internal queue structures
+Registry internals
+ItemSyncState internals
+Migration/repair internals
+Private keys/secrets
+Firmware internals
+Arbitrary SQL execution
+Arbitrary Runtime command execution
+```
 
 ---
 
@@ -133,11 +179,12 @@ public sealed class SadrStore
 
 قواعد:
 
-- `Code` هویت Store است؛
+- `Code` هویت پایدار Store است؛
 - `Code = "0"` شعبه پیش‌فرض است؛
-- `Name` فقط نام نمایشی است؛
-- Upsert مجاز است؛
-- ارتباط Scale با Store بر اساس `StoreCode` است.
+- `Name` هویت نیست و فقط نام نمایشی است؛
+- Upsert عمومی است؛
+- ارتباط Scale با Store با `StoreCode` تعریف می‌شود؛
+- Delete عمومی در Contract پایه ارائه نمی‌شود تا FK و رفتار Scale مبهم نشود.
 
 ---
 
@@ -154,21 +201,21 @@ public sealed class SadrItemGroup
 
 **Source of truth:** `dbo.SADR_ItemClass`
 
-Group مستقل از assignment گروه به Scale است.
+مدیریت Group و اختصاص Group به Scale دو مفهوم جدا هستند.
 
 ---
 
 ## 5.3 Item / PLU
 
-هویت عمومی کالا `PluNo` است.
+هویت اصلی کالا `PluNo` است.
 
 قواعد:
 
 - `PluNo = 0` نامعتبر است؛
 - Insert/Update عمومی است؛
-- حذف کالا soft-delete است؛
-- Batch باید bounded و atomic باشد؛
-- internal sync/delivery state عمومی نیست؛
+- حذف عمومی به شکل soft-delete انجام می‌شود؛
+- Batch bounded و atomic است؛
+- stateهای داخلی ارسال/Sync جزو مدل عمومی Item نیستند؛
 - Price history فقط Read عمومی است.
 
 ---
@@ -192,19 +239,23 @@ public sealed class SadrScale
 }
 ```
 
-Static scale data از `dbo.SADR_Scale` خوانده می‌شود.
+Static data از `dbo.SADR_Scale` خوانده می‌شود.
 
-Lifecycle واقعی Scale مثل افزودن/حذف/تغییراتی که Registry و اتصال فعال را درگیر می‌کنند نباید با چند SQL خام ناقص تقلید شود. برای این عملیات در نسخه‌های بعدی باید Managed Command Channel طراحی شود.
+### نکته مهم 5.2.1
+
+Runtime 5.2.1 هر ۱۰ ثانیه DB را برای ترازوهای جدید بررسی می‌کند، Registry را Reload می‌کند و برای Scale جدید Connection Check را شروع می‌کند.
+
+پس Scale جدیدی که در DB ظاهر شود قابل شناسایی است؛ اما **این به معنی مجاز بودن INSERT خام عمومی نیست**.
+
+مسیر داخلی Add Scale علاوه بر DB شامل Validation، Duplicate check، License authorization، Registry reload و Connection check است. بنابراین Public SDK نباید برای Add/Update/Delete صرفاً جدول `SADR_Scale` را خام تغییر دهد.
 
 ---
 
-## 5.5 Scale Status در SQL Integration فعلی
+## 5.5 Scale Status در SQL Integration
 
-این قسمت با تصمیم مالک اصلاح شده است.
+Sadr Scales هنگام Online/Offline شدن Scale مقدار `dbo.SADR_Scale.Status` را به‌روزرسانی می‌کند.
 
-Sadr Scales 5.2.1 هنگام اتصال و قطع ارتباط، `dbo.SADR_Scale.Status` را به‌روزرسانی می‌کند.
-
-پس برای Integration مبتنی بر SQL فعلی، Status عمومی قابل پشتیبانی این است:
+پس SQL Contract عمومی وضعیت پایه:
 
 ```csharp
 public enum SadrScaleConnectionStatus
@@ -221,7 +272,7 @@ public sealed class SadrScaleStatus
 }
 ```
 
-API پیشنهادی:
+API:
 
 ```csharp
 var status = await sadr.Scales.GetStatusAsync(scaleId, ct);
@@ -229,35 +280,13 @@ var status = await sadr.Scales.GetStatusAsync(scaleId, ct);
 
 **Source of truth برای SQL transport:** `dbo.SADR_Scale.Status`
 
-### مرز این Contract
-
-در SQL Contract فعلی فقط وضعیت coarse اتصال ارائه می‌شود:
-
-```text
-Online
-Offline
-Unknown / invalid value
-```
-
-Stateهای غنی‌تر داخلی مانند:
-
-```text
-Connecting
-Current Activity
-Progress
-Last Error
-Operation Busy
-```
-
-در 5.2.1 Contract عمومی SQL نیستند.
-
-اگر در آینده Service/API عمومی ساخته شود، می‌توان بدون شکستن مدل اصلی Scale، یک مدل وضعیت پیشرفته‌تر اضافه کرد.
+اطلاعات غنی‌تر مثل Progress، CurrentActivity و LastError در 5.2.1 SQL Contract نیستند و بعداً می‌توانند با Service/API افزوده شوند.
 
 ---
 
 ## 5.6 Scale Group Assignment
 
-یک ترازو می‌تواند چند گروه داشته باشد.
+یک ترازو می‌تواند چند Group داشته باشد.
 
 ```csharp
 public sealed class SadrScaleGroupAssignment
@@ -269,9 +298,22 @@ public sealed class SadrScaleGroupAssignment
 
 **Canonical source:** `dbo.SADR_ScaleItemClass`
 
-`dbo.SADR_Scale.ItemClassCode` برای compatibility قدیمی باقی می‌ماند، ولی source اصلی Multi-Group نیست.
+`dbo.SADR_Scale.ItemClassCode` فقط compatibility قدیمی است و source اصلی Multi-Group نیست.
 
-تغییر assignment باید از API کنترل‌شده انجام شود تا validation و reset stateهای لازم در یک نقطه انجام شوند.
+Write عمومی از SQL مجاز است، ولی فقط از API کنترل‌شده با semantic زیر:
+
+```text
+Validate ScaleId
+Validate at least one distinct Group
+Validate referenced Groups
+BEGIN TRANSACTION
+Delete existing Scale groups
+Insert complete replacement set
+Reset SADR_Scale.LastSendItem = 0
+COMMIT
+```
+
+مصرف‌کننده نباید `LastSendItem` را خودش مدیریت کند؛ SDK/SQL adapter این کار را انجام می‌دهد.
 
 ---
 
@@ -282,25 +324,36 @@ public sealed class SadrScaleItemAssignment
 {
     public int ScaleId { get; set; }
     public int PluNo { get; set; }
-    public string ItemCode { get; set; }
+    public int ItemCode { get; set; }
     public SadrHotKeyPosition HotKeyPosition { get; set; }
 }
 ```
 
-**Storage:** `dbo.SADR_ScaleItemMap`
+**Source:** `dbo.SADR_ScaleItemMap`
 
 قواعد:
 
-- PLU تکراری در یک Scale مجاز نیست؛
-- ItemCode تکراری در یک Scale مجاز نیست؛
-- موقعیت کلید سریع تکراری مجاز نیست؛
-- Page/Key باید با Layout همان Scale سازگار باشد.
+- PLU تکراری برای یک Scale رد می‌شود؛
+- ItemCode تکراری برای یک Scale رد می‌شود؛
+- Page/Key تکراری رد می‌شود؛
+- Layout باید با `HotKeyCountPerPage` و `HotKeyPageCount` همان Scale سازگار باشد؛
+- جایگزینی Mapping باید atomic باشد؛
+- پس از تغییر Mapping، `LastSendItem` باید توسط adapter reset شود.
+
+API:
+
+```csharp
+await sadr.ScaleAssignments.SetItemsAsync(scaleId, assignments, ct);
+await sadr.ScaleAssignments.CopyItemsAsync(sourceScaleId, targetScaleId, ct);
+```
+
+این عملیات **Data SQL کنترل‌شده** است، نه Device Command.
 
 ---
 
 ## 5.8 HotKey Template
 
-`dbo.SADR_KeyAssignment` الگوی کلید سریع در سطح Group است و با Scale Item Mapping یکی نیست.
+`dbo.SADR_KeyAssignment` یک Template در سطح Group است.
 
 ```csharp
 public sealed class SadrHotKeyTemplateEntry
@@ -316,20 +369,26 @@ public sealed class SadrHotKeyTemplateEntry
 
 ```text
 Item Group
-   └── HotKey Template
+   └── HotKey Template         → SADR_KeyAssignment
 
 Scale
-   └── Scale Item Assignment
+   └── Scale Item Assignment   → SADR_ScaleItemMap
          └── optional Page/Key
 ```
 
+Write عمومی از SQL مجاز است، اما باید از API کنترل‌شده انجام شود.
+
+برای Upsert معمولی، RowVersion خود جدول تغییر را قابل مشاهده می‌کند.
+
+برای Replace/Delete که ممکن است Row حذف شود، adapter باید `LastSendKey` ترازوهای تحت تأثیر را reset کند تا حذف نیز در ارسال بعدی گم نشود.
+
+`HotKeys.SetTemplateAsync` تعریف داده است؛ `Commands.SendHotKeysAsync` انتقال همین داده به Device است و یک مفهوم جدا محسوب می‌شود.
+
 ---
 
-# 6. Sales Feed و Structured Invoice دو مسیر جدا هستند
+# 6. Sales Feed و Structured Invoice دو مسیر مستقل‌اند
 
 ## 6.1 Sales Feed
-
-Feed برای Sync پیوسته است:
 
 ```csharp
 var batch = await sadr.Sales.ReadAfterAsync(lastProcessedId, pageSize, ct);
@@ -338,33 +397,28 @@ var batch = await sadr.Sales.ReadAfterAsync(lastProcessedId, pageSize, ct);
 قواعد:
 
 - `SADR_Logs` Read-only است؛
-- مقصد Cursor خودش را نگه می‌دارد؛
+- مقصد Cursor خودش را durable نگه می‌دارد؛
 - gap در ID مجاز است؛
-- SDK رکوردهای `SADR_Logs` را Ack یا Update نمی‌کند.
-
-این مسیر برای «هر فروش جدیدی که آمده» مناسب است.
+- SDK رکوردهای `SADR_Logs` را Ack/Update نمی‌کند.
 
 ---
 
-## 6.2 Structured Invoice / Aggregate Barcode
+## 6.2 Structured Invoice / TotalBarcode
 
-این مسیر برای دریافت یک فاکتور مشخص است.
-
-Barcode فاکتور در Core به شکل زیر ساخته می‌شود:
+TotalBarcode در Core:
 
 ```text
 25 + ScaleID(D3) + FID(D9)
 ```
 
-Lookup عمومی:
+Lookup:
 
 ```csharp
-var result = await sadr.Invoices.GetByBarcodeAsync(totalBarcode, ct);
-
-var result2 = await sadr.Invoices.GetAsync(scaleId, fid, ct);
+var byBarcode = await sadr.Invoices.GetByBarcodeAsync(totalBarcode, ct);
+var byIdentity = await sadr.Invoices.GetAsync(scaleId, fid, ct);
 ```
 
-داده فاکتور از رابطه زیر ساخته می‌شود:
+Data از این ساختار ساخته می‌شود:
 
 ```text
 SADR_Total
@@ -374,57 +428,46 @@ SADR_Detail
 SADR_Logs when complementary data is required
 ```
 
-مصرف‌کننده نباید JOIN داخلی را خودش طراحی کند.
+JOIN داخلی نباید به مصرف‌کننده تحمیل شود.
 
 ---
 
-# 7. Invoice Read Status و ACK — تصمیم اصلاح‌شده Phase 2
-
-این بخش با تصمیم صریح مالک پروژه جزو Contract عمومی است.
+# 7. Invoice Read Status و ACK
 
 ## 7.1 معنی `LableStatus`
 
-در `SADR_Total`:
-
 ```text
-LableStatus = 0 / NULL  → فاکتور هنوز توسط نرم‌افزار مقصد Ack نشده
-LableStatus = 1         → فاکتور قبلاً Ack / خوانده شده
+NULL / 0 → مقصد هنوز فاکتور را ACK نکرده
+1        → مقصد قبلاً فاکتور را ACK کرده
 ```
 
-این Contract در سطح **کل فاکتور** است.
+این semantic در سطح کل Invoice است.
 
-`SADR_Detail.ItemStatus` در Contract پایه Invoice Ack تغییر داده نمی‌شود، مگر بعداً semantic مستقل و مشخصی برای Ack خط‌به‌خط تعریف شود.
+`SADR_Detail.ItemStatus` فعلاً جزو Invoice-level ACK عمومی نیست.
 
 ---
 
 ## 7.2 Lookup هیچ‌وقت Auto-Ack نمی‌کند
-
-این اشتباه است:
-
-```text
-Get invoice
-→ automatically mark as read
-```
 
 رفتار درست:
 
 ```text
 Lookup invoice
       ↓
-Return full invoice + current read status
+Return full invoice + read status
       ↓
-Destination saves/commits invoice successfully
+Destination saves invoice
+      ↓
+Destination transaction COMMIT succeeds
       ↓
 Destination explicitly ACKs invoice
 ```
 
-اگر نرم‌افزار مقصد قبل از Commit خراب شود، فاکتور هنوز خوانده‌شده علامت نمی‌خورد.
+اگر Read یا Save ناقص بماند، فاکتور نباید اشتباهی خوانده‌شده علامت بخورد.
 
 ---
 
-## 7.3 نتیجه Lookup باید همیشه Data را برگرداند
-
-مدل پیشنهادی:
+## 7.3 AlreadyRead هشدار است، نه Block
 
 ```csharp
 public enum SadrInvoiceLookupStatus
@@ -433,79 +476,31 @@ public enum SadrInvoiceLookupStatus
     AlreadyRead,
     NotFound
 }
-
-public sealed class SadrInvoiceLookupResult
-{
-    public SadrInvoiceLookupStatus Status { get; set; }
-    public SadrInvoice Invoice { get; set; }
-}
 ```
 
-### فاکتور جدید
+در هر دو حالت زیر Invoice کامل برمی‌گردد:
 
 ```text
-Status = FoundUnread
-Invoice = full invoice
+FoundUnread → full invoice
+AlreadyRead → full invoice + warning
 ```
 
-### فاکتوری که قبلاً ACK شده
+`AlreadyRead` فقط اطلاع می‌دهد که این بارکد قبلاً ACK شده است.
 
-```text
-Status = AlreadyRead
-Invoice = full invoice
-```
+نرم‌افزار مقصد می‌تواند به کاربر هشدار بدهد و اگر رکورد قبلی اشتباهی حذف شده یا بازیابی لازم است، اجازه ثبت دوباره بدهد.
 
-یعنی **AlreadyRead مانع برگشت Data نمی‌شود.**
-
-هدف این است که POS بتواند بفهمد فاکتور قبلاً مصرف شده، ولی در صورت نیاز همچنان اطلاعات کامل آن را ببیند.
-
-### فاکتور ناموجود
-
-```text
-Status = NotFound
-Invoice = null
-```
+SDK نباید این تصمیم تجاری را Block کند.
 
 ---
 
-## 7.4 ACK صریح
-
-API پیشنهادی:
+## 7.4 ACK صریح و Idempotent
 
 ```csharp
-var ack = await sadr.Invoices.AcknowledgeAsync(totalBarcode, ct);
+await sadr.Invoices.AcknowledgeAsync(totalBarcode, ct);
+await sadr.Invoices.AcknowledgeAsync(scaleId, fid, ct);
 ```
 
-یا با identity منطقی:
-
-```csharp
-var ack = await sadr.Invoices.AcknowledgeAsync(scaleId, fid, ct);
-```
-
-رفتار:
-
-```text
-Find exact logical invoice
-        ↓
-If not found → NotFound
-        ↓
-If LableStatus != 1
-        ↓
-Set LableStatus = 1
-        ↓
-Return Acknowledged
-```
-
-اگر قبلاً `LableStatus = 1` بوده:
-
-```text
-Return AlreadyAcknowledged
-No harmful second mutation
-```
-
-پس Ack باید **idempotent** باشد.
-
-مدل نتیجه:
+Result:
 
 ```csharp
 public enum SadrInvoiceAckStatus
@@ -516,162 +511,164 @@ public enum SadrInvoiceAckStatus
 }
 ```
 
----
-
-## 7.5 ترتیب درست POS
+رفتار:
 
 ```text
-1. Scan / receive TotalBarcode
-2. GetByBarcode
-3. If FoundUnread or AlreadyRead → receive complete invoice
-4. Save invoice in POS transaction
-5. Commit POS transaction
-6. Acknowledge invoice in Sadr
+Not found        → NotFound
+LableStatus != 1 → set 1 → Acknowledged
+LableStatus == 1 → no harmful mutation → AlreadyAcknowledged
 ```
 
-اگر مرحله 6 به دلیل قطع SQL شکست خورد، POS می‌تواند Ack را دوباره تلاش کند چون عملیات Ack idempotent است.
+ACK باید transaction-safe و idempotent باشد.
 
 ---
 
-## 7.6 Cursor و Invoice ACK یکی نیستند
+# 8. Managed SQL Command Channel
 
-این دو را نباید مخلوط کنیم:
+## 8.1 چرا لازم است؟
+
+شرکت ثالث امروز SQL دارد، اما بعضی عملیات فقط با تغییر DB کامل نمی‌شوند.
+
+مثلاً مسیر واقعی Add Scale در Core شامل این موارد است:
 
 ```text
-Sales Feed
-→ destination-owned cursor
-
-Structured Invoice Lookup
-→ SADR_Total.LableStatus acknowledgement
+Input validation
+Duplicate check
+License authorization
+DB persistence
+Registry reload
+Connection check
 ```
 
-یک شرکت ممکن است یکی یا هر دو روش را استفاده کند.
+Update/Delete نیز Connection lifecycle و cleanup دارند.
+
+Device Commandها هم به Queue، connection state، model capability و protocol runtime وابسته‌اند.
+
+پس به جای Direct SQL mutation، Sadr Scales باید request را خودش اجرا کند.
 
 ---
 
-# 8. Reports
+## 8.2 معماری پیشنهادی
 
-API عمومی گزارش‌ها باید business-oriented باشد:
+```text
+Third-party app / SDK
+        ↓
+Typed SQL procedure
+        ↓
+Integration Command Queue
+        ↓
+Sadr Scales Runtime
+        ↓
+Validate / Execute
+        ↓
+Command Result
+        ↓
+Third-party app / SDK
+```
+
+این مدل باعث می‌شود شرکت ثالث همچنان فقط SQL Server را بشناسد.
+
+---
+
+## 8.3 Queue table جزئیات داخلی می‌ماند
+
+برنامه‌نویس بیرونی نباید مستقیماً یک `CommandType` دلخواه و Payload خام داخل table بنویسد.
+
+Public SQL Contract باید **Typed stored procedure** داشته باشد.
+
+نمونه جهت نام‌گذاری، نه Schema نهایی:
+
+```text
+dbo.SADR_Integration_AddScale
+dbo.SADR_Integration_UpdateScale
+dbo.SADR_Integration_DeleteScale
+
+dbo.SADR_Integration_SendItems
+dbo.SADR_Integration_GetItems
+dbo.SADR_Integration_SendHotKeys
+dbo.SADR_Integration_GetHotKeys
+dbo.SADR_Integration_GetSales
+
+dbo.SADR_Integration_SetDateTime
+...
+
+dbo.SADR_Integration_GetCommandResult
+```
+
+هر request یک `CommandId` برمی‌گرداند.
+
+SDK جزئیات polling/result table را مخفی می‌کند.
+
+---
+
+## 8.4 Command state عمومی
 
 ```csharp
-sadr.Reports.Sales.DailyAsync(...)
-sadr.Reports.Sales.ByScaleAsync(...)
-sadr.Reports.Sales.ByItemAsync(...)
+public enum SadrCommandState
+{
+    Pending,
+    Running,
+    Succeeded,
+    Failed,
+    Cancelled
+}
 ```
 
-همچنین:
+Result عمومی حداقل:
 
 ```csharp
-sadr.Sales.QueryAsync(...)
-sadr.Sales.GetSummaryAsync(...)
+public sealed class SadrCommandResult
+{
+    public Guid CommandId { get; set; }
+    public SadrCommandState State { get; set; }
+    public string Code { get; set; }
+    public string Message { get; set; }
+    public int? ScaleId { get; set; }
+}
 ```
 
----
-
-# 9. SQL Contract vNext — سطح داده قابل پشتیبانی
-
-| Domain | SQL object | Read | Write | Contract |
-|---|---|---:|---:|---|
-| Connection/schema | effective schema | Yes | No | Validate |
-| Store | `SADR_Store` | Yes | Upsert | Public |
-| Item Group | `SADR_ItemClass` | Yes | Upsert | Public |
-| Item | `SADR_Item` | Yes | Upsert + soft delete | Public |
-| Price History | `SADR_PriceLog` | Yes | No | Public read |
-| Scale definition | `SADR_Scale` | Yes | Controlled | Public model |
-| Scale online/offline status | `SADR_Scale.Status` | Yes | No by consumer | Public read |
-| Scale group assignment | `SADR_ScaleItemClass` | Yes | Controlled | Public domain API |
-| Scale item mapping | `SADR_ScaleItemMap` | Yes | Controlled | Public domain API |
-| HotKey template | `SADR_KeyAssignment` | Yes | Controlled | Public domain API |
-| Sales Feed | `SADR_Logs` | Yes | No | Public read |
-| Structured Invoice | `SADR_Total` + `SADR_Detail` | Yes | Ack only | Public |
-| Invoice Ack | `SADR_Total.LableStatus` | Yes | `0/NULL → 1` | Public controlled write |
-| Reports | reporting queries | Yes | No | Public read |
-
-`Controlled` یعنی مصرف‌کننده از API/Query رسمی مستندشده استفاده می‌کند و لازم نیست side-effectهای داخلی را خودش حدس بزند.
+Protocol code/packet نباید در Contract اصلی result باشد.
 
 ---
 
-# 10. SQL surfaces که عمومی نیستند
+## 8.5 Idempotency
 
-این موارد public write contract نیستند:
+Commandهایی که ممکن است دوباره submit شوند باید `RequestId` یا Idempotency Key داشته باشند تا retry شبکه باعث اجرای دوباره خطرناک نشود.
+
+قاعده:
 
 ```text
-SADR_ItemSyncState
-SADR_Scale.LastSendItem
-SADR_Scale.LastSendKey
-schema migration internals
-backup/restore/drop operations
-recovery/repair internals
-protocol-specific state
+Same RequestId
+→ same logical command
+→ no duplicate destructive execution
 ```
 
-همچنین:
-
-```text
-SADR_Detail.ItemStatus
-```
-
-تا وقتی semantic عمومی مستقل برای آن تعریف نشده، بخشی از Invoice-level ACK نیست.
+برای command غیرقابل replay، timeout نباید باعث retry کور شود.
 
 ---
 
-# 11. Device Commands و عملیات فعال ترازو
+# 9. مرز Writeهای SQL
 
-عملیاتی مثل:
-
-```text
-Send Items to device
-Get Items from device
-Send/Get HotKeys
-Get Sales from device
-Send/Get Specification
-Set Date/Time
-Text
-Salesman
-Print Format
-Barcode Format
-Paper Type
-```
-
-با خواندن یا نوشتن ساده یک Business Table معادل نیستند؛ باید توسط خود Sadr Scales اجرا شوند چون اتصال واقعی ترازو در اختیار آن است.
-
-در 5.2.1 نرم‌افزار ثالث کانال عمومی مستقیم برای این Runtime ندارد.
-
-پس Phase 2 فقط Contract مفهومی این عملیات را تعریف می‌کند و در فاز پیاده‌سازی باید یکی از کانال‌های مدیریت‌شده طراحی شود، برای نمونه:
-
-```text
-SQL Command Queue consumed by Sadr Scales
-or
-Local Service/API
-or
-Future REST Gateway
-```
-
-انتخاب کانال نباید معنی command را عوض کند.
-
-### اصل امنیتی
-
-API عمومی typed است:
-
-```csharp
-await sadr.Commands.SendItemsAsync(...);
-await sadr.Commands.GetSalesAsync(...);
-await sadr.Commands.SetDateTimeAsync(...);
-```
-
-Raw packet / command bytes عمومی نمی‌شوند.
+| Capability | Read SQL | Direct/Controlled SQL Write | Managed SQL Command |
+|---|---:|---:|---:|
+| Connection/schema | Yes | No | No |
+| Store | Yes | Upsert | No |
+| Item Group | Yes | Upsert | No |
+| Item / PLU | Yes | Upsert + soft delete | No |
+| Price History | Yes | No | No |
+| Static Scale | Yes | **No raw lifecycle write** | Add/Update/Delete |
+| Scale Status | Yes | No | No |
+| Scale Groups | Yes | Replace atomic + reset send state | No |
+| Scale Item Mapping | Yes | Replace/copy atomic + validation | No |
+| HotKey Template | Yes | Controlled upsert/replace + reset when needed | No |
+| Sales Feed | Yes | No | No |
+| Structured Invoice | Yes | ACK only | No |
+| Reports | Yes | No | No |
+| Device operations | No | No | **Yes** |
 
 ---
 
-# 12. File / Firmware / Label transfer
-
-Core می‌تواند عملیات file/firmware/label داشته باشد، اما به دلیل ریسک و مالکیت فکری، این‌ها تا Security/API review مستقل در Public default surface قرار نمی‌گیرند.
-
-این تصمیم قابلیت Core را حذف نمی‌کند.
-
----
-
-# 13. Public API نمونه پس از تکمیل vNext
+# 10. Public API هدف
 
 ```csharp
 var sadr = new SadrScalesClient(options);
@@ -679,131 +676,198 @@ var sadr = new SadrScalesClient(options);
 await sadr.Connection.ValidateAsync(ct);
 
 await sadr.Stores.UpsertAsync(store, ct);
-var stores = await sadr.Stores.GetAllAsync(ct);
-
 await sadr.ItemGroups.UpsertAsync(group, ct);
 await sadr.Items.UpsertAsync(item, ct);
 await sadr.Items.UpsertBatchAsync(items, ct);
-await sadr.Items.DeleteAsync(pluNo, ct);
+await sadr.Items.DeleteAsync(pluNo, ct); // soft delete
 
 var scales = await sadr.Scales.GetAllAsync(ct);
-var scaleStatus = await sadr.Scales.GetStatusAsync(scaleId, ct);
+var scale = await sadr.Scales.GetAsync(scaleId, ct);
+var status = await sadr.Scales.GetStatusAsync(scaleId, ct);
 
 await sadr.ScaleAssignments.SetGroupsAsync(scaleId, groupCodes, ct);
 await sadr.ScaleAssignments.SetItemsAsync(scaleId, assignments, ct);
+await sadr.ScaleAssignments.CopyItemsAsync(sourceScaleId, targetScaleId, ct);
 
-var sales = await sadr.Sales.ReadAfterAsync(cursor, 200, ct);
+await sadr.HotKeys.SetTemplateAsync(groupCode, entries, ct);
+var template = await sadr.HotKeys.GetTemplateAsync(groupCode, ct);
+
+var feed = await sadr.Sales.ReadAfterAsync(cursor, 200, ct);
 var query = await sadr.Sales.QueryAsync(filter, ct);
 var summary = await sadr.Sales.GetSummaryAsync(filter, ct);
 
-SadrInvoiceLookupResult invoice =
-    await sadr.Invoices.GetByBarcodeAsync(totalBarcode, ct);
-
-if (invoice.Status == SadrInvoiceLookupStatus.FoundUnread ||
-    invoice.Status == SadrInvoiceLookupStatus.AlreadyRead)
-{
-    SaveAndCommitInPos(invoice.Invoice);
-    await sadr.Invoices.AcknowledgeAsync(totalBarcode, ct);
-}
+var invoice = await sadr.Invoices.GetByBarcodeAsync(totalBarcode, ct);
+var ack = await sadr.Invoices.AcknowledgeAsync(totalBarcode, ct);
 
 var daily = await sadr.Reports.Sales.DailyAsync(range, ct);
+var byScale = await sadr.Reports.Sales.ByScaleAsync(range, ct);
+var byItem = await sadr.Reports.Sales.ByItemAsync(range, ct);
 ```
 
-Device commands زمانی عملیاتی می‌شوند که Managed Command Channel اضافه شود.
+با وجود Managed SQL Command Channel:
+
+```csharp
+await sadr.Scales.AddAsync(createRequest, ct);
+await sadr.Scales.UpdateAsync(updateRequest, ct);
+await sadr.Scales.DeleteAsync(scaleId, ct);
+
+await sadr.Commands.SendItemsAsync(scaleId, request, ct);
+await sadr.Commands.GetItemsAsync(scaleId, request, ct);
+await sadr.Commands.SendHotKeysAsync(scaleId, request, ct);
+await sadr.Commands.GetSalesAsync(scaleId, request, ct);
+await sadr.Commands.SetDateTimeAsync(scaleId, value, ct);
+```
 
 ---
 
-# 14. Retry و Idempotency
+# 11. Capability discovery و سازگاری با 5.2.1
 
-## Read operations
+SDK باید بفهمد DB چه Contractی را پشتیبانی می‌کند.
+
+مثلاً:
+
+```csharp
+var capabilities = await sadr.Connection.GetCapabilitiesAsync(ct);
+```
+
+5.2.1 فعلی می‌تواند این قابلیت‌ها را ارائه کند:
+
+```text
+Data SQL
+Scale coarse Online/Offline status
+Sales feed
+Structured Invoice lookup
+Invoice ACK after vNext SDK contract implementation if schema is compatible
+Reports
+Controlled data assignments where required schema exists
+```
+
+اما تا وقتی Sadr Scales Command Channel را نداشته باشد:
+
+```text
+Scale lifecycle commands
+Device commands
+```
+
+باید `CapabilityNotAvailable` برگردانند؛ نه اینکه SDK آن‌ها را با SQL خام تقلید کند.
+
+این محدودیت باید در Sample و Documentation کاملاً واضح باشد.
+
+---
+
+# 12. Device Commands عمومی
+
+حداقل خانواده‌های مورد انتظار:
+
+```text
+Items
+- SendItems
+- GetItems
+- DeleteAllItems
+
+HotKeys
+- SendHotKeys
+- GetHotKeys
+
+Sales
+- GetSales
+
+Settings
+- SendSpecification
+- GetSpecification
+- SetDateTime
+- Salesmen operations where supported
+- Text operations where supported
+- PrintFormat operations where supported
+- BarcodeFormat operations where supported
+- PaperType operations where supported
+```
+
+هر command قبل از اجرا باید Scale existence، enabled state، connection state، busy state و model capability را بررسی کند.
+
+Raw protocol passthrough عمومی ممنوع است.
+
+---
+
+# 13. Firmware / File / Label transfer
+
+این قابلیت‌ها در Core وجود دارند، ولی در Public default surface قرار نمی‌گیرند تا Security/API review جداگانه انجام شود.
+
+این تصمیم قابلیت Core را حذف نمی‌کند.
+
+---
+
+# 14. Retry و Transaction
+
+### Read SQL
 
 Bounded retry مجاز است.
 
-## Business SQL writes
-
-- validation قبل از اجرا؛
-- transaction در عملیات چندمرحله‌ای؛
-- blind replay بعد از transaction مبهم ممنوع.
-
-## Invoice Ack
-
-Ack استثنائاً برای retry مناسب است چون semantic آن idempotent است:
+### Data SQL Write
 
 ```text
-Desired final state = LableStatus 1
+Validate before execution
+Bounded transaction
+No blind replay after transaction begins
+Atomic commit/rollback
 ```
 
-اگر بار اول موفق شده باشد و جواب به مقصد نرسیده باشد، بار دوم `AlreadyAcknowledged` برمی‌گرداند.
+### Invoice ACK
 
-## Device commands
+Idempotent است و retry کنترل‌شده مجاز است.
 
-Blind replay ممنوع است مگر خود command صریحاً idempotent تعریف شده باشد.
+### Runtime Command
 
----
-
-# 15. Compatibility با v1.0.0
-
-`v1.0.0` frozen باقی می‌ماند.
-
-این APIها معتبر می‌مانند:
+هر command باید policy مشخص داشته باشد:
 
 ```text
-ItemGroups.Upsert
-Items.Upsert
-Items.UpsertBatch
-Sales.ReadAfter
-SQL Contract v1
+SafeRetry
+IdempotentControlledRetry
+NonReplayable
 ```
 
-vNext قابلیت‌های جدید را additive اضافه می‌کند.
-
-اگر تغییر شکستن API یا semantic لازم شد، تصمیم versioning مستقل گرفته می‌شود.
+Timeout هیچ‌وقت به معنی retry کور command غیرقابل replay نیست.
 
 ---
 
-# 16. تصمیم‌های Phase 2 پس از اصلاح
+# 15. نتیجه Phase 2 تا این نقطه
 
-در صورت تأیید مالک، این موارد قفل می‌شوند:
+تصمیم‌های تثبیت‌شده در طراحی:
 
-1. Domain مستقل از Transport است؛
-2. SQL روش اصلی Integration قابل استفاده با Sadr Scales 5.2.1 است؛
-3. `SADR_Scale.Status` منبع وضعیت Online/Offline برای SQL Integration فعلی است؛
-4. richer runtime status مربوط به Service/API آینده است؛
-5. Store با `StoreCode` شناخته می‌شود؛
-6. Multi-group با `SADR_ScaleItemClass` canonical است؛
-7. Scale mapping و Group HotKey template دو مفهوم جدا هستند؛
-8. Sales Feed با destination cursor کار می‌کند؛
-9. Structured Invoice lookup با TotalBarcode و ScaleID+FID عمومی است؛
-10. Lookup همیشه invoice را برمی‌گرداند، حتی اگر قبلاً خوانده شده باشد؛
-11. `AlreadyRead` یک status نتیجه است، نه مانع دریافت داده؛
-12. Ack صریح و جدا از Lookup است؛
-13. Ack موفق `SADR_Total.LableStatus = 1` می‌کند؛
-14. Ack idempotent است؛
-15. `SADR_Detail.ItemStatus` در Contract پایه Invoice Ack دست‌کاری نمی‌شود؛
-16. Device Commands typed هستند و raw protocol عمومی نیست؛
-17. اجرای Device Commands نیازمند Managed Command Channel در Sadr Scales است؛
-18. firmware/file/label تا review جدا در public default surface نیست؛
-19. `v1.0.0` تغییر نمی‌کند.
+1. Domain از Transport مستقل است؛
+2. SQL روش اصلی Integration فعلی است؛
+3. `SADR_Scale.Status` منبع عمومی Online/Offline در SQL است؛
+4. Store با `StoreCode` شناخته می‌شود؛
+5. Multi-Group با `SADR_ScaleItemClass` canonical است؛
+6. Scale Mapping و Group HotKey Template دو مفهوم جدا هستند؛
+7. Group/Mapping/HotKey writeها از SQL ممکن‌اند ولی semantic و transaction آن‌ها باید در SDK کنترل شود؛
+8. Structured Invoice با TotalBarcode و `ScaleID + FID` قابل lookup است؛
+9. Lookup auto-ACK نمی‌کند؛
+10. `AlreadyRead` فاکتور را Block نمی‌کند و Data کامل برمی‌گردد؛
+11. Invoice ACK صریح، بعد از Commit مقصد و idempotent است؛
+12. Scale lifecycle و Device Commands نباید با raw SQL mutation پیاده شوند؛
+13. جهت vNext، Managed SQL Command Channel راه پیشنهادی برای اجرای این عملیات توسط خود Sadr Scales است؛
+14. protocol implementation خصوصی باقی می‌ماند؛
+15. `v1.0.0` frozen است و vNext باید additive باشد.
 
 ---
 
-# 17. Gate خروج از Phase 2
+# 16. Gate خروج از Phase 2
 
-Phase 2 وقتی Complete است که این موارد تأیید شوند:
+قبل از شروع implementation باید مالک/نگهدارنده این موارد را تأیید کند:
 
-- [ ] Domain model
-- [ ] SQL-first behavior برای 5.2.1
-- [ ] Scale Status از `SADR_Scale.Status`
-- [ ] Store/Scale relation
-- [ ] Multi-group source of truth
-- [ ] Mapping/HotKey split
-- [ ] Structured Invoice lookup
-- [ ] `LableStatus` ACK semantics
-- [ ] AlreadyRead + return-full-data behavior
-- [ ] Sales cursor مستقل از Invoice Ack
-- [ ] Managed Device Command boundary
-- [ ] SQL safe surface
-- [ ] v1 compatibility
-- [ ] firmware/file/label exclusion pending separate review
+- [ ] Data SQL boundary؛
+- [ ] Store/Scale relation؛
+- [ ] Multi-group semantics؛
+- [ ] Mapping write semantics؛
+- [ ] HotKey write semantics؛
+- [x] SQL Online/Offline status؛
+- [x] Structured Invoice lookup؛
+- [x] Explicit Invoice ACK؛
+- [x] AlreadyRead returns full data؛
+- [ ] Managed SQL Command Channel direction؛
+- [ ] Scale lifecycle through managed command؛
+- [ ] Device command families؛
+- [ ] firmware/file/label exclusion pending separate review.
 
-بعد از پذیرش، وارد Implementation Planning می‌شویم؛ نه توسعه پراکنده.
+بعد از پذیرش، تصمیم‌ها در `docs/DECISIONS.md` به‌عنوان Accepted ثبت می‌شوند و سپس implementation planning شروع می‌شود.
