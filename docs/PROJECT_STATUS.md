@@ -1,7 +1,7 @@
 # Project Status — SadrScales-Integration
 
 **Last updated:** 2026-08-19  
-**Phase:** Phase 2 — Contract & Domain Design under final owner review  
+**Phase:** Phase 2 — Contract scope frozen for Vendor-Ready 5.2.1 implementation planning  
 **Current stable release:** `v1.0.0`  
 **Supported published Sadr Scales baseline:** `5.2.1`  
 **Current published integration contract:** `SQL Contract v1`
@@ -18,96 +18,129 @@ Read in this order:
 
 Chat history is not the project source of truth.
 
-## Phase 2 owner-confirmed decisions
+## Immediate business priority
 
-- SQL is the current third-party integration transport for Sadr Scales 5.2.1.
-- `SADR_Scale.Status` is the supported SQL source for coarse Online/Offline status.
+The next software-vendor outreach must happen only after a **Vendor-Ready Stable Baseline** is complete.
+
+The owner does not want external software companies to be asked repeatedly to review and update their integrations. Therefore the current objective is:
+
+```text
+Complete 5.2.1 SQL Integration
+        ↓
+SDK + Raw SQL + Docs + Sample
+        ↓
+End-to-End Vendor Acceptance Test
+        ↓
+Stable RC / Freeze
+        ↓
+One serious vendor outreach / letter
+```
+
+Sadr Scales 5.3 features must not delay this baseline.
+
+## Owner-confirmed Phase 2 decisions
+
+- SQL remains the current third-party integration transport for Sadr Scales 5.2.1.
+- `SADR_Scale.Status` is the supported SQL source for coarse Online/Offline state.
 - Structured Invoice lookup is supported by TotalBarcode and by ScaleID + FID.
 - Invoice lookup never auto-ACKs.
-- Explicit ACK happens only after the destination persistence/commit succeeds.
-- Invoice-level ACK sets `SADR_Total.LableStatus = 1` and repeated ACK is idempotent.
-- Re-reading an ACKed invoice still returns the complete invoice and reports `AlreadyRead`; this warning does not block recovery/re-import.
-- Item AutoSend resend is requested through `LastSendItem = 0`.
-- HotKey AutoSend resend is requested through `LastSendKey = 0` where the current model/runtime supports automatic HotKey transfer.
-- Resetting `LastSendItem` / `LastSendKey` is not an immediate device command; it marks the next eligible AutoSend cycle to resend.
-- A successful Resend request means the DB trigger state was reset; it does not claim that the physical scale has already received the data.
-- Runtime-only capabilities are planned for a typed Sadr Integration Service; the previously proposed SQL Command Queue direction is removed.
+- Explicit ACK happens only after destination Save/Commit succeeds.
+- Invoice ACK sets `SADR_Total.LableStatus = 1` and is idempotent.
+- An ACKed invoice still returns complete data with `AlreadyRead`; this is a warning, not a block.
+- Item AutoSend resend request uses `LastSendItem = 0`.
+- HotKey AutoSend resend request uses `LastSendKey = 0` where supported.
+- Resend request success means the DB resend state was recorded; it does not mean the physical scale already received the data.
+- The earlier Service-only runtime-command direction is superseded.
+- A per-scale typed Command Mailbox is planned for **Sadr Scales 5.3**, not for the immediate 5.2.1 Vendor-Ready release.
+- Service/REST can later become another transport over the same Command Domain.
 
-These confirmed decisions are recorded in `docs/DECISIONS.md` as D-024 through D-028.
+These decisions are recorded in `docs/DECISIONS.md` through D-030.
 
-## Current SQL vNext direction
+## Vendor-Ready 5.2.1 SQL scope
 
-The SQL surface being designed covers:
+The implementation target now covers:
 
 ```text
 Connection/schema validation
 Store read/upsert
 Item Group read/upsert
-Item/PLU read/upsert/soft-delete
+Item/PLU read/upsert/bounded batch/soft-delete
 Price history read
 Static Scale read
 Scale Online/Offline status read
-Scale group assignment
-Scale item mapping
-HotKey templates
+Scale Group Assignment
+Scale Item Mapping
+HotKey Template
 Request Item Resend
 Request HotKey Resend where supported
-Sales feed/query/summary
+Sales Feed
+Sales Query / Summary
 Structured Invoice lookup
 Invoice ACK
 Reports
 ```
 
-### AutoSend resend semantics
+## Out of immediate scope
+
+These items must not hold up Vendor Outreach:
 
 ```text
-RequestItemResend(scaleId)
-→ SADR_Scale.LastSendItem = 0
-
-RequestHotKeyResend(scaleId)
-→ SADR_Scale.LastSendKey = 0
+Sadr Scales 5.3 Command Mailbox implementation
+Service / REST transport
+Realtime Runtime progress API
+Public Scale Emulator
+Full Integration Lab
+Advanced runtime device commands beyond the 5.2.1 SQL surface
+Firmware/File/Label public operations
 ```
 
-These are documented SQL operations and will also have simple SDK methods. The current Runtime processes them on a later eligible AutoSend cycle; the scale must be enabled, connected and configured for automatic sending. HotKey AutoSend remains model/capability dependent.
+## Vendor-Ready release gate
 
-The SDK result for these methods reports whether the resend request was recorded successfully. Physical transfer completion is a separate concern that requires Runtime/Service visibility.
+Before the next software-vendor letter/outreach:
 
-## Future Service boundary
+1. complete the final SQL Contract for the 5.2.1 capabilities above;
+2. implement all corresponding SDK APIs;
+3. keep Raw SQL examples for non-C# consumers;
+4. add real SQL integration tests for Structured Invoice + ACK;
+5. test Scale status, Group/Mapping/HotKey and Resend semantics;
+6. implement Sales Query/Summary and Reports coverage;
+7. provide a runnable WinForms Developer Sample;
+8. provide seeded/reproducible Demo Data with Production-DB guard;
+9. keep a short Getting Started path plus a complete reference guide;
+10. keep `.NET Framework 4.8` consumer validation and SQL Server CI green;
+11. run an external-developer-style end-to-end acceptance test;
+12. freeze naming/contract after RC except for bug/security/compatibility fixes.
 
-The following capabilities are not forced into SQL:
+## Sadr Scales 5.3 follow-up
+
+A per-scale Command Mailbox is now a planned 5.3 capability.
+
+High-level semantics:
 
 ```text
-Safe Add/Update/Delete Scale lifecycle
-Immediate Send/Get Items
-Immediate Send/Get HotKeys
-Get Sales directly from the device
-Send/Get Specification
-Set Date/Time
-Salesman/Text/Print/Barcode/Paper operations where supported
-Richer Runtime status/progress/activity/error information
+one stable mailbox/row per Scale
+one active command per Scale
+RequestId
+Typed CommandCode / flags
+Idle / Pending / Running / Succeeded / Failed / Rejected
+ResultCode / ResultMessage
 ```
 
-They will be provided later through a typed Sadr Integration Service that keeps protocol details private and reuses Sadr Scales Runtime validation, licensing, registry, connection and model-capability logic.
+The Runtime performs validation, licensing, connection/busy checks, model capability and actual protocol work. Device protocol details remain private.
 
-The exact Service transport (local API / future REST, etc.) is intentionally deferred to implementation design.
+Examples planned for 5.3 include immediate SendItems with options such as ClearExisting, RetrieveItems, HotKey commands, RetrieveSales and supported setting operations.
 
-## Remaining Phase 2 review gates
+Exact schema and command code values are not part of the current 5.2.1 Integration release and will be frozen during 5.3 design.
 
-- Store/Scale relation;
-- multi-group semantics;
-- Mapping write semantics;
-- HotKey write semantics;
-- Scale lifecycle service boundary details;
-- final device-command family list;
-- firmware/file/label public exclusion pending separate review.
+## Exact next step
 
-After final acceptance:
-
-1. mark Phase 2 complete;
-2. ensure every accepted decision is in `docs/DECISIONS.md`;
-3. merge PR #14 only after all required CI gates pass;
-4. begin implementation planning in small, testable slices;
-5. do not modify Sadr Scales runtime or create large SDK clients before the implementation plan is accepted.
+1. finish Phase 2 PR #14 and merge it after required CI passes;
+2. convert the Vendor-Ready capability matrix into small implementation slices;
+3. implement current 5.2.1 SQL/SDK capabilities first;
+4. complete Sample + Demo Data;
+5. run Vendor Acceptance Test;
+6. freeze and publish the Vendor-Ready release;
+7. only then prepare/send the software-vendor outreach letter.
 
 ## Stable release identity
 
@@ -115,8 +148,6 @@ After final acceptance:
 - Stable source commit: `a6bccc7c13a8afba29b6860869d2a942b1231803`
 - Release ID: `372167195`
 - Protected Release run: `32112295891` — PASS
-- Protected Release artifact: `SadrScales-Integration-v1.0.0-1`
-- Artifact ID: `9315377547`
 - License: MIT
 - Providers/copyright identity: **Tozin Sadr and Behzad Erfanian**
 
@@ -131,7 +162,7 @@ Required checks on the stable source:
 - `net48-package-consumer`: PASS
 - `validate-public-boundary`: PASS
 
-The published `v1.0.0` Basic SQL Contract remains valid and unchanged while the next-generation Integration Platform is designed additively.
+The published `v1.0.0` Basic SQL Contract remains valid and unchanged while the next Vendor-Ready contract is developed additively.
 
 ## Security boundary
 
