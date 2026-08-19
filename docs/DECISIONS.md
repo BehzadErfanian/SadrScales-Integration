@@ -131,3 +131,13 @@ Invoice lookup by TotalBarcode or logical `ScaleID + FID` never auto-acknowledge
 **Date:** 2026-08-19  
 **Status:** Accepted
 If an invoice has already been ACKed (`LableStatus = 1`), a later lookup still returns the complete invoice and reports `AlreadyRead`. `AlreadyRead` is an informational warning, not a data-access block, so the destination can recover or re-import an invoice that was previously removed or lost after an earlier successful scan.
+
+## D-027 — SQL Integration supports explicit AutoSend resend requests
+**Date:** 2026-08-19  
+**Status:** Accepted
+Sadr Scales 5.2.1 already uses `SADR_Scale.LastSendItem` and `SADR_Scale.LastSendKey` as AutoSend watermarks. The public vNext SQL contract therefore supports `RequestItemResend(scaleId)` by setting `LastSendItem = 0`, and `RequestHotKeyResend(scaleId)` by setting `LastSendKey = 0` where the current model/runtime supports automatic HotKey transfer. These operations are resend requests, not immediate device commands: the next eligible AutoSend cycle performs the transfer when the scale is enabled, connected and configured for automatic sending. SDK methods hide the watermark detail; the Raw SQL path remains documented for non-C# consumers.
+
+## D-028 — Runtime-only capabilities move to a Service, not a SQL command queue
+**Date:** 2026-08-19  
+**Status:** Accepted
+SQL is extended only for behavior that Sadr Scales 5.2.1 can safely and predictably expose through its database. Scale lifecycle orchestration, immediate Send/Get commands, direct device sales retrieval, settings and richer Runtime state are not modeled as a new SQL command queue. They will be exposed later through a typed Sadr Integration Service that reuses Sadr Scales validation, licensing, registry, connection and model-capability logic while keeping device protocols private. The exact local/REST transport of that Service is a later implementation decision and must not change the public Domain semantics.
