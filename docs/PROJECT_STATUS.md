@@ -1,28 +1,146 @@
 # Project Status — SadrScales-Integration
 
-**Last updated:** 2026-08-18  
-**Phase:** Phase 1 — Full Integration Surface Audit completed on branch; maintainer review pending  
+**Last updated:** 2026-08-19  
+**Phase:** Phase 2 — Contract scope frozen for Vendor-Ready 5.2.1 implementation planning  
 **Current stable release:** `v1.0.0`  
-**Supported Sadr Scales baseline:** `5.2.1`  
+**Supported published Sadr Scales baseline:** `5.2.1`  
 **Current published integration contract:** `SQL Contract v1`
 
-## Canonical next-generation plan
+## Canonical references
 
-The accepted future direction is recorded in:
+Read in this order:
 
-- `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`
+1. `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`
+2. `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`
+3. `.github/maintainers/INTEGRATION_CONTRACT_DOMAIN_DESIGN_FA.md`
+4. `docs/DECISIONS.md`
+5. this file
 
-The Phase 1 audit is recorded in:
+Chat history is not the project source of truth.
 
-- `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`
+## Immediate business priority
 
-The master plan remains the canonical source for the product goal, completeness-first priorities, repository simplification, transport-independent domain design, coding/comment/region rules, testing strategy, Developer Sample App, seeded/random demo-data generation, internal simulator completion, protected public scale emulator, POS simulator and full single-PC Integration Lab.
+The next software-vendor outreach must happen only after a **Vendor-Ready Stable Baseline** is complete.
 
-The audit maps the externally useful Sadr Scales 5.2.1 surface into Safe Data Contract, Managed Runtime Command and Internal / Do Not Expose categories. It also records the design gaps that must be resolved before a new public Contract/API is implemented.
+The owner does not want external software companies to be asked repeatedly to review and update their integrations. Therefore the current objective is:
 
-The existing `v1.0.0` release remains immutable and valid for its published Basic SQL Contract. The next public version number is intentionally undecided until the new Contract/API compatibility design is complete.
+```text
+Complete 5.2.1 SQL Integration
+        ↓
+SDK + Raw SQL + Docs + Sample
+        ↓
+End-to-End Vendor Acceptance Test
+        ↓
+Stable RC / Freeze
+        ↓
+One serious vendor outreach / letter
+```
 
-**Next exact step:** maintainer/owner review of the Phase 1 audit. After acceptance, begin Phase 2 Contract & Domain Design. Do not add large new Public SDK clients before the Phase 2 decisions are accepted.
+Sadr Scales 5.3 features must not delay this baseline.
+
+## Owner-confirmed Phase 2 decisions
+
+- SQL remains the current third-party integration transport for Sadr Scales 5.2.1.
+- `SADR_Scale.Status` is the supported SQL source for coarse Online/Offline state.
+- Structured Invoice lookup is supported by TotalBarcode and by ScaleID + FID.
+- Invoice lookup never auto-ACKs.
+- Explicit ACK happens only after destination Save/Commit succeeds.
+- Invoice ACK sets `SADR_Total.LableStatus = 1` and is idempotent.
+- An ACKed invoice still returns complete data with `AlreadyRead`; this is a warning, not a block.
+- Item AutoSend resend request uses `LastSendItem = 0`.
+- HotKey AutoSend resend request uses `LastSendKey = 0` where supported.
+- Resend request success means the DB resend state was recorded; it does not mean the physical scale already received the data.
+- The earlier Service-only runtime-command direction is superseded.
+- A per-scale typed Command Mailbox is planned for **Sadr Scales 5.3**, not for the immediate 5.2.1 Vendor-Ready release.
+- Service/REST can later become another transport over the same Command Domain.
+
+These decisions are recorded in `docs/DECISIONS.md` through D-030.
+
+## Vendor-Ready 5.2.1 SQL scope
+
+The implementation target now covers:
+
+```text
+Connection/schema validation
+Store read/upsert
+Item Group read/upsert
+Item/PLU read/upsert/bounded batch/soft-delete
+Price history read
+Static Scale read
+Scale Online/Offline status read
+Scale Group Assignment
+Scale Item Mapping
+HotKey Template
+Request Item Resend
+Request HotKey Resend where supported
+Sales Feed
+Sales Query / Summary
+Structured Invoice lookup
+Invoice ACK
+Reports
+```
+
+## Out of immediate scope
+
+These items must not hold up Vendor Outreach:
+
+```text
+Sadr Scales 5.3 Command Mailbox implementation
+Service / REST transport
+Realtime Runtime progress API
+Public Scale Emulator
+Full Integration Lab
+Advanced runtime device commands beyond the 5.2.1 SQL surface
+Firmware/File/Label public operations
+```
+
+## Vendor-Ready release gate
+
+Before the next software-vendor letter/outreach:
+
+1. complete the final SQL Contract for the 5.2.1 capabilities above;
+2. implement all corresponding SDK APIs;
+3. keep Raw SQL examples for non-C# consumers;
+4. add real SQL integration tests for Structured Invoice + ACK;
+5. test Scale status, Group/Mapping/HotKey and Resend semantics;
+6. implement Sales Query/Summary and Reports coverage;
+7. provide a runnable WinForms Developer Sample;
+8. provide seeded/reproducible Demo Data with Production-DB guard;
+9. keep a short Getting Started path plus a complete reference guide;
+10. keep `.NET Framework 4.8` consumer validation and SQL Server CI green;
+11. run an external-developer-style end-to-end acceptance test;
+12. freeze naming/contract after RC except for bug/security/compatibility fixes.
+
+## Sadr Scales 5.3 follow-up
+
+A per-scale Command Mailbox is now a planned 5.3 capability.
+
+High-level semantics:
+
+```text
+one stable mailbox/row per Scale
+one active command per Scale
+RequestId
+Typed CommandCode / flags
+Idle / Pending / Running / Succeeded / Failed / Rejected
+ResultCode / ResultMessage
+```
+
+The Runtime performs validation, licensing, connection/busy checks, model capability and actual protocol work. Device protocol details remain private.
+
+Examples planned for 5.3 include immediate SendItems with options such as ClearExisting, RetrieveItems, HotKey commands, RetrieveSales and supported setting operations.
+
+Exact schema and command code values are not part of the current 5.2.1 Integration release and will be frozen during 5.3 design.
+
+## Exact next step
+
+1. finish Phase 2 PR #14 and merge it after required CI passes;
+2. convert the Vendor-Ready capability matrix into small implementation slices;
+3. implement current 5.2.1 SQL/SDK capabilities first;
+4. complete Sample + Demo Data;
+5. run Vendor Acceptance Test;
+6. freeze and publish the Vendor-Ready release;
+7. only then prepare/send the software-vendor outreach letter.
 
 ## Stable release identity
 
@@ -30,126 +148,34 @@ The existing `v1.0.0` release remains immutable and valid for its published Basi
 - Stable source commit: `a6bccc7c13a8afba29b6860869d2a942b1231803`
 - Release ID: `372167195`
 - Protected Release run: `32112295891` — PASS
-- Protected Release artifact: `SadrScales-Integration-v1.0.0-1`
-- Artifact ID: `9315377547`
 - License: MIT
 - Providers/copyright identity: **Tozin Sadr and Behzad Erfanian**
 
-The stable tag points to the exact validated merge commit and must never be moved or reused.
+The stable tag is immutable and must never be moved or reused.
 
-## Stable release assets
+## Stable v1.0.0 validation evidence
 
-The published release contains exactly these eight primary assets:
-
-1. `SadrScales.Integration.1.0.0.nupkg`
-2. `SadrScales.Integration.1.0.0.snupkg`
-3. `SadrScales.Integration-1.0.0-Binaries.zip`
-4. `SadrScales.Integration-1.0.0-DeveloperKit.zip`
-5. `SadrScales_Integration_Database_Guide_5.2.1_FA.pdf`
-6. `release-manifest.json`
-7. `SHA256SUMS.txt`
-8. `RELEASE_NOTES.md`
-
-All Draft Release assets were downloaded directly and verified before publication. File sizes matched GitHub asset metadata, `SHA256SUMS.txt` validated the release files, NuGet metadata was checked for package identity/version/MIT/both providers, the Binaries ZIP contained the compiled SDK and XML documentation, and the Developer Kit contained the expected public handoff/governance material.
-
-## Final validation evidence
-
-### Exact stable release source
-
-`a6bccc7c13a8afba29b6860869d2a942b1231803`
-
-### Main CI for stable release
-
-- SDK CI run `32111583869`: **PASS**
-- Public Repository Guard run `32112295906`: **PASS**
-
-Required status checks verified on the stable source:
+Required checks on the stable source:
 
 - `build-test-pack`: PASS
 - `sql-integration-test`: PASS
 - `net48-package-consumer`: PASS
 - `validate-public-boundary`: PASS
 
-### Protected release
+The published `v1.0.0` Basic SQL Contract remains valid and unchanged while the next Vendor-Ready contract is developed additively.
 
-Protected Release run `32112295891`: **PASS**
+## Security boundary
 
-Jobs:
+The public repository and future Integration surface must not expose:
 
-- `build-test-pack`: PASS
-- `sql-integration-test`: PASS
-- `net48-package-consumer`: PASS
-- `draft-release`: PASS
-
-## Official Integration Guide
-
-- File: `SadrScales_Integration_Database_Guide_5.2.1_FA.pdf`
-- Pages: 38
-- SHA-256: `182be9aa73348a35a299ab0fad22e5e9deeba800ef9222c0145ba582b02e281b`
-- Source Sadr Scales release commit: `1048749f52faba35e69464b64983e772c1c857e3`
-
-## GitHub security and branch protection
-
-Repository-owner verification confirmed before publication:
-
-- Secret Scanning: enabled;
-- Push Protection: enabled;
-- Dependabot vulnerability alerts: enabled;
-- Dependabot security updates: enabled and not paused;
-- Private Vulnerability Reporting: enabled;
-- CodeQL default setup for C#: configured with default query suite and `remote_and_local` threat model.
-
-`main` branch protection is active with:
-
-- required checks: `build-test-pack`, `sql-integration-test`, `net48-package-consumer`, `validate-public-boundary`;
-- strict/up-to-date status checks;
-- admin enforcement;
-- conversation resolution required;
-- force pushes disabled;
-- branch deletion disabled;
-- zero required approving reviews while the repository has one maintainer.
-
-## Completed engineering and developer readiness for v1.0.0
-
-- SQL Contract v1 audit/freeze and bilingual contract documentation.
-- C# SDK targeting `netstandard2.0` with `Microsoft.Data.SqlClient 7.0.2`.
-- Real SQL Server 2022 integration tests.
-- Bounded safe connection/read retry.
-- Transaction-scoped writes intentionally non-replayed after execution begins.
-- Real .NET Framework 4.8 generated-package consumer validation.
-- Atomic bounded PLU batch API, maximum 200 unique PLUs.
-- Executable read-only-by-default C# Quick Start.
-- Bilingual Getting Started and troubleshooting documentation.
-- Raw SQL path for non-C# consumers.
-- Production-readiness/go-live checklist.
-- Support, security, contribution and code-of-conduct policies.
-- CODEOWNERS and Dependabot policy.
-- Source Link/repository package metadata.
-- NuGet package-shape/.NET package validation.
-- SDK API/SemVer compatibility policy.
-- Strong-name decision: stable v1 remains unsigned unless a real supported-consumer requirement appears.
-- Automated release bundles, manifest, SHA-256 and protected tag workflow.
-
-## Distribution model
-
-GitHub is the developer source of truth. Stable SDK packages, compiled binaries, Developer Kit, official guide and checksums are distributed from the `v1.0.0` GitHub Release rather than committed as binary clutter to `main`.
-
-NuGet.org publication remains a separate decision because it requires package-account/ownership/publication-policy administration.
-
-## Scope boundary of published v1.0.0
-
-`v1.0.0` does not expose direct device protocols, packet captures, private firmware/vendor data, customer data, private keys or internal Sadr Scales runtime source.
-
-Its Basic SQL Contract is intentionally narrower than the accepted long-term Integration Platform goal. The Phase 1 audit documents that gap explicitly; future work must address it through Contract/Domain design rather than silently changing the published v1 contract.
-
-## Phase 1 audit result
-
-The audit confirms that the useful integration surface is substantially broader than the v1 Basic SQL Contract. Important surfaces include stores, scale configuration, live runtime state, scale/group/item assignments, hot keys, structured invoices, aggregate-barcode lookup, sales query/reporting and managed device commands.
-
-It also confirms that some operations must not be exposed as raw SQL merely because tables exist. Scale lifecycle and live device operations require Runtime orchestration; internal sync/migration/recovery/protocol state remains private.
-
-Open design gates are listed in `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md` and must be resolved in Phase 2 before implementation.
+- proprietary device protocols or raw packet formats;
+- captures/PCAPs or reverse-engineering material;
+- private firmware/vendor data;
+- private keys or secrets;
+- customer production data;
+- arbitrary SQL execution;
+- arbitrary Runtime/protocol command execution.
 
 ## Handoff rule
 
-A future session begins with `AGENTS.md`, then `.github/maintainers/INTEGRATION_PLATFORM_MASTER_PLAN_FA.md`, then `.github/maintainers/INTEGRATION_SURFACE_AUDIT_5.2.1_FA.md`, then this status file and only the current-state/contract references relevant to the task.
+A future session starts from the canonical references listed at the top of this file. Chat history is not the project source of truth.

@@ -77,10 +77,10 @@ The shared SDK assembly targets `netstandard2.0` to serve modern .NET and .NET F
 **Status:** Accepted
 SDK v1 uses `Microsoft.Data.SqlClient 7.0.2`; caller owns connection/security configuration.
 
-## D-016 — SDK does not own destination sales state
+## D-016 — SDK does not own destination sales feed cursor
 **Date:** 2026-08-16  
 **Status:** Accepted
-Sales read is read-only and the destination owns durable cursor/state.
+Sales Feed read is read-only and the destination owns its durable cursor/state. This does not remove the separate Structured Invoice acknowledgement contract accepted later in D-025.
 
 ## D-017 — SQL integration tests use disposable synthetic SQL Server
 **Date:** 2026-08-16  
@@ -116,3 +116,38 @@ The tested v1 consumer surface does not require a strong-name identity. A real .
 **Date:** 2026-08-18  
 **Status:** Accepted
 Before the first stable public release, the repository must have Secret Scanning, Push Protection, Dependabot vulnerability alerts/security updates, Private Vulnerability Reporting and C# CodeQL default setup enabled/configured. These controls were verified on 2026-08-18. `main` branch protection is configured only after the release-hardening PR is merged, using the exact validated post-merge check identities. While the repository has one maintainer, branch protection does not require an unavailable second approving reviewer; it does require validated checks and disallows force-push/deletion.
+
+## D-024 — SQL Scale status is the supported coarse third-party status for 5.2.1
+**Date:** 2026-08-19  
+**Status:** Accepted
+For SQL-based third-party integration against Sadr Scales 5.2.1, `dbo.SADR_Scale.Status` is the supported source for coarse `Online` / `Offline` state because Sadr Scales itself persists those transitions. Rich transient Runtime state such as progress/current activity/last error is not part of the 5.2.1 SQL contract and may be added later through a managed service/API.
+
+## D-025 — Structured Invoice lookup and explicit ACK are separate operations
+**Date:** 2026-08-19  
+**Status:** Accepted
+Invoice lookup by TotalBarcode or logical `ScaleID + FID` never auto-acknowledges. The destination first receives the complete invoice and current read state, persists/commits its own transaction, and only then explicitly ACKs the invoice. Invoice-level ACK sets `SADR_Total.LableStatus = 1` and is idempotent.
+
+## D-026 — AlreadyRead never blocks invoice recovery
+**Date:** 2026-08-19  
+**Status:** Accepted
+If an invoice has already been ACKed (`LableStatus = 1`), a later lookup still returns the complete invoice and reports `AlreadyRead`. `AlreadyRead` is an informational warning, not a data-access block, so the destination can recover or re-import an invoice that was previously removed or lost after an earlier successful scan.
+
+## D-027 — SQL Integration supports explicit AutoSend resend requests
+**Date:** 2026-08-19  
+**Status:** Accepted
+Sadr Scales 5.2.1 already uses `SADR_Scale.LastSendItem` and `SADR_Scale.LastSendKey` as AutoSend watermarks. The public vNext SQL contract therefore supports `RequestItemResend(scaleId)` by setting `LastSendItem = 0`, and `RequestHotKeyResend(scaleId)` by setting `LastSendKey = 0` where the current model/runtime supports automatic HotKey transfer. These operations are resend requests, not immediate device commands: the next eligible AutoSend cycle performs the transfer when the scale is enabled, connected and configured for automatic sending. SDK methods hide the watermark detail; the Raw SQL path remains documented for non-C# consumers.
+
+## D-028 — Service-only runtime command direction
+**Date:** 2026-08-19  
+**Status:** Superseded by D-029
+The earlier Phase 2 direction proposed keeping all runtime-only operations outside SQL and exposing them later only through a typed Sadr Integration Service. This direction is superseded because the owner later accepted a per-scale SQL Command Mailbox for Sadr Scales 5.3. The Service remains a future transport, but is no longer the only planned runtime-command entry point.
+
+## D-029 — Command Mailbox belongs to Sadr Scales 5.3, not the current Vendor-Ready baseline
+**Date:** 2026-08-19  
+**Status:** Accepted
+A typed per-scale Command Mailbox is a planned Sadr Scales 5.3 capability. Each scale has a stable command slot/mailbox, one active command at a time, a RequestId, typed command code/flags, execution state and result. Sadr Scales executes the command through its real Runtime validation, licensing, registry, connection and model-capability logic. Raw protocol packets/opcodes are never exposed. The exact schema and command codes are frozen during 5.3 design, not during the current 5.2.1 Integration work.
+
+## D-030 — Vendor-Ready 5.2.1 Integration is completed before the next software-vendor outreach
+**Date:** 2026-08-19  
+**Status:** Accepted
+The immediate priority is to complete and stabilize every integration capability already supportable against Sadr Scales 5.2.1 through SQL, SDK, documentation and executable samples. The software-vendor outreach/letter is sent only after this Vendor-Ready Baseline passes its end-to-end release gate. The goal is one serious integration update cycle for external software companies rather than repeated requests caused by an unstable or incomplete public contract. Sadr Scales 5.3 Command Mailbox, Service/API, public scale emulator and other later capabilities must not delay this current Vendor-Ready release and must be additive/compatible with it.
