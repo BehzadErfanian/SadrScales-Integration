@@ -5,14 +5,21 @@ namespace SadrScales.Integration.SampleApp
 {
     public partial class MainForm
     {
-        #region Sales and Reports Sample Composition
+        #region Additive Sample Composition
 
         private bool _salesReportsTabAdded;
+        private bool _demoDataTabAdded;
 
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
 
+            AddSalesReportsTab();
+            AddDemoDataTab();
+        }
+
+        private void AddSalesReportsTab()
+        {
             if (_salesReportsTabAdded)
             {
                 return;
@@ -33,6 +40,30 @@ namespace SadrScales.Integration.SampleApp
             page.Controls.Add(control);
             tabMain.Controls.Add(page);
             _salesReportsTabAdded = true;
+        }
+
+        private void AddDemoDataTab()
+        {
+            if (_demoDataTabAdded)
+            {
+                return;
+            }
+
+            var control = new DemoDataControl
+            {
+                Dock = DockStyle.Fill,
+                ConnectionStringProvider = () => txtConnectionString.Text.Trim()
+            };
+
+            var page = new TabPage
+            {
+                Text = "Demo Data",
+                Padding = new Padding(8),
+                UseVisualStyleBackColor = true
+            };
+            page.Controls.Add(control);
+            tabMain.Controls.Add(page);
+            _demoDataTabAdded = true;
         }
 
         #endregion
