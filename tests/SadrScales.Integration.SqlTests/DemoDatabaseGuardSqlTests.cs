@@ -28,7 +28,7 @@ namespace SadrScales.Integration.SqlTests
                 Assert.IsTrue(safety.CanInitializeMarker);
                 Assert.IsFalse(safety.CanWriteDemoData);
 
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(
+                await Assert.ThrowsExactlyAsync<InvalidOperationException>(
                     () => guard.InitializeMarkerAsync(database.DatabaseName + "_WRONG"));
 
                 await guard.InitializeMarkerAsync(database.DatabaseName);
@@ -55,7 +55,7 @@ VALUES('0', 700001, N'Real-looking row');");
                 Assert.IsFalse(safety.IsBusinessDataEmpty);
                 Assert.IsFalse(safety.CanInitializeMarker);
                 Assert.IsFalse(safety.CanWriteDemoData);
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(
+                await Assert.ThrowsExactlyAsync<InvalidOperationException>(
                     () => guard.InitializeMarkerAsync(database.DatabaseName));
             }
         }
