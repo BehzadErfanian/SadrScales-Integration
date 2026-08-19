@@ -1,114 +1,136 @@
 # Getting Started — Sadr Scales Integration
 
-This is the shortest supported path for **Sadr Scales 5.2.1 / SQL Contract v1 / SadrScales.Integration 1.x**.
+This is the shortest supported path for software vendors integrating with **Sadr Scales 5.2.1**.
 
-## 1. Architecture
+> Stable public release is currently `v1.0.0`. The additive Vendor-Ready `1.1.0` line is being frozen and tested before the next vendor outreach.
+
+## 1. Understand the boundary
 
 ```text
 POS / ERP / Accounting
         ↓
-SadrScales.Integration / SQL Contract v1
+SadrScales.Integration or documented SQL
         ↓
-Sadr Scales Runtime
+Sadr Scales database/runtime
         ↓
 Supported scales
 ```
 
-Your application integrates with Sadr Scales. Sadr Scales remains responsible for device sessions, retries, Registry, model differences and direct scale communication.
+Your software does not implement PLUS/LSG/Aclas wire protocols. Sadr Scales keeps ownership of device communication.
 
 ## 2. Prerequisites
 
-- Sadr Scales 5.2.1 or a later release explicitly compatible with SQL Contract v1.
-- Access to the SQL Server database used by that Sadr Scales installation.
-- For the C# SDK: .NET Framework 4.8 or a modern .NET runtime capable of consuming `netstandard2.0`.
+- Sadr Scales `5.2.1` or a later version explicitly documented as compatible.
+- SQL Server access to the database used by Sadr Scales.
+- For C#: .NET Framework 4.8 or modern .NET capable of consuming `netstandard2.0`.
 
-Run Sadr Scales once first so its own schema migration/check completes.
+Run Sadr Scales once first so its schema check/migration completes.
 
-## 3. Validate the contract first
-
-C#:
+## 3. Validate before doing anything else
 
 ```csharp
 var client = new SadrScalesClient(connectionString);
 await client.ValidateAsync();
 ```
 
-Or run the read-only SQL validator:
+Non-C# stacks can use the read-only [`00-validate-contract.sql`](../../samples/SQL/00-validate-contract.sql).
 
-[`samples/SQL/00-validate-contract.sql`](../../samples/SQL/00-validate-contract.sql)
+A mismatch is a stop condition. Do not bypass validation.
 
-Do not continue against an unknown/mismatched schema.
+## 4. See what is available
 
-## 4. Try the executable C# Quick Start
+Read the [Vendor-Ready Capabilities](capabilities.md) page.
 
-The repository contains a build-validated sample:
+The current approved 5.2.1 surface includes:
 
-[`samples/csharp/SadrScales.Integration.QuickStart`](../../samples/csharp/SadrScales.Integration.QuickStart/README.md)
+- Stores, Item Groups and Items/PLUs;
+- registered Scales and Online/Offline status;
+- Scale Assignments, per-scale Mapping and group HotKeys;
+- Item/HotKey AutoSend resend requests;
+- incremental Sales Feed;
+- filtered Sales Query and typed Reports;
+- structured Invoice lookup and explicit ACK.
 
-It reads the connection string only from `SADR_SCALES_CONNECTION_STRING`, validates Contract v1 and performs a read-only sales query by default.
+## 5. Run the executable Developer Sample
+
+The main reference application is:
+
+[`samples/csharp/SadrScales.Integration.SampleApp`](../../samples/csharp/SadrScales.Integration.SampleApp/README.md)
+
+It contains visible flows for the approved capabilities plus guarded Demo Data.
+
+Set the connection string without committing credentials:
 
 ```powershell
 $env:SADR_SCALES_CONNECTION_STRING = "Server=...;Database=...;..."
-dotnet run --project samples/csharp/SadrScales.Integration.QuickStart
+dotnet run --project samples/csharp/SadrScales.Integration.SampleApp
 ```
 
-Never commit a real connection string.
+The smaller read-only Quick Start remains available under [`samples/csharp/SadrScales.Integration.QuickStart`](../../samples/csharp/SadrScales.Integration.QuickStart/README.md).
 
-## 5. Use the release NuGet package
+## 6. C# package path
 
-For a GitHub Release package downloaded to a local folder:
+For a release package downloaded to a local folder:
 
 ```bash
-dotnet add package SadrScales.Integration --version 1.0.0 --source <download-folder>
+dotnet add package SadrScales.Integration --version <release-version> --source <download-folder>
 ```
 
-Then:
+Typical entry point:
 
 ```csharp
 var client = new SadrScalesClient(connectionString);
-
 await client.ValidateAsync();
+
+await client.Stores.UpsertAsync(store);
 await client.ItemGroups.UpsertAsync(group);
 await client.Items.UpsertAsync(item);
-
-SadrSalesBatch batch = await client.Sales.ReadAfterAsync(lastProcessedId, 100);
 ```
 
-## 6. Items and PLUs
+## 7. Invoice rule that must not be broken
 
-- Create the referenced group before the item.
-- `PluNo` must be unique and non-zero.
-- `PluNo` is the Contract v1 public item identity; do not use legacy `ID`/`IDitem` as integration identities.
-- Never write `TimeStamp/rowversion`.
-- `UpsertAsync` avoids unnecessary updates when semantic values are unchanged.
-- `UpsertBatchAsync` accepts at most **200 unique PLUs** in one atomic transaction. Larger imports must be paged by the caller.
-- Transaction-scoped writes are not automatically replayed after execution begins.
+```text
+Read invoice
+→ Save in destination
+→ Commit destination transaction
+→ ACK source invoice
+```
 
-Raw SQL dry-run: [`samples/SQL/01-upsert-item.sql`](../../samples/SQL/01-upsert-item.sql).
+Lookup never ACKs automatically. An ACKed invoice remains fully readable with `AlreadyRead` so recovery/re-import is possible.
 
-## 7. Sales
+## 8. Sales Feed rule that must not be broken
 
-The SDK reads accepted sales incrementally and never updates/deletes `SADR_Logs` for acknowledgement.
+`Sales.ReadAfterAsync` is a destination-owned synchronization feed.
 
-Consumer rules:
+1. read rows after your stored cursor;
+2. persist destination rows;
+3. commit destination transaction;
+4. only then persist the new cursor.
 
-- keep the cursor in destination-owned durable state;
-- persist destination data first, then advance the cursor;
-- use `(DeviceNo, FID, SubID)` for destination duplicate protection;
-- tolerate gaps in `ID` values.
+Use `(DeviceNo, FID, SubID)` as the preferred duplicate-protection key. `Sales.QueryAsync` is a separate search/report API and does not replace the Feed cursor.
 
-Raw SQL sample: [`samples/SQL/02-read-sales-incremental.sql`](../../samples/SQL/02-read-sales-incremental.sql).
+## 9. Non-C# / Raw SQL path
 
-## 8. If something fails
+Use the documented recipes under [`samples/SQL`](../../samples/SQL/README.md). They cover the same approved 5.2.1 SQL capabilities without requiring C#.
 
-Start with [Troubleshooting](troubleshooting.md).
+Do not invent writes against internal tables/columns that are not part of those recipes.
 
-Then read:
+## 10. Demo safety
 
-- [SQL Contract v1](sql-contract-v1.md)
-- [SDK Design v1](../SDK_DESIGN_V1.md)
-- [Compatibility](../COMPATIBILITY.md)
-- [Security boundary](../SECURITY_BOUNDARY.md)
-- [Full Persian technical guide](../reference/README.md)
+Demo Data is intentionally isolated from the production SDK contract. The Sample requires a clearly non-production database, required schema, empty business data, explicit database-name confirmation and a Demo marker before generation/reset.
 
-Direct PLUS/LSG/Aclas wire protocols are intentionally outside this public integration surface.
+Never initialize the Demo marker on a customer/production database.
+
+## 11. Reference only when needed
+
+- [Capabilities](capabilities.md)
+- [Catalog](catalog.md)
+- [Scales / Status / Resend](scales-status-resend.md)
+- [Assignments / Mapping / HotKeys](assignments-mapping-hotkeys.md)
+- [Structured Invoice + ACK](structured-invoices.md)
+- [Sales Query + Reports](sales-query-reports.md)
+- [Raw SQL recipes](../../samples/SQL/README.md)
+- [Troubleshooting](troubleshooting.md)
+- [Security](../../SECURITY.md)
+
+Direct device protocols, raw packets, private keys and arbitrary Runtime commands are intentionally outside this repository.
