@@ -77,10 +77,10 @@ The shared SDK assembly targets `netstandard2.0` to serve modern .NET and .NET F
 **Status:** Accepted
 SDK v1 uses `Microsoft.Data.SqlClient 7.0.2`; caller owns connection/security configuration.
 
-## D-016 — SDK does not own destination sales state
+## D-016 — SDK does not own destination sales feed cursor
 **Date:** 2026-08-16  
 **Status:** Accepted
-Sales read is read-only and the destination owns durable cursor/state.
+Sales Feed read is read-only and the destination owns its durable cursor/state. This does not remove the separate Structured Invoice acknowledgement contract accepted later in D-025.
 
 ## D-017 — SQL integration tests use disposable synthetic SQL Server
 **Date:** 2026-08-16  
@@ -116,3 +116,18 @@ The tested v1 consumer surface does not require a strong-name identity. A real .
 **Date:** 2026-08-18  
 **Status:** Accepted
 Before the first stable public release, the repository must have Secret Scanning, Push Protection, Dependabot vulnerability alerts/security updates, Private Vulnerability Reporting and C# CodeQL default setup enabled/configured. These controls were verified on 2026-08-18. `main` branch protection is configured only after the release-hardening PR is merged, using the exact validated post-merge check identities. While the repository has one maintainer, branch protection does not require an unavailable second approving reviewer; it does require validated checks and disallows force-push/deletion.
+
+## D-024 — SQL Scale status is the supported coarse third-party status for 5.2.1
+**Date:** 2026-08-19  
+**Status:** Accepted
+For SQL-based third-party integration against Sadr Scales 5.2.1, `dbo.SADR_Scale.Status` is the supported source for coarse `Online` / `Offline` state because Sadr Scales itself persists those transitions. Rich transient Runtime state such as progress/current activity/last error is not part of the 5.2.1 SQL contract and may be added later through a managed service/API.
+
+## D-025 — Structured Invoice lookup and explicit ACK are separate operations
+**Date:** 2026-08-19  
+**Status:** Accepted
+Invoice lookup by TotalBarcode or logical `ScaleID + FID` never auto-acknowledges. The destination first receives the complete invoice and current read state, persists/commits its own transaction, and only then explicitly ACKs the invoice. Invoice-level ACK sets `SADR_Total.LableStatus = 1` and is idempotent.
+
+## D-026 — AlreadyRead never blocks invoice recovery
+**Date:** 2026-08-19  
+**Status:** Accepted
+If an invoice has already been ACKed (`LableStatus = 1`), a later lookup still returns the complete invoice and reports `AlreadyRead`. `AlreadyRead` is an informational warning, not a data-access block, so the destination can recover or re-import an invoice that was previously removed or lost after an earlier successful scan.
