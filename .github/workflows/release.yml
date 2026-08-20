@@ -188,7 +188,7 @@ jobs:
             -GuidePath $guidePath
 
       - name: Upload release engineering evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: SadrScales-Integration-${{ github.ref_name }}-${{ github.run_number }}
           path: artifacts/release/
