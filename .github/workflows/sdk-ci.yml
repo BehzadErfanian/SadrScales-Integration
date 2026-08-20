@@ -52,7 +52,7 @@ jobs:
 
       - name: Build release bundle smoke test
         shell: pwsh
-        run: ./tools/New-ReleaseBundle.ps1 -Version 1.1.0 -PackageDirectory artifacts/package -OutputDirectory artifacts/release-smoke
+        run: ./tools/New-ReleaseBundle.ps1 -PackageDirectory artifacts/package -OutputDirectory artifacts/release-smoke
 
       - name: Upload release bundle smoke evidence
         uses: actions/upload-artifact@v4
