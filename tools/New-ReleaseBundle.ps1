@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Version = '1.0.0',
+    [string]$Version = '',
     [string]$PackageDirectory = '',
     [string]$OutputDirectory = '',
     [string]$GuidePath = ''
@@ -33,7 +33,10 @@ if ($null -eq $projectVersionNode) {
 }
 
 $projectVersion = [string]$projectVersionNode.InnerText
-if ($projectVersion -ne $Version) {
+if ([string]::IsNullOrWhiteSpace($Version)) {
+    $Version = $projectVersion
+}
+elseif ($projectVersion -ne $Version) {
     throw "Requested release version '$Version' does not match SDK project version '$projectVersion'."
 }
 
