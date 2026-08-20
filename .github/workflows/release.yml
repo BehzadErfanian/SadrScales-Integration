@@ -63,7 +63,12 @@ jobs:
 
       - name: Validate NuGet package
         shell: pwsh
-        run: ./tools/Validate-NuGetPackage.ps1 -PackagePath artifacts/package/SadrScales.Integration.1.0.0.nupkg
+        run: |
+          $package = Get-ChildItem artifacts/package/SadrScales.Integration.*.nupkg |
+            Where-Object { $_.Name -notlike '*.snupkg' } |
+            Select-Object -First 1
+          if (-not $package) { throw 'SDK NuGet package was not produced.' }
+          ./tools/Validate-NuGetPackage.ps1 -PackagePath $package.FullName
 
   sql-integration-test:
     runs-on: ubuntu-latest
@@ -151,7 +156,12 @@ jobs:
 
       - name: Validate tagged NuGet package
         shell: pwsh
-        run: ./tools/Validate-NuGetPackage.ps1 -PackagePath artifacts/package/SadrScales.Integration.1.0.0.nupkg
+        run: |
+          $package = Get-ChildItem artifacts/package/SadrScales.Integration.*.nupkg |
+            Where-Object { $_.Name -notlike '*.snupkg' } |
+            Select-Object -First 1
+          if (-not $package) { throw 'Tagged SDK NuGet package was not produced.' }
+          ./tools/Validate-NuGetPackage.ps1 -PackagePath $package.FullName
 
       - name: Download and verify official Integration Guide
         shell: pwsh
@@ -173,7 +183,6 @@ jobs:
           $definition = Get-Content 'docs/reference/integration-guide-5.2.1.json' -Raw | ConvertFrom-Json
           $guidePath = Join-Path 'artifacts/guide' ([string]$definition.fileName)
           ./tools/New-ReleaseBundle.ps1 `
-            -Version 1.0.0 `
             -PackageDirectory artifacts/package `
             -OutputDirectory artifacts/release `
             -GuidePath $guidePath
@@ -181,7 +190,7 @@ jobs:
       - name: Upload release engineering evidence
         uses: actions/upload-artifact@v4
         with:
-          name: SadrScales-Integration-v1.0.0-${{ github.run_number }}
+          name: SadrScales-Integration-${{ github.ref_name }}-${{ github.run_number }}
           path: artifacts/release/
           if-no-files-found: error
           retention-days: 90
