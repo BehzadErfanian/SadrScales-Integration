@@ -55,7 +55,7 @@ jobs:
         run: ./tools/New-ReleaseBundle.ps1 -PackageDirectory artifacts/package -OutputDirectory artifacts/release-smoke
 
       - name: Upload release bundle smoke evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: SadrScales-Integration-release-smoke-${{ github.run_number }}
           path: artifacts/release-smoke/
