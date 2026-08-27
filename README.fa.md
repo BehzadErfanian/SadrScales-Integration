@@ -9,24 +9,26 @@
 
 ارائه و نگهداری توسط **Tozin Sadr و Behzad Erfanian**.
 
-[English](README.md) · [شروع سریع](docs/fa/getting-started.md) · [قابلیت‌ها](docs/fa/capabilities.md) · [نمونه‌های SQL](samples/SQL/README.md) · [برنامه نمونه](samples/csharp/SadrScales.Integration.SampleApp/README.md) · [پشتیبانی](SUPPORT.md) · [امنیت](SECURITY.md)
+[English](README.md) · [شروع سریع](docs/fa/getting-started.md) · [قابلیت‌ها](docs/fa/capabilities.md) · [نمونه‌های SQL](samples/SQL/README.md) · [برنامه نمونه](samples/csharp/SadrScales.Integration.SampleApp/README.md) · [انتشارها](https://github.com/BehzadErfanian/SadrScales-Integration/releases) · [پشتیبانی](SUPPORT.md) · [امنیت](SECURITY.md)
 
 ## وضعیت
 
-- نسخه عمومی پایدار: **`v1.0.0`**
-- نسخه افزوده‌ی Vendor-Ready بعدی: **`1.1.0`**
-- مبنای Sadr Scales: **`5.2.1`**
+- نسخه عمومی پایدار SDK: **`v1.1.0`**
+- بسته: **`SadrScales.Integration.1.1.0`**
+- مبنای قرارداد تأییدشده Sadr Scales: **`5.2.1`**
+- انتشار برنامه Sadr Scales **`5.3`** در حال تکمیل است و قرارداد SQL/SDK سازگاری عقب‌رو را حفظ می‌کند.
+- تمرین Clean-room نهایی شرکت نرم‌افزاری و راهنمای جدید برنامه‌نویسان سایت عمداً **بعد از انتشار Sadr Scales 5.3** انجام می‌شود.
 - Target SDK: `netstandard2.0`
 - مصرف Package تأییدشده: .NET Framework 4.8 و .NET جدید
 - مجوز: MIT
 
-نسخه `v1.0.0` ثابت و تغییرناپذیر است. خط `1.1.0` فقط پس از تکمیل سطح Vendor-Ready 5.2.1، برنامه نمونه، محافظ Demo Data و تست Vendor Acceptance از روی Package Freeze می‌شود.
+`v1.1.0` بسته عمومی فعلی و Freeze‌شده SDK است و فایل‌های Release آن روی GitHub منتشر شده‌اند. مرحله بعدی مستندات، اجرای Vendor Rehearsal فقط از روی Package در محیط Sadr Scales 5.3 منتشرشده است. راهنمای رسمی سایت فقط بعد از سبز شدن همان تست نهایی می‌شود.
 
 ## از اینجا شروع کنید
 
 ```text
 ۱. شروع سریع را بخوانید
-۲. Contract بانک را Validate کنید
+۲. قرارداد بانک را بررسی کنید
 ۳. صفحه قابلیت‌ها را ببینید
 ۴. برنامه نمونه را اجرا کنید
 ۵. اگر C# ندارید از نمونه‌های Raw SQL استفاده کنید
@@ -66,25 +68,11 @@ SadrSalesBatch batch = await client.Sales.ReadAfterAsync(lastProcessedId, 100);
 
 ابتدا داده را در مقصد ذخیره و Commit کنید و فقط بعد از آن `batch.LastReadId` را به‌عنوان Cursor جدید نگه دارید.
 
-## قابلیت‌های Vendor-Ready 1.1
+## قابلیت‌های v1.1.0
 
-سطح تأییدشده Sadr Scales 5.2.1 شامل این موارد است:
+سطح تأییدشده شامل شعبه‌ها، گروه کالا و کالا/PLU، تاریخچه قیمت، ترازوها، تخصیص گروه، Mapping هر ترازو، HotKey، درخواست AutoSend، Sales Feed افزایشی، Sales Query و Summary، دریافت ساختاریافته فاکتور، ACK صریح و Idempotent و گزارش‌های روزانه/ترازو/کالا است.
 
-- شعبه‌ها؛
-- گروه‌های کالا و کالا/PLU؛
-- خواندن تاریخچه قیمت؛
-- ترازوهای ثبت‌شده و وضعیت `Online / Offline / Unknown`؛
-- تخصیص گروه‌های کالا به ترازو؛
-- Mapping اختصاصی هر ترازو؛
-- HotKeyهای گروه؛
-- درخواست ارسال مجدد خودکار کالا/HotKey؛
-- Sales Feed افزایشی؛
-- Sales Query و Summary؛
-- دریافت فاکتور با TotalBarcode یا ScaleID + FID؛
-- ACK صریح و Idempotent؛
-- گزارش روزانه، بر اساس ترازو و بر اساس کالا.
-
-نقشه کامل در [صفحه قابلیت‌ها](docs/fa/capabilities.md) است.
+نقشه کامل در [صفحه قابلیت‌ها](docs/fa/capabilities.md) قرار دارد.
 
 ## قانون مهم فاکتور
 
@@ -99,11 +87,7 @@ Lookup هیچ‌وقت خودکار ACK نمی‌کند. فاکتور ACK شده
 
 ## برنامه نمونه اجرایی
 
-مرجع اصلی:
-
 [`samples/csharp/SadrScales.Integration.SampleApp`](samples/csharp/SadrScales.Integration.SampleApp/README.md)
-
-این برنامه Invoices، Scales، Catalog، Assignments/Mapping/HotKeys، Sales/Reports و Demo Data محافظت‌شده را نشان می‌دهد.
 
 ```powershell
 $env:SADR_SCALES_CONNECTION_STRING = "Server=...;Database=...;..."
@@ -114,35 +98,29 @@ Credential واقعی را داخل Source قرار ندهید.
 
 ## مسیر غیر C# / Raw SQL
 
-استفاده از C# اجباری نیست. نمونه‌های مستقل از زبان در [`samples/SQL`](samples/SQL/README.md) قرار دارند.
-
-برای قابلیت‌هایی که مستند نشده‌اند، Write تازه روی جدول‌ها یا ستون‌های داخلی اختراع نکنید.
+استفاده از C# اجباری نیست. نمونه‌های مستقل از زبان در [`samples/SQL`](samples/SQL/README.md) قرار دارند. برای قابلیت‌هایی که مستند نشده‌اند، Write تازه روی جدول‌ها یا ستون‌های داخلی اختراع نکنید.
 
 ## ایمنی Demo Data
 
-DemoLab جزو API تولیدی SDK نیست. Generate/Reset فقط روی دیتابیس واضح غیرتولیدی، با Schema سازگار، داده تجاری خالی، تأیید دوباره نام دقیق دیتابیس و Demo marker معتبر مجاز است.
-
-Demo marker را روی دیتابیس مشتری یا Production فعال نکنید.
+DemoLab جزو API تولیدی SDK نیست. Demo marker را روی دیتابیس مشتری یا Production فعال نکنید.
 
 ## Gate کیفیت Release
 
-نسخه Vendor-Ready باید این موارد را سبز داشته باشد:
-
-- Build/Test/Pack SDK؛
-- SQL Server Integration Tests؛
-- Build برنامه WinForms Sample؛
-- مصرف واقعی Package روی .NET Framework 4.8؛
-- Vendor Acceptance از روی Package و بدون ProjectReference؛
-- Public Repository Guard؛
-- Release Bundle smoke test.
-
-بعد از Freeze نسخه `1.1.0 RC` فقط اصلاح Bug، Security و Compatibility مجاز است تا نامه به شرکت‌های نرم‌افزاری ارسال شود.
+بسته `v1.1.0` Gateهای Build/Test/Package/Public Repository را گذرانده است. قبل از اینکه راهنمای برنامه‌نویسان سایت نهایی اعلام شود، Vendor Rehearsal از روی Package و در برابر Sadr Scales منتشرشده نیز باید PASS شود.
 
 ## مرز امنیتی
 
 این مخزن عمداً پروتکل مستقیم ترازو، Packet خام، Capture شبکه، کلید خصوصی، داده واقعی مشتری، Firmware خصوصی و Runtime Command دلخواه را منتشر نمی‌کند.
 
-Command Mailbox تایپ‌شده برای هر ترازو در **Sadr Scales 5.3** برنامه‌ریزی شده و جزو انتشار فعلی 5.2.1 نیست.
+Integration Command Mailbox تایپ‌شده برای هر ترازو به مسیر معماری آینده **Sadr Scales 5.4** منتقل شده است؛ اگر 5.4 برای یک انتشار عمومی میانی مصرف شود، این کار به اولین نسخه دو بخشی آزاد بعدی منتقل می‌شود. این قابلیت جزو SDK `v1.1.0` نیست.
+
+## صحت انتشار
+
+GitHub Release `v1.1.0` مرجع عمومی بسته است. SHA-256 بسته NuGet:
+
+```text
+2baa100d6cf3125c75edbb7e99e1d15ff3e99d0bcd52534180ebe3f29d9d359f
+```
 
 ## مجوز
 
