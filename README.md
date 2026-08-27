@@ -7,18 +7,20 @@
 
 Provided and maintained by **Tozin Sadr and Behzad Erfanian**.
 
-[فارسی](README.fa.md) · [Getting Started](docs/en/getting-started.md) · [Capabilities](docs/en/capabilities.md) · [Raw SQL Recipes](samples/SQL/README.md) · [Developer Sample](samples/csharp/SadrScales.Integration.SampleApp/README.md) · [Support](SUPPORT.md) · [Security](SECURITY.md)
+[فارسی](README.fa.md) · [Getting Started](docs/en/getting-started.md) · [Capabilities](docs/en/capabilities.md) · [Raw SQL Recipes](samples/SQL/README.md) · [Developer Sample](samples/csharp/SadrScales.Integration.SampleApp/README.md) · [Releases](https://github.com/BehzadErfanian/SadrScales-Integration/releases) · [Support](SUPPORT.md) · [Security](SECURITY.md)
 
 ## Status
 
-- Stable public release: **`v1.0.0`**
-- Next additive Vendor-Ready release: **`1.1.0`**
-- Supported Sadr Scales baseline: **`5.2.1`**
+- Stable public SDK release: **`v1.1.0`**
+- Package: **`SadrScales.Integration.1.1.0`**
+- Accepted Sadr Scales contract baseline: **`5.2.1`**
+- Sadr Scales **`5.3`** application publication is in progress; the supported SQL/SDK contract remains backward-compatible.
+- Final clean-room vendor rehearsal and the new website Developer Guide are intentionally scheduled **after Sadr Scales 5.3 is published**.
 - SDK target: `netstandard2.0`
-- Proven package consumer: .NET Framework 4.8 and modern .NET
+- Proven package consumers: .NET Framework 4.8 and modern .NET
 - License: MIT
 
-`v1.0.0` remains immutable. The `1.1.0` line is being frozen only after the full 5.2.1 Vendor-Ready surface, executable sample, Demo safety and package-only Vendor Acceptance gate are green.
+`v1.1.0` is the current frozen public SDK package. GitHub release assets are already published. The next documentation gate is a clean-room, package-only vendor rehearsal against the released Sadr Scales 5.3 environment; the official website Developer Guide will be finalized only after that rehearsal passes.
 
 ## Start here
 
@@ -64,23 +66,9 @@ SadrSalesBatch batch = await client.Sales.ReadAfterAsync(lastProcessedId, 100);
 
 Persist destination data first, commit it, and only then persist `batch.LastReadId` as your new cursor.
 
-## Vendor-Ready 1.1 capabilities
+## v1.1.0 capabilities
 
-The approved Sadr Scales 5.2.1 integration surface includes:
-
-- Stores;
-- Item Groups and Items/PLUs;
-- Price History read;
-- registered Scales and coarse `Online / Offline / Unknown` state;
-- Scale Group Assignments;
-- per-scale Item Mapping;
-- group HotKey templates;
-- Item/HotKey AutoSend resend requests;
-- incremental Sales Feed;
-- filtered Sales Query and summaries;
-- structured Invoice lookup by TotalBarcode or ScaleID + FID;
-- explicit idempotent Invoice ACK;
-- Daily / Scale / Item reports.
+The approved integration surface includes Stores, Items/PLUs, Price History, Scales, Scale Group Assignments, per-scale Item Mapping, HotKey templates, Item/HotKey AutoSend resend requests, incremental Sales Feed, filtered Sales Query/summaries, structured Invoice lookup, idempotent Invoice ACK, and Daily/Scale/Item reports.
 
 See the [Capabilities map](docs/en/capabilities.md).
 
@@ -97,11 +85,9 @@ Lookup never ACKs automatically. An acknowledged invoice remains fully readable 
 
 ## Executable Developer Sample
 
-Use the growing WinForms reference application:
+Use the WinForms reference application:
 
 [`samples/csharp/SadrScales.Integration.SampleApp`](samples/csharp/SadrScales.Integration.SampleApp/README.md)
-
-It demonstrates Invoices, Scales, Catalog, Assignments/Mapping/HotKeys, Sales/Reports and guarded Demo Data.
 
 ```powershell
 $env:SADR_SCALES_CONNECTION_STRING = "Server=...;Database=...;..."
@@ -112,35 +98,29 @@ Never commit production credentials.
 
 ## Non-C# / Raw SQL
 
-C# is optional. The supported language-independent recipes are under [`samples/SQL`](samples/SQL/README.md).
-
-Do not invent writes against internal Sadr tables/columns that are not part of the documented recipes.
+C# is optional. The supported language-independent recipes are under [`samples/SQL`](samples/SQL/README.md). Do not invent writes against internal Sadr tables/columns that are not part of the documented recipes.
 
 ## Demo Data safety
 
-DemoLab is intentionally **not** part of the production SDK API. Demo generation/reset requires a clearly non-production database, compatible schema, empty business data, exact database-name confirmation and a valid Demo marker.
-
-Never initialize the Demo marker on a customer or production database.
+DemoLab is intentionally **not** part of the production SDK API. Never initialize the Demo marker on a customer or production database.
 
 ## Release quality
 
-The Vendor-Ready release gate includes:
-
-- SDK build/test/package validation;
-- disposable SQL Server integration tests;
-- executable WinForms Sample build;
-- real .NET Framework 4.8 package consumer;
-- package-only external-developer Vendor Acceptance flow;
-- Public Repository Guard;
-- release-bundle smoke validation.
-
-After the `1.1.0` RC freeze, only bug, security and compatibility fixes are allowed before vendor outreach.
+The `v1.1.0` package release passed the repository build/test/package/public-repository gates. Before the website Developer Guide is promoted as final, a clean-room package-only vendor rehearsal against the released Sadr Scales application is required.
 
 ## Security boundary
 
 This repository intentionally excludes direct scale protocols, raw packets, packet captures, private keys, customer production data, private firmware/vendor material and arbitrary Runtime commands.
 
-A typed per-scale Command Mailbox is planned for **Sadr Scales 5.3** and is outside the immediate 5.2.1 Vendor-Ready release.
+The typed per-scale Integration Command Mailbox belongs to the future Sadr Scales **5.4 architecture track** (or the next unused two-part release if 5.4 is consumed by an intervening public release). It is not part of SDK `v1.1.0`.
+
+## Release integrity
+
+GitHub Release `v1.1.0` is the authoritative public package release. NuGet package SHA-256:
+
+```text
+2baa100d6cf3125c75edbb7e99e1d15ff3e99d0bcd52534180ebe3f29d9d359f
+```
 
 ## License
 
