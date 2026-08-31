@@ -11,14 +11,15 @@ Provided and maintained by **Tozin Sadr and Behzad Erfanian**.
 
 ## Status
 
-- Stable public release: **`v1.0.0`**
-- Next additive Vendor-Ready release: **`1.1.0`**
-- Supported Sadr Scales baseline: **`5.2.1`**
+- Stable public Integration release: **`v1.1.0`**
+- Frozen SQL/SDK contract baseline: **Sadr Scales `5.2.1`**
+- Current Sadr Scales application release: **`5.3`**
+- Sadr Scales 5.3 compatibility: **final vendor-rehearsal validation in progress**
 - SDK target: `netstandard2.0`
 - Proven package consumer: .NET Framework 4.8 and modern .NET
 - License: MIT
 
-`v1.0.0` remains immutable. The `1.1.0` line is being frozen only after the full 5.2.1 Vendor-Ready surface, executable sample, Demo safety and package-only Vendor Acceptance gate are green.
+`v1.1.0` is the current Vendor-Ready release. Its public SQL/SDK contract remains intentionally pinned to the validated Sadr Scales 5.2.1 integration surface; advancing the Sadr Scales application to 5.3 does not silently redefine that contract. The current post-release work is a published-package clean-room and compatibility rehearsal against Sadr Scales 5.3 before the next external vendor outreach.
 
 ## Start here
 
@@ -66,7 +67,7 @@ Persist destination data first, commit it, and only then persist `batch.LastRead
 
 ## Vendor-Ready 1.1 capabilities
 
-The approved Sadr Scales 5.2.1 integration surface includes:
+The frozen Sadr Scales 5.2.1 integration surface includes:
 
 - Stores;
 - Item Groups and Items/PLUs;
@@ -97,7 +98,7 @@ Lookup never ACKs automatically. An acknowledged invoice remains fully readable 
 
 ## Executable Developer Sample
 
-Use the growing WinForms reference application:
+Use the WinForms reference application:
 
 [`samples/csharp/SadrScales.Integration.SampleApp`](samples/csharp/SadrScales.Integration.SampleApp/README.md)
 
@@ -124,7 +125,7 @@ Never initialize the Demo marker on a customer or production database.
 
 ## Release quality
 
-The Vendor-Ready release gate includes:
+The `v1.1.0` Vendor-Ready release gate includes:
 
 - SDK build/test/package validation;
 - disposable SQL Server integration tests;
@@ -132,15 +133,15 @@ The Vendor-Ready release gate includes:
 - real .NET Framework 4.8 package consumer;
 - package-only external-developer Vendor Acceptance flow;
 - Public Repository Guard;
-- release-bundle smoke validation.
+- release-bundle validation.
 
-After the `1.1.0` RC freeze, only bug, security and compatibility fixes are allowed before vendor outreach.
+The post-release compatibility rehearsal uses the published package bytes and Sadr Scales 5.3 rather than expanding the frozen 1.1 contract.
 
 ## Security boundary
 
 This repository intentionally excludes direct scale protocols, raw packets, packet captures, private keys, customer production data, private firmware/vendor material and arbitrary Runtime commands.
 
-A typed per-scale Command Mailbox is planned for **Sadr Scales 5.3** and is outside the immediate 5.2.1 Vendor-Ready release.
+Typed managed commands, Service/REST, Webhook/realtime and related Gateway capabilities are future **Sadr Scales 5.4+** architecture work. They are outside the current frozen 1.1 SQL/SDK contract.
 
 ## License
 
