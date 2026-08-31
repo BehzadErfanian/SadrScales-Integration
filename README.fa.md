@@ -13,14 +13,15 @@
 
 ## وضعیت
 
-- نسخه عمومی پایدار: **`v1.0.0`**
-- نسخه افزوده‌ی Vendor-Ready بعدی: **`1.1.0`**
-- مبنای Sadr Scales: **`5.2.1`**
+- نسخه عمومی پایدار Integration: **`v1.1.0`**
+- مبنای ثابت Contract بانک/SDK: **Sadr Scales `5.2.1`**
+- نسخه پایدار فعلی نرم‌افزار Sadr Scales: **`5.3`**
+- سازگاری با Sadr Scales 5.3: **در مرحله نهایی تست Package و Vendor Rehearsal**
 - Target SDK: `netstandard2.0`
 - مصرف Package تأییدشده: .NET Framework 4.8 و .NET جدید
 - مجوز: MIT
 
-نسخه `v1.0.0` ثابت و تغییرناپذیر است. خط `1.1.0` فقط پس از تکمیل سطح Vendor-Ready 5.2.1، برنامه نمونه، محافظ Demo Data و تست Vendor Acceptance از روی Package Freeze می‌شود.
+`v1.1.0` نسخه Vendor-Ready پایدار فعلی است. Contract عمومی SQL/SDK آن عمداً روی سطح یکپارچه‌سازی تأییدشده Sadr Scales 5.2.1 ثابت مانده است؛ ارتقای خود نرم‌افزار Sadr Scales به 5.3 به‌معنی تغییر خودکار Contract نیست. کار فعلی، تست Clean-room از روی Package منتشرشده و کنترل سازگاری روی Sadr Scales 5.3 پیش از ارائه بعدی به شرکت‌های نرم‌افزاری است.
 
 ## از اینجا شروع کنید
 
@@ -68,7 +69,7 @@ SadrSalesBatch batch = await client.Sales.ReadAfterAsync(lastProcessedId, 100);
 
 ## قابلیت‌های Vendor-Ready 1.1
 
-سطح تأییدشده Sadr Scales 5.2.1 شامل این موارد است:
+سطح ثابت Integration مربوط به Sadr Scales 5.2.1 شامل این موارد است:
 
 - شعبه‌ها؛
 - گروه‌های کالا و کالا/PLU؛
@@ -126,7 +127,7 @@ Demo marker را روی دیتابیس مشتری یا Production فعال نک�
 
 ## Gate کیفیت Release
 
-نسخه Vendor-Ready باید این موارد را سبز داشته باشد:
+نسخه `v1.1.0` با این Gateها ساخته و منتشر شده است:
 
 - Build/Test/Pack SDK؛
 - SQL Server Integration Tests؛
@@ -134,15 +135,15 @@ Demo marker را روی دیتابیس مشتری یا Production فعال نک�
 - مصرف واقعی Package روی .NET Framework 4.8؛
 - Vendor Acceptance از روی Package و بدون ProjectReference؛
 - Public Repository Guard؛
-- Release Bundle smoke test.
+- Release Bundle validation.
 
-بعد از Freeze نسخه `1.1.0 RC` فقط اصلاح Bug، Security و Compatibility مجاز است تا نامه به شرکت‌های نرم‌افزاری ارسال شود.
+تست فعلی بعد از Release از روی خود Package منتشرشده و Sadr Scales 5.3 انجام می‌شود و قرار نیست Contract ثابت 1.1 را بی‌دلیل گسترش دهد.
 
 ## مرز امنیتی
 
 این مخزن عمداً پروتکل مستقیم ترازو، Packet خام، Capture شبکه، کلید خصوصی، داده واقعی مشتری، Firmware خصوصی و Runtime Command دلخواه را منتشر نمی‌کند.
 
-Command Mailbox تایپ‌شده برای هر ترازو در **Sadr Scales 5.3** برنامه‌ریزی شده و جزو انتشار فعلی 5.2.1 نیست.
+Commandهای مدیریت‌شده تایپ‌شده، Service/REST، Webhook/realtime و قابلیت‌های Gateway جزو معماری آینده **Sadr Scales 5.4+** هستند و داخل Contract ثابت SQL/SDK نسخه 1.1 قرار ندارند.
 
 ## مجوز
 
