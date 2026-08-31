@@ -1,110 +1,112 @@
 # Roadmap
 
+**Updated:** 2026-08-31
+
 ## M0 — Public repository foundation — complete
-- [x] Public repository, bilingual README, security boundary, continuity docs and Public Guard.
-- [x] Public support/contribution/code-of-conduct files.
+- [x] Public repository, bilingual landing pages, security boundary and continuity docs.
+- [x] Support/contribution/code-of-conduct files.
 - [x] CODEOWNERS and hardened Issue/PR intake.
-- [x] Weekly Dependabot policy for NuGet and GitHub Actions.
+- [x] Dependency/security maintenance policy.
 
 ## M1 — Contract v1 / public documentation — complete
-- [x] Freeze Contract v1 against effective Sadr Scales 5.2.1 schema.
-- [x] Bilingual contract docs, SQL samples and regression checklist.
-- [x] Final 5.2.1 Integration Guide identity pinned to the 38-page release asset and SHA-256.
-- [x] Bilingual Getting Started and troubleshooting paths.
-- [x] Vendor production-readiness/go-live checklist.
-- [x] Complete/review repository-owner GitHub host-security controls.
-- [x] Publish and verify the final Guide in stable GitHub Release `v1.0.0`.
+- [x] Freeze Contract v1 against effective Sadr Scales 5.2.1 schema/behavior.
+- [x] Bilingual contract docs, SQL samples and regression guidance.
+- [x] Getting Started and troubleshooting paths.
+- [x] production-readiness/go-live checklist.
+- [x] stable public Guide/release evidence for the original v1 line.
 
 ## M2 — C# Integration SDK v1 — complete
+- [x] `netstandard2.0` SDK.
+- [x] contract validator and semantic Stores/Groups/Items operations.
+- [x] bounded atomic PLU batch writes.
+- [x] retry/reliability rules.
+- [x] Sales Feed, Query, Summary and reports.
+- [x] scale metadata/status/resend.
+- [x] Assignments / Mapping / HotKeys.
+- [x] structured Invoice + explicit idempotent ACK + `AlreadyRead` recovery.
+- [x] disposable SQL Server integration suite.
+- [x] .NET Framework 4.8 package consumer.
+- [x] C# Quick Start + WinForms Developer Sample.
+- [x] Raw SQL language-neutral path.
+- [x] guarded DemoLab.
+- [x] NuGet validation/Source Link/repository metadata.
+- [x] automated release bundles/manifest/checksums.
+- [x] Public Repository Guard and protected release flow.
 
-### Foundation
-- [x] `netstandard2.0`, `Microsoft.Data.SqlClient 7.0.2`.
-- [x] Contract validator, semantic item/group upserts and read-only incremental sales.
-- [x] Unit/package CI and documentation.
+## M3 — Stable `v1.0.0` publication — complete / historical
+The original stable release remains immutable historical evidence.
 
-### SQL-backed hardening
-- [x] Disposable SQL Server 2022 integration suite.
-- [x] Contract, write, batch and rollback paths exercised against real SQL Server.
+## M4 — Vendor-Ready `v1.1.0` — complete / current stable
+- [x] additive Vendor-Ready contract surface completed.
+- [x] package-only Vendor Acceptance with no SDK ProjectReference.
+- [x] PR/release-engineering hardening.
+- [x] exact accepted source `d79fe6b359f25e93d12edfc4970777a4c3d06efc`.
+- [x] tag and publish `v1.1.0`.
+- [x] stable NuGet package published in release assets.
+- [x] current public package SHA256 `2baa100d6cf3125c75edbb7e99e1d15ff3e99d0bcd52534180ebe3f29d9d359f`.
 
-### Retry/reliability
-- [x] Safe bounded/cancellable connection/read retry.
-- [x] Transaction-scoped writes deliberately non-replayed after execution begins.
+The frozen public SQL/SDK contract remains the validated Sadr Scales 5.2.1 integration surface.
 
-### PLU batch
-- [x] Atomic `UpsertBatchAsync`, maximum 200 unique PLUs per call.
-- [x] Complete prevalidation, aggregate results and full transaction rollback on failure.
-- [x] Semantic no-op/rowversion behavior covered.
+## M5 — Post-release Sadr Scales 5.3 compatibility / vendor rehearsal — current
 
-### .NET Framework 4.8 compatibility
-- [x] Real NuGet-package consumer application.
-- [x] Local generated-package restore.
-- [x] Windows Server 2022 `net48` build/runtime smoke.
-- [x] Warnings treated as errors.
-- [x] SDK + SqlClient dependency graph loads at runtime.
+Sadr Scales 5.3 is now the Stable application release. The next credibility gate is a human rehearsal using the **published 1.1.0 package bytes** rather than a source-built substitute.
 
-### Developer experience
-- [x] Executable read-only-by-default C# Quick Start.
-- [x] Environment-variable connection-string configuration.
-- [x] Root English/Persian developer landing pages.
-- [x] Bilingual troubleshooting guide.
-- [x] Raw SQL reference samples.
-- [x] Public support policy and production-readiness checklist.
-- [x] Obsolete duplicate C# sample placeholder removed.
+- [ ] published-package clean-room restore/build/run;
+- [ ] frozen contract validation on a safe Sadr Scales 5.3 database;
+- [ ] Store/Group/Item/Scale/Sales smoke on 5.3;
+- [ ] T-Plus structured invoice / TotalBarcode / ACK / `AlreadyRead` path;
+- [ ] LSG structured invoice / TotalBarcode / ACK / `AlreadyRead` path;
+- [ ] targeted POS restart/failure/duplicate recovery regression;
+- [ ] public-documentation-only usability walk;
+- [ ] record all setup/docs friction before next vendor outreach.
 
-### Package/release hardening
-- [x] Package version/metadata published as `1.0.0`.
-- [x] MIT license approved and committed.
-- [x] Package/provider identity: Tozin Sadr + Behzad Erfanian.
-- [x] Source Link/repository metadata validated inside generated NuGet package.
-- [x] .NET package validation enabled.
-- [x] API/SemVer compatibility policy documented.
-- [x] Strong-name decision recorded: unsigned v1.0.0.
-- [x] Automated Binaries/Developer Kit bundles, release manifest and SHA-256 checksums.
-- [x] Release bundle includes license/support/contribution/changelog/production-readiness material.
-- [x] Release-bundle smoke gate in normal CI.
-- [x] Protected tag workflow reruns SDK/SQL/net48 gates, verifies final Guide SHA and creates a Draft GitHub Release.
+This is a compatibility/usability delta. It does not silently rename or expand the frozen 1.1 contract.
 
-### GitHub host security
-- [x] Secret Scanning enabled.
-- [x] Push Protection enabled.
-- [x] Dependabot vulnerability alerts enabled.
-- [x] Dependabot security updates enabled.
-- [x] Private Vulnerability Reporting enabled.
-- [x] C# CodeQL default setup configured.
-- [x] `main` branch protection configured with validated checks.
-- [x] Admin enforcement and conversation resolution enabled.
-- [x] Force pushes/deletion disabled on protected `main`.
+## M6 — Developer documentation and external vendor acceptance — next
 
-## M3 — Stable `v1.0.0` publication — complete
-- [x] Approve MIT public software license and add `LICENSE`/package license metadata.
-- [x] Joint provider/copyright identity documented and package-validated.
-- [x] Complete GitHub owner/admin host-security gate.
-- [x] Merge release-hardening PR #8.
-- [x] Validate exact merged `main` commit `a6bccc7c13a8afba29b6860869d2a942b1231803`.
-- [x] Configure `main` branch protection using validated post-merge checks.
-- [x] Tag exact validated source as `v1.0.0`.
-- [x] Confirm Protected Release run `32112295891` passes.
-- [x] Inspect and verify Draft Release package/DLL/symbols/developer kit/guide/manifest/checksums.
-- [x] Publish GitHub Release ID `372167195` as stable/non-prerelease.
+After the internal 5.3/package rehearsal:
+- [ ] finalize current Developer Guide from tested setup/flows;
+- [ ] update the Sadr website Developers page;
+- [ ] assemble exact vendor-safe package/docs/simulator/sample set;
+- [ ] run a security/public-boundary audit;
+- [ ] select one serious external software vendor;
+- [ ] measure time/questions/friction through first package build, contract validation, item, Sales Feed, invoice and correct ACK;
+- [ ] classify findings as current bug/compatibility/docs vs future architecture requirement.
 
-## M4 — Multi-language reference examples — post-v1
+## M7 — Current contract maintenance
+
+Until a separately approved contract/version change:
+- [ ] accept bug/security/compatibility fixes;
+- [ ] accept documentation/sample/package corrections that do not redefine behavior;
+- [ ] preserve SemVer/API compatibility policy;
+- [ ] keep package/release/security evidence current;
+- [ ] do not expose direct scale wire protocols.
+
+## M8 — Future Sadr Scales 5.4+ transport evolution
+
+Only after accepted SadrScales architecture decisions:
+- [ ] typed managed commands / Command Mailbox;
+- [ ] Service/REST transport;
+- [ ] realtime/Webhook adapters where justified;
+- [ ] extend the same Integration Domain rather than creating competing SQL/REST concepts;
+- [ ] update samples/tests for accepted future transports.
+
+If the public `5.4` product version is consumed first by a maintenance release, this architecture stream follows the next unused SadrScales public version.
+
+## M9 — Multi-language reference examples — future
 - [ ] Python.
 - [ ] Node.js.
 - [ ] Java.
 - [ ] PHP.
-- [ ] Language-neutral SQL type/null mapping table.
+- [ ] language-neutral SQL type/null mapping table.
 
-Until these wrappers exist, non-C# developers use the documented SQL Contract v1 and executable SQL samples as the language-neutral integration source of truth.
+Until wrappers exist, non-C# developers use the documented SQL Contract and executable SQL samples.
 
-## M5 — Developer distribution improvements — post-v1
-- [ ] Website developer landing page linking GitHub/release/guide.
-- [ ] Evaluate NuGet.org publication and package ownership policy.
+## M10 — Distribution/public engineering improvements — future
+- [ ] evaluate NuGet.org publication and package ownership policy.
+- [ ] evaluate immutable GitHub Releases after confirming compatibility with the verification workflow.
+- [ ] add a second trusted maintainer when operationally appropriate.
+- [ ] keep dependency/security/compatibility evidence current.
 
-## M6 — Post-v1 repository hardening
-- [ ] Evaluate GitHub Immutable Releases after confirming compatibility with the Draft→verify→publish process.
-- [ ] Add a second trusted maintainer when operationally appropriate; then revisit required approving reviews/CODEOWNERS enforcement.
-- [ ] Keep dependency/security alerts and compatibility evidence current.
-
-## Future
-
-No-code connectors, REST/Webhook Gateway and advanced structured-invoice helpers remain separately versioned future scope. Direct scale wire protocols remain private.
+## Non-goals
+No-code connectors, direct wire-protocol publication and speculative REST/Webhook contracts are not current work. Future transports must follow accepted SadrScales/SadrPlatform architecture, not precede it.
