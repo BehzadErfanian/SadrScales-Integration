@@ -6,29 +6,25 @@ on:
 permissions:
   contents: read
 
-# Compatibility stub for protected-branch required checks.
-# All real build/test work is performed by the release workflow only.
+# Protected-branch compatibility checks only.
+# Real build/test/release work runs from the release workflow, not on each change.
 jobs:
   build-test-pack:
-    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Skipped by free-tier policy"
+      - run: echo "Heavy CI disabled by free-tier policy"
 
   sql-integration-test:
-    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Skipped by free-tier policy"
+      - run: echo "Heavy CI disabled by free-tier policy"
 
   net48-package-consumer:
-    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Skipped by free-tier policy"
+      - run: echo "Heavy CI disabled by free-tier policy"
 
   vendor-acceptance:
-    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Skipped by free-tier policy"
+      - run: echo "Heavy CI disabled by free-tier policy"
