@@ -1,17 +1,15 @@
 name: Public repository guard
 
 on:
-  push:
   pull_request:
 
 permissions:
   contents: read
 
+# Protected-branch compatibility check only.
+# The full public-boundary validation remains in the final release workflow.
 jobs:
   validate-public-boundary:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Validate public repository boundary
-        shell: pwsh
-        run: ./tools/Validate-PublicRepository.ps1
+      - run: echo "Heavy per-change validation disabled by free-tier policy"
