@@ -71,6 +71,8 @@ The repository already contains:
 
 These assets are reused for 5.5 certification. They are not rewritten unless the compatibility audit finds a real defect.
 
+**Local package pre-certification:** PASS — 2026-09-18 on SDK `1.1.1-rc.1` (23/23 unit tests, 30/30 SQL tests, NuGet, modern .NET, net48 package consumer, package-only Vendor Acceptance and WinForms Sample build all PASS).
+
 ## 5.5 certification gates
 
 ### Gate A — SadrScales 5.5 RC baseline
