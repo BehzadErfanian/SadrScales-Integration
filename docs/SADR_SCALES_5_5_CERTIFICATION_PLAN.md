@@ -89,6 +89,26 @@ GitHub Actions should not run on every small documentation or maintenance commit
 
 Pass condition: all supported consumer/runtime gates pass against the final package candidate.
 
+## Local pre-certification evidence — 2026-09-18
+
+Behzad executed `tools/Invoke-LocalCertification.ps1` on Windows against local SQL Server using SDK candidate `1.1.1-rc.1`.
+
+Recorded PASS evidence:
+
+- public repository boundary: PASS
+- SDK unit tests: 23/23 PASS
+- modern .NET QuickStart build: PASS
+- NuGet package validation: PASS
+- SQL integration tests: 30/30 PASS
+- .NET Framework 4.8 package consumer load/runtime: PASS
+- package-only Vendor Acceptance: PASS
+- WinForms Developer Sample build: PASS
+- candidate package/hash generation: PASS
+
+Candidate package: `SadrScales.Integration.1.1.1-rc.1.nupkg`.
+
+This closes the local automated/package pre-certification gate. SadrScales 5.5 compatibility is **not yet published/certified** until Gate D One-PC acceptance passes for both PLUS and LSG.
+
 ### Gate D — Real 5.5 end-to-end acceptance
 
 Use SadrScales 5.5 + SQL + Developer Simulator and validate both PLUS and LSG.
