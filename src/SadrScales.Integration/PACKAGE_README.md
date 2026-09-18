@@ -5,7 +5,7 @@ Official C# SDK for the public **Sadr Scales SQL Contract v1**.
 **Provided and maintained by:** Tozin Sadr and Behzad Erfanian  
 **License:** MIT  
 **SDK line:** 1.x  
-**Baseline:** Sadr Scales 5.2.1 or a later release explicitly compatible with SQL Contract v1  
+**Baseline:** Sadr Scales 5.2.1; SadrScales 5.5 certification is in progress for SDK 1.1.1 and is not claimed until the recorded acceptance gates pass  
 **Target framework:** `netstandard2.0`
 
 ## Start safely
