@@ -1,10 +1,10 @@
 # Project Status — SadrScales-Integration
 
-**Last updated:** 2026-09-17  
+**Last updated:** 2026-09-18  
 **Current SDK line:** `1.1.x`  
-**Current package version in source:** `1.1.0`  
+**Current package candidate in certification branch:** `1.1.1-rc.1`  
 **Current certified Sadr Scales baseline:** `5.2.1`  
-**Next objective:** certify the frozen SQL Contract v1 / SDK against SadrScales `5.5`
+**Next objective:** complete local executable certification of SQL Contract v1 / SDK against SadrScales `5.5`
 
 ## Canonical references
 
@@ -26,7 +26,7 @@ The public contract is frozen. The immediate task is **certification, not featur
 - REST, Webhook, Command Mailbox and new service transports are deferred to Sadr Platform.
 - SadrScales 5.5 is not considered supported until the explicit certification gates pass.
 
-If 5.5 works with the current public API unchanged, the target certified SDK release is `1.1.1`. Only a genuinely necessary additive public API change would move the release to `1.2.0`.
+Source audit found no public API/Contract v1 change, so the active candidate is `1.1.1-rc.1` and the intended certified release remains `1.1.1`. Only executable evidence of a genuinely necessary additive API change would move it to `1.2.0`.
 
 ## Frozen public integration scope
 
@@ -126,4 +126,4 @@ After the certified 5.5 bundle is released:
 
 ## Exact next step
 
-Wait for the SadrScales 5.5 Release Candidate baseline, then execute `docs/SADR_SCALES_5_5_CERTIFICATION_PLAN.md` without expanding the public contract unless the audit proves a change is necessary.
+Run `tools/Invoke-LocalCertification.ps1` against a disposable/local SQL Server, then complete the One-PC SadrScales 5.5 + Developer Simulator acceptance. Do not expand the public contract unless executable evidence proves a change is necessary.
