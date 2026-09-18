@@ -1,6 +1,6 @@
 # SadrScales.Integration — SadrScales 5.5 Certification Plan
 
-Last updated: 2026-09-17
+Last updated: 2026-09-18
 
 ## Decision
 
@@ -22,6 +22,19 @@ After the compatibility audit:
 - If SQL Contract v1 and the public SDK API work unchanged: release `1.1.1` and document it as certified for SadrScales 5.5.
 - If an additive public API change is genuinely required: use `1.2.0`.
 - A breaking public API or SQL Contract change is outside the 5.5 closure scope and must not be introduced merely to finish the release.
+
+## Preliminary source audit — 2026-09-18
+
+Source-level compatibility review completed before executable certification:
+
+- SadrScales `DLLs/Scripts/DB.sql` is byte-identical across `release/5.2`, `release/5.2.2`, `release/5.3`, `release/5.4` and `release/5.5` (same Git blob SHA `5e494b5b3e14e7be7e32e29b96cdca14f99be028`).
+- SadrScales 5.5 adds nullable `SADR_Scale.PlusDeviceId` plus internal indexes for stable PLUS identity and changes the legacy endpoint index to non-unique.
+- The public SDK does not read `PlusDeviceId` and does not define `ScaleIP + Port` uniqueness as a public Contract v1 guarantee.
+- No public SDK API change or SQL Contract v1 expansion is indicated by this source audit.
+
+Result: **provisional version path remains 1.1.1**. Executable Gates B-D are still required before any 5.5 compatibility claim.
+
+Local-only certification runner: `tools/Invoke-LocalCertification.ps1`. GitHub Actions are not required for this certification cycle.
 
 ## Certification sequence
 
