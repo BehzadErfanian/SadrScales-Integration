@@ -11,14 +11,14 @@ Provided and maintained by **Tozin Sadr and Behzad Erfanian**.
 
 ## Status
 
-- Stable public release: **`v1.0.0`**
-- Next additive Vendor-Ready release: **`1.1.0`**
-- Supported Sadr Scales baseline: **`5.2.1`**
+- Stable public line: **`1.1.x`**
+- Current certification candidate: **`1.1.1-rc.1`**
+- Certified Sadr Scales baseline remains **`5.2.1`** until the explicit 5.5 acceptance gates pass
 - SDK target: `netstandard2.0`
 - Proven package consumer: .NET Framework 4.8 and modern .NET
 - License: MIT
 
-`v1.0.0` remains immutable. The `1.1.0` line is being frozen only after the full 5.2.1 Vendor-Ready surface, executable sample, Demo safety and package-only Vendor Acceptance gate are green.
+The public SQL Contract v1 surface is frozen. `1.1.1-rc.1` is a compatibility-certification candidate for SadrScales 5.5; it must not be described as 5.5-certified until the local package gates and One-PC acceptance pass.
 
 ## Start here
 
