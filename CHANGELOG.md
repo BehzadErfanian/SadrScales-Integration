@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 ### Changed
+- Prepared `1.1.1-rc.1` as the SadrScales 5.5 compatibility certification candidate with no public API or SQL Contract v1 expansion.
+- Added a local-only certification runner so unit, SQL, package, net48 and vendor-acceptance gates can run without GitHub Actions.
+
+### Changed
 - Post-release repository documentation now identifies `v1.0.0` as the stable public release and records the final release/security evidence.
 - `SDK CI` now runs on every pull request and every push to `main`/`m2/**`, so the branch-protection required checks are always produced even for documentation/governance-only changes.
 
