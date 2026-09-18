@@ -107,7 +107,7 @@ Recorded PASS evidence:
 
 Candidate package: `SadrScales.Integration.1.1.1-rc.1.nupkg`.
 
-This closes the local automated/package pre-certification gate. SadrScales 5.5 compatibility is **not yet published/certified** until Gate D One-PC acceptance passes for both PLUS and LSG.
+This closes the local automated/package pre-certification gate. SadrScales 5.5 compatibility is **not yet published/certified** until Gate D One-PC acceptance and the owning SadrScales Final Physical Acceptance both pass.
 
 ### Gate D — Real 5.5 end-to-end acceptance
 
@@ -121,15 +121,23 @@ Verify exact invoice header, details, amounts, prices, FID/identity and aggregat
 
 Pass condition: both scale families complete the end-to-end flow with no physical scale required.
 
-### Gate E — Compatibility publication
+### Gate E — Final Physical Acceptance dependency
 
-Only after Gates A-D pass:
+After Gates A-D and release-package readiness, SadrScales must complete its final release gate with real PLUS and LSG scales. The physical matrix covers connection, Discovery, sale delivery, ACK, reconnect, restart, IP change, network disconnect/reconnect and duplicate prevention.
+
+Pass condition: the owning SadrScales release records PASS for the Final Physical Acceptance. The SDK must not claim 5.5 certification or publish the final compatibility baseline before this result.
+
+### Gate F — Compatibility publication
+
+Only after Gates A-E pass:
 
 - add SadrScales `5.5` to `docs/COMPATIBILITY.md`;
 - update README / Getting Started wording;
 - publish the certified package version;
 - update release notes and DeveloperKit assets;
 - record exact SadrScales and SDK baselines used for certification.
+
+The final certified set is `SadrScales 5.5 <-> SadrScales.Integration 1.1.1 <-> SadrScaleSimulator.Developer 1.0.0`. Until Gate E passes, these versions remain the intended baseline and are not Final/Certified.
 
 ## 5.5 deliverables
 

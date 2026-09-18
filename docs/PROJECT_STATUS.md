@@ -89,8 +89,11 @@ For both PLUS and LSG, using the Developer Simulator rather than physical scales
 
 `PLU -> Sale -> SadrScales 5.5 -> SQL -> SDK -> Save/Commit -> ACK -> AlreadyRead`
 
-### Gate E — publication
-Only after A-D pass, update the Compatibility Matrix to include 5.5 and publish the certified SDK package and docs.
+### Gate E — final physical release acceptance
+After A-D and release-package readiness, the owning SadrScales release must pass Final Physical Acceptance with real PLUS and LSG scales. Until that final gate passes, `1.1.1` remains the intended certification version and must not be published as part of a Final/Stable 5.5 baseline.
+
+### Gate F — publication
+Only after A-E pass, update the Compatibility Matrix to include 5.5 and publish the certified SDK package and docs.
 
 Details and pass conditions are in `docs/SADR_SCALES_5_5_CERTIFICATION_PLAN.md`.
 
@@ -112,6 +115,8 @@ One-PC Lab guide
 
 The intended outcome is that a developer can execute the complete supported integration workflow without owning a physical PLUS or LSG scale.
 
+The intended certified set is `SadrScales 5.5 <-> SadrScales.Integration 1.1.1 <-> SadrScaleSimulator.Developer 1.0.0`. It is a target baseline, not a current certification claim; it becomes the Certified Baseline only after the SadrScales Final Physical Acceptance passes.
+
 ## Security boundary
 
 The public repository and vendor-facing tooling must not expose proprietary device protocols, raw packets/captures, reverse-engineering notes, private keys, customer production data, private firmware/vendor material or arbitrary raw protocol execution.
@@ -128,4 +133,4 @@ After the certified 5.5 bundle is released:
 
 ## Exact next step
 
-Run `tools/Invoke-LocalCertification.ps1` against a disposable/local SQL Server, then complete the One-PC SadrScales 5.5 + Developer Simulator acceptance. Do not expand the public contract unless executable evidence proves a change is necessary.
+Complete the One-PC SadrScales 5.5 + Developer Simulator acceptance, then wait for the owning SadrScales Final Physical Acceptance before publishing `1.1.1` as 5.5-certified. Do not expand the public contract unless executable evidence proves a change is necessary.
